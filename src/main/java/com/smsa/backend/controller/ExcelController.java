@@ -21,19 +21,19 @@ public class ExcelController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file,@RequestParam("data") List<String> filterValues) {
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file,@RequestParam("data") String accountNumber) {
         String message = "";
 
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
 
-                printFilteredRows( fileService.filterRowsByValues(file,filterValues));
-
+        fileService.filterRowsByTwoValues(file,23,accountNumber);
 
                 message = "Uploaded the file successfully: " + file.getOriginalFilename();
                 return ResponseEntity.status(HttpStatus.OK).body(message);
             } catch (Exception e) {
                 message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+                e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
             }
         }

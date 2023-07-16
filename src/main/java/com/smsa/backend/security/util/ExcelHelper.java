@@ -68,30 +68,31 @@ public class ExcelHelper {
     }
 
 
-        public static List<List<String>> parseExcelFile (MultipartFile file) {
-            List<List<String>> rows = new ArrayList<>();
+    public static List<List<String>> parseExcelFile(MultipartFile file) {
+        List<List<String>> rows = new ArrayList<>();
 
-            try (InputStream is = file.getInputStream()) {
-                Workbook workbook = WorkbookFactory.create(is);
+        try (InputStream is = file.getInputStream()) {
+            Workbook workbook = new XSSFWorkbook(is);
 
-                Sheet sheet = workbook.getSheetAt(0); // Assuming you want to parse the first sheet
+            Sheet sheet = workbook.getSheetAt(0); // Assuming you want to parse the first sheet
 
-                for (Row row : sheet) {
-                    List<String> rowData = new ArrayList<>();
-                    for (Cell cell : row) {
-                        String cellValue = getCellValueAsString(cell);
-                        rowData.add(cellValue);
-                    }
-                    rows.add(rowData);
+            DataFormatter dataFormatter = new DataFormatter();
+            for (Row row : sheet) {
+                List<String> rowData = new ArrayList<>();
+                for (Cell cell : row) {
+                    String cellValue = dataFormatter.formatCellValue(cell);
+                    rowData.add(cellValue);
                 }
-
-                workbook.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+                rows.add(rowData);
             }
 
-            return rows;
+            workbook.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+        return rows;
+    }
 
             private static String getCellValueAsString (Cell cell){
                 if (cell.getCellType() == CellType.STRING) {
