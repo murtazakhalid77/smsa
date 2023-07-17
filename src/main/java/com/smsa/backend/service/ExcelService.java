@@ -8,11 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import java.util.*;
 
 
 @Service
@@ -99,5 +95,84 @@ public class ExcelService {
             System.out.println(); // Move to the next line after printing each row
         }
     }
+    public  Map<String, List<List<String>>> filterRowsByCommonKey(MultipartFile multipartFile) {
+        List<List<String>> rowsToBeFiltered = excelHelper.parseExcelFile(multipartFile);
 
+        Map<String, List<List<String>>> filteredRowsMap = new HashMap<>();
+
+        List<String> uniqueKeys = new ArrayList<>();
+
+        for (List<String> row : rowsToBeFiltered) {
+            if (row.size() > 23) {
+                String commonKey = row.get(23);
+                if (!commonKey.isEmpty() && !uniqueKeys.contains(commonKey)) {
+                    uniqueKeys.add(commonKey);
+                }
+            }
+        }
+
+        for (String key : uniqueKeys) {
+            List<List<String>> rowsForKey = new ArrayList<>();
+            for (List<String> row : rowsToBeFiltered) {
+                if (row.size() > 23 && key.equals(row.get(23))) {
+                    rowsForKey.add(row);
+                }
+            }
+            filteredRowsMap.put(key, rowsForKey);
+        }
+
+        return filteredRowsMap;
+    }
+    public  Map<String, Map<String, List<List<String>>>> filterRowsByCommonKeyAndMawbNumber(MultipartFile multipartFile) {
+
+        List<List<String>> rowsToBeFiltered = excelHelper.parseExcelFile(multipartFile);
+        Map<String, Map<String, List<List<String>>>> filteredRowsMap = new HashMap<>();
+
+        for (List<String> row : rowsToBeFiltered) {
+            if (row.size() > 23 && row.size() > 0) {
+                String commonKey = row.get(23);
+                String mawbNumber = row.get(0);
+
+                if (!commonKey.isEmpty()) {
+                    filteredRowsMap.putIfAbsent(commonKey, new HashMap<>());
+
+                    Map<String, List<List<String>>> mawbFilteredRowsMap = filteredRowsMap.get(commonKey);
+                    mawbFilteredRowsMap.putIfAbsent(mawbNumber, new ArrayList<>());
+                    mawbFilteredRowsMap.get(mawbNumber).add(row);
+                }
+            }
+        }
+        printHashMap(filteredRowsMap);
+        return filteredRowsMap;
+    }
+
+
+    public void printHashMap(Map<String, Map<String, List<List<String>>>> filteredRowsMap){
+        for (Map.Entry<String, Map<String, List<List<String>>>> accountEntry : filteredRowsMap.entrySet()) {
+            String accountNumber = accountEntry.getKey();
+            Map<String, List<List<String>>> mawbFilteredRowsMap = accountEntry.getValue();
+
+            System.out.println("Account Number: " + accountNumber);
+
+            for (Map.Entry<String, List<List<String>>> mawbEntry : mawbFilteredRowsMap.entrySet()) {
+                String mawbNumber = mawbEntry.getKey();
+                List<List<String>> rowsForMawb = mawbEntry.getValue();
+
+                System.out.println("MAWB Number: " + mawbNumber);
+
+                for (List<String> row : rowsForMawb) {
+                    // Print each row
+                    for (String cellValue : row) {
+                        System.out.print(cellValue + "\t");
+                    }
+                    System.out.println(); // Newline after printing each row
+                }
+                System.out.println(); // Empty line between each group of rows with the same MAWB number
+            }
+            System.out.println(); // Empty line between each group of rows with the same account number
+        }
+    }
 }
+
+
+

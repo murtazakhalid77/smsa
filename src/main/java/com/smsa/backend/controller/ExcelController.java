@@ -21,13 +21,13 @@ public class ExcelController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file,@RequestParam("data") String accountNumber) {
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         String message = "";
 
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
 
-        fileService.filterRowsByTwoValues(file,23,accountNumber);
+        fileService.filterRowsByCommonKeyAndMawbNumber(file);
 
                 message = "Uploaded the file successfully: " + file.getOriginalFilename();
                 return ResponseEntity.status(HttpStatus.OK).body(message);
