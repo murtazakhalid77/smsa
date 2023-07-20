@@ -10,6 +10,7 @@ import org.springframework.util.ReflectionUtils;
 import com.smsa.backend.repository.CustomerRepository;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,7 +23,12 @@ public class CustomerService {
     CustomerRepository customerRepository;
 
     public List<CustomerDTO> getAllCustomer() {
-        return this.customerRepository.findAllByIsPresent(true).stream().map(c->toDto(c)).collect(Collectors.toList());
+        List<Customer> customer = this.customerRepository.findAllByIsPresent(true);
+        if(!customer.isEmpty()){
+          return   customer.stream().map(c->toDto(c)).collect(Collectors.toList());
+        }
+        return new ArrayList<>();
+
     }
 
     public CustomerDTO addCustomer(CustomerDTO customerDTO) {
