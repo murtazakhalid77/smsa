@@ -10,6 +10,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @ToString
+@Entity
 @Builder
 @Table(name="customer")
 public class Customer {
@@ -17,11 +18,16 @@ public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
-    private String name;
+    private String accountNumber;
+    private String invoiceCurrency;
+    private Long currencyRateFromSAR;
+    private Long smsaServiceFromSAR;
     private String email;
-    private Long phoneNumber;
+    private String customerNameArabic;
+    private String NameEnglish;
+    private String VatNumber;
     private String address;
-    private Long smsaCharges;
-    private Boolean isPresent;
-
+    private String poBox;
+    private String country;
+    private boolean isPresent;
 }

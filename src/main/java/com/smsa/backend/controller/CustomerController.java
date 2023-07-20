@@ -16,7 +16,7 @@ public class CustomerController {
     @Autowired
     CustomerService customerService;
     @GetMapping("/customer")
-ResponseEntity<List<CustomerDTO>> getAllCustomer(){
+   ResponseEntity<List<CustomerDTO>> getAllCustomer(){
     return ResponseEntity.ok(customerService.getAllCustomer());
 }
     @PostMapping("/customer")

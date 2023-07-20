@@ -26,23 +26,23 @@ public class ExcelService {
     private Double usDollar=0.0;
     List<List<String>> pdfRows = new ArrayList<>();
     public  void filterRowsByTwoValues(MultipartFile multipartFile, int firstColumnIndex,String accountNumber) {
-        List<List<String>> rowsToBeFiltered = excelHelper.parseExcelFile(multipartFile);
-
-        List<List<String>> accountNumberFilterdRows = new ArrayList<>();
-
-        for (List<String> row : rowsToBeFiltered) {
-            if (row.size() > firstColumnIndex) {
-                String firstColumnValue = row.get(firstColumnIndex);
-                if (accountNumber.equals(firstColumnValue)) {
-                    accountNumberFilterdRows.add(row);
-                }
-            }
-        }
-
-        Set<String> mawbNumber = uniqueMawb(accountNumberFilterdRows);
-        for (String mawb : mawbNumber){
-            fiterValuesbyMawb(accountNumberFilterdRows,0,mawb);
-        }
+//        List<List<String>> rowsToBeFiltered = excelHelper.parseExcelFile(multipartFile);
+//
+//        List<List<String>> accountNumberFilterdRows = new ArrayList<>();
+//
+//        for (List<String> row : rowsToBeFiltered) {
+//            if (row.size() > firstColumnIndex) {
+//                String firstColumnValue = row.get(firstColumnIndex);
+//                if (accountNumber.equals(firstColumnValue)) {
+//                    accountNumberFilterdRows.add(row);
+//                }
+//            }
+//        }
+//
+//        Set<String> mawbNumber = uniqueMawb(accountNumberFilterdRows);
+//        for (String mawb : mawbNumber){
+//            fiterValuesbyMawb(accountNumberFilterdRows,0,mawb);
+//        }
     }
 
     public  void  fiterValuesbyMawb(List<List<String>> rowsToBeFilteredByMawb, int secondColumnIndex, String mawb) {
@@ -78,50 +78,6 @@ public class ExcelService {
         vatAmount=0.0;
         documentation=0.0;
 
-    }
-
-    private Set<String> uniqueMawb(List<List<String>> filteredRows) {
-        Set<String> uniqueMawb = new HashSet<>();
-        for(List<String> row: filteredRows){
-            uniqueMawb.add(row.get(0));
-        }
-        return uniqueMawb;
-    }
-    public static void printFilteredRows(List<List<String>> filteredRows) {
-        for (List<String> row : filteredRows) {
-            for (String cellValue : row) {
-                System.out.print(cellValue + "\t");
-            }
-            System.out.println(); // Move to the next line after printing each row
-        }
-    }
-    public  Map<String, List<List<String>>> filterRowsByCommonKey(MultipartFile multipartFile) {
-        List<List<String>> rowsToBeFiltered = excelHelper.parseExcelFile(multipartFile);
-
-        Map<String, List<List<String>>> filteredRowsMap = new HashMap<>();
-
-        List<String> uniqueKeys = new ArrayList<>();
-
-        for (List<String> row : rowsToBeFiltered) {
-            if (row.size() > 23) {
-                String commonKey = row.get(23);
-                if (!commonKey.isEmpty() && !uniqueKeys.contains(commonKey)) {
-                    uniqueKeys.add(commonKey);
-                }
-            }
-        }
-
-        for (String key : uniqueKeys) {
-            List<List<String>> rowsForKey = new ArrayList<>();
-            for (List<String> row : rowsToBeFiltered) {
-                if (row.size() > 23 && key.equals(row.get(23))) {
-                    rowsForKey.add(row);
-                }
-            }
-            filteredRowsMap.put(key, rowsForKey);
-        }
-
-        return filteredRowsMap;
     }
     public  Map<String, Map<String, List<List<String>>>> filterRowsByCommonKeyAndMawbNumber(MultipartFile multipartFile) {
 
