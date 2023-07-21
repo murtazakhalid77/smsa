@@ -49,6 +49,7 @@ public class ExcelService {
         }
 
         List<List<InvoiceDetails>> allInvoices = maptoDomain(rows);
+        List<List<InvoiceDetails>> NonAccountInvoice=filterNonAccountInvoices(allInvoices);
 
         List<InvoiceDetails> flatInvoiceList = allInvoices.stream()
                 .flatMap(Collection::stream)
@@ -56,37 +57,47 @@ public class ExcelService {
 
         invoiceDetailsRepository.saveAll(flatInvoiceList);
     }
+    private List<List<InvoiceDetails>> filterNonAccountInvoices(List<List<InvoiceDetails>> allInvoices) {
+        List<List<InvoiceDetails>> invoicesWithAccount = new ArrayList<>();
+        List<List<InvoiceDetails>> invoicesWithoutAccount = new ArrayList<>();
+
+        for (List<InvoiceDetails> invoiceList : allInvoices) {
+            boolean hasAccountNumber = false;
+
+            for (InvoiceDetails invoiceDetails : invoiceList) {
+                String accountNumber = invoiceDetails.getInvoiceDetailsId().getAccountNumber();
+                if (checkAccountNumberInCustomerTable(accountNumber)) {
+                    hasAccountNumber = true;
+                    break;
+                }
+            }
+
+            if (hasAccountNumber) {
+                invoicesWithAccount.add(invoiceList);
+            } else {
+                invoicesWithoutAccount.add(invoiceList);
+            }
+        }
+
+        //making accounts
+        for (List<InvoiceDetails> invoiceList : invoicesWithoutAccount) {
+            Customer newCustomer = createNewCustomerWithAccountNumberSystem();
+
+        }
+
+        return invoicesWithAccount;
+    }
+
+
+
 
     private List<List<InvoiceDetails>> maptoDomain(List<List<String>> rows) {
         List<List<InvoiceDetails>> invoices = new ArrayList<>();
-        List<List<String>> rowsWithMissingAccount = new ArrayList<>();
 
         for (List<String> rowData : rows) {
             InvoiceDetails invoiceDetails = mapRowToEntity(rowData);
-
-            // Check if the account number exists in the customer table
-            String accountNumber = invoiceDetails.getInvoiceDetailsId().getAccountNumber();
-            boolean accountNumberExistsInCustomerTable = checkAccountNumberInCustomerTable(accountNumber);
-
-            // If the account number exists, add to the list for database insertion
-            if (accountNumberExistsInCustomerTable) {
-                invoices.add(Collections.singletonList(invoiceDetails));
-            } else {
-                // If the account number does not exist, add the row to the separate list
-                rowsWithMissingAccount.add(rowData);
-            }
-        }
-        // Process the rows with missing account numbers, if needed
-        for (List<String> rowData : rowsWithMissingAccount) {
-            // Create a new customer account with the account number "system"
-            Customer newCustomer = createNewCustomerWithAccountNumberSystem();
-
-            InvoiceDetails invoiceDetails = mapRowToEntity(rowData);
-            invoiceDetails.getInvoiceDetailsId().setAccountNumber(newCustomer.getAccountNumber());
-
             invoices.add(Collections.singletonList(invoiceDetails));
         }
-//        getRowsWithm??
         return invoices;
     }
     private Customer createNewCustomerWithAccountNumberSystem() {
