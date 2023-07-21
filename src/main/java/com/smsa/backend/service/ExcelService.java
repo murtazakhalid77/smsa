@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,23 +42,34 @@ public class ExcelService {
     public void importDataFromExcel(MultipartFile file) {
         List<List<String>> rows = ExcelHelper.parseExcelFile(file);
 
+
         // Skipping the header row
         if (rows.size() > 0) {
             rows.remove(0);
         }
 
         List<List<InvoiceDetails>> allInvoices = maptoDomain(rows);
-        List<List<InvoiceDetails>> NonAccountInvoice=filterNonAccountInvoices(allInvoices);
 
-        List<InvoiceDetails> flatInvoiceList = allInvoices.stream()
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+        List<List<InvoiceDetails>> NonAccountInvoice = filterNonAccountInvoices(allInvoices);
+
+
+        List<InvoiceDetails> flatInvoiceList = new ArrayList<>();
+
+        for (List<InvoiceDetails> invoiceList : allInvoices) {
+            flatInvoiceList.addAll(invoiceList);
+        }
 
         invoiceDetailsRepository.saveAll(flatInvoiceList);
     }
-    private List<List<InvoiceDetails>> filterNonAccountInvoices(List<List<InvoiceDetails>> allInvoices) {
+    public List<List<InvoiceDetails>> filterNonAccountInvoices(List<List<InvoiceDetails>> allInvoices) {
         List<List<InvoiceDetails>> invoicesWithAccount = new ArrayList<>();
         List<List<InvoiceDetails>> invoicesWithoutAccount = new ArrayList<>();
+
+        // Generate a single UUID for the sheetUniqueId column for all invoices
+        String sheetUniqueId = UUID.randomUUID().toString();
+
+        // HashMap to store unique customers and their UUIDs
+        HashMap<String, String> customerUuidMap = new HashMap<>();
 
         for (List<InvoiceDetails> invoiceList : allInvoices) {
             boolean hasAccountNumber = false;
@@ -75,20 +85,28 @@ public class ExcelService {
             if (hasAccountNumber) {
                 invoicesWithAccount.add(invoiceList);
             } else {
+                // Assign the same UUID for the sheetUniqueId column for all invoices
+                for (InvoiceDetails invoiceDetails : invoiceList) {
+                    invoiceDetails.setSheetUniqueId(sheetUniqueId);
+                    invoiceDetails.setSheetTimesStamp(LocalDate.now());
+                }
                 invoicesWithoutAccount.add(invoiceList);
+            }
+
+            // Ensure each customer has a unique UUID and update the customerUniqueId column
+            for (InvoiceDetails invoiceDetails : invoiceList) {
+                String accountNumber = invoiceDetails.getInvoiceDetailsId().getAccountNumber();
+                if (!customerUuidMap.containsKey(accountNumber)) {
+                    String customerUniqueId = UUID.randomUUID().toString();
+                    customerUuidMap.put(accountNumber, customerUniqueId);
+                }
+                invoiceDetails.setCustomerUniqueId(customerUuidMap.get(accountNumber));
+                invoiceDetails.setCustomerTimestamp(LocalDate.now() );
             }
         }
 
-        //making accounts
-        for (List<InvoiceDetails> invoiceList : invoicesWithoutAccount) {
-            Customer newCustomer = createNewCustomerWithAccountNumberSystem();
-
-        }
-
-        return invoicesWithAccount;
+        return invoicesWithoutAccount;
     }
-
-
 
 
     private List<List<InvoiceDetails>> maptoDomain(List<List<String>> rows) {
@@ -100,14 +118,6 @@ public class ExcelService {
         }
         return invoices;
     }
-    private Customer createNewCustomerWithAccountNumberSystem() {
-        Customer newCustomer = new Customer();
-        newCustomer.setAccountNumber("system");
-
-        customerRepository.save(newCustomer);
-        return newCustomer;
-    }
-
     private boolean checkAccountNumberInCustomerTable(String accountNumber) {
         Customer customer = customerRepository.findByAccountNumber(accountNumber);
         return customer != null;

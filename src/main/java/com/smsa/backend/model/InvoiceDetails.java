@@ -1,5 +1,6 @@
 package com.smsa.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.EmbeddedId;
@@ -23,13 +24,18 @@ public class InvoiceDetails {
     private String origin;
     private String destination;
     private String shippersName;
-    private  String consigneeName;
+    private String consigneeName;
     private String weight;
     private Long declaredValue;
     private Long valueCustom;
     private Double vatAmount;
     private Long customFormCharges;
     private Long other;
+    private Long totalCharges;
     private String customDeclaration;
     private LocalDate customDeclarationDate;
+    private String  sheetUniqueId;
+    private LocalDate sheetTimesStamp;
+    private String customerUniqueId;
+    private LocalDate CustomerTimestamp;
 }

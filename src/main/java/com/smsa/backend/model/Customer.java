@@ -1,8 +1,11 @@
 package com.smsa.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,8 +19,6 @@ import javax.persistence.*;
 public class Customer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
     private String accountNumber;
     private String invoiceCurrency;
     private Long currencyRateFromSAR;
@@ -29,5 +30,9 @@ public class Customer {
     private String address;
     private String poBox;
     private String country;
+    private Boolean isEmailSent;
+    private Boolean status;
     private boolean isPresent;
+
 }
+
