@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface CustomerRepository extends JpaRepository<Customer,Long> {
 
     List<Customer> findAllByIsPresent(boolean b);
+    Customer findByAccountNumber(String accountNumber);
 }

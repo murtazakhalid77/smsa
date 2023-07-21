@@ -17,19 +17,28 @@ public class SimpleCorsFilter implements Filter {
         log.info("SimpleCORSFilter init");
     }
 
+    private final String[] allowedOrigins = {"http://localhost:4200/"};
+
+
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
+        String origin =request.getHeader("Origin");
+        log.info(origin);
 
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
-        response.setHeader("Access-Control-Allow-Methods", "POST,PUT, GET, OPTIONS, DELETE,PATCH");
-        response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, remember-me, Authorization");
+        if (isOriginAllowed(origin)){
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control-Allow-Credentials", "true");
+            response.setHeader("Access-Control-Allow-Methods", "POST,PUT, GET, OPTIONS, DELETE,PATCH");
+            response.setHeader("Access-Control-Max-Age", "3600");
+            response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, remember-me, Authorization");
 
+
+        }
         chain.doFilter(req, res);
+
     }
 
     @Override
@@ -38,5 +47,13 @@ public class SimpleCorsFilter implements Filter {
 
     @Override
     public void destroy() {
+    }
+    private boolean isOriginAllowed(String origin) {
+        for (String allowedOrigin : allowedOrigins) {
+            if (allowedOrigin.equals(origin)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

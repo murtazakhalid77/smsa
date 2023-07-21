@@ -12,7 +12,7 @@ import java.util.Date;
 public class EmailSchedular {
     private static final Logger logger = LoggerFactory.getLogger(EmailSchedular.class);
 
-    @Scheduled(cron = "0 30 0 ? * *")
+    @Scheduled(cron = "0 30 0 ? * *") //after every 30 min
     public void markExpired(){
         logger.info("hello murtaza is my name"+new Date());
     }

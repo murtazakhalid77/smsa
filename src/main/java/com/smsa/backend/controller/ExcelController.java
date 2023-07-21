@@ -12,9 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@CrossOrigin
+
 @RestController
 @RequestMapping("/api/excel")
+@CrossOrigin("*")
 public class ExcelController {
     @Autowired
     ExcelService fileService;
@@ -27,7 +28,7 @@ public class ExcelController {
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
 
-        fileService.filterRowsByCommonKeyAndMawbNumber(file);
+        fileService.importDataFromExcel(file);
 
                 message = "Uploaded the file successfully: " + file.getOriginalFilename();
                 return ResponseEntity.status(HttpStatus.OK).body(message);
