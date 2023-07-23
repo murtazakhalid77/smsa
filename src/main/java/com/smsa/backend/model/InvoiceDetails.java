@@ -17,23 +17,23 @@ import java.time.LocalDate;
 @Entity
 @Builder
 @Table(name="invoiceDetails")
-public class InvoiceDetails {
-    @EmbeddedId
-    private InvoiceDetailsId invoiceDetailsId;
-    private String orderNumber;
-    private String origin;
-    private String destination;
-    private String shippersName;
-    private String consigneeName;
-    private String weight;
-    private Long declaredValue;
-    private Long valueCustom;
-    private Double vatAmount;
-    private Long customFormCharges;
-    private Long other;
-    private Long totalCharges;
-    private String customDeclaration;
-    private LocalDate customDeclarationDate;
+    public class InvoiceDetails {
+        @EmbeddedId
+        private InvoiceDetailsId invoiceDetailsId = new InvoiceDetailsId();;
+        private String orderNumber;
+        private String origin;
+        private String destination;
+        private String shippersName;
+        private String consigneeName;
+        private String weight;
+        private Long declaredValue;
+        private Long valueCustom;
+        private Double vatAmount;
+        private Long customFormCharges;
+        private Long other;
+        private Double totalCharges;
+        private String customDeclaration;
+        private LocalDate customDeclarationDate;
     private String  sheetUniqueId;
     private LocalDate sheetTimesStamp;
     private String customerUniqueId;

@@ -28,7 +28,7 @@ public class ExcelController {
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
 
-        fileService.importDataFromExcel(file);
+        fileService.saveInvoicesToDatabase(file);
 
                 message = "Uploaded the file successfully: " + file.getOriginalFilename();
                 return ResponseEntity.status(HttpStatus.OK).body(message);

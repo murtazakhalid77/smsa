@@ -28,130 +28,125 @@ public class ExcelService {
     CustomerRepository customerRepository;
     @Autowired
     private InvoiceDetailsRepository invoiceDetailsRepository;
-    private String origin = "";
-    private Double awbsCount = 0.0;
-    private Double weight = 0.0;
-    private Double devalaredValueSAR = 0.0;
-    private Double vatAmount = 0.0;
-    private Double documentation = 0.0;
-    private Double sar = 0.0;
-    private Double smsaFeesCharges = 0.0;
-    private Double usDollar = 0.0;
-    List<List<String>> pdfRows = new ArrayList<>();
-
-    public void importDataFromExcel(MultipartFile file) {
-        List<List<String>> rows = ExcelHelper.parseExcelFile(file);
+    List<InvoiceDetails> invoicesWithAccount = new ArrayList<>();
+    List<InvoiceDetails>invoicesWithoutAccount = new ArrayList<>();
 
 
-        // Skipping the header row
-        if (rows.size() > 0) {
-            rows.remove(0);
+    public void saveInvoicesToDatabase(MultipartFile file) {
+        Map<String, List<InvoiceDetails>> filterd =filterRowsByAccountNumber(file);
+        for (List<InvoiceDetails> invoiceDetailsList : filterd.values()) {
+
+            invoiceDetailsRepository.saveAll(invoiceDetailsList);
         }
-
-        List<List<InvoiceDetails>> allInvoices = maptoDomain(rows);
-
-        List<List<InvoiceDetails>> NonAccountInvoice = filterNonAccountInvoices(allInvoices);
-
-
-        List<InvoiceDetails> flatInvoiceList = new ArrayList<>();
-
-        for (List<InvoiceDetails> invoiceList : allInvoices) {
-            flatInvoiceList.addAll(invoiceList);
-        }
-
-        invoiceDetailsRepository.saveAll(flatInvoiceList);
     }
-    public List<List<InvoiceDetails>> filterNonAccountInvoices(List<List<InvoiceDetails>> allInvoices) {
-        List<List<InvoiceDetails>> invoicesWithAccount = new ArrayList<>();
-        List<List<InvoiceDetails>> invoicesWithoutAccount = new ArrayList<>();
+    public Map<String, List<InvoiceDetails>> filterRowsByAccountNumber(MultipartFile multipartFile) {
+        List<List<String>> rowsToBeFiltered = excelHelper.parseExcelFile(multipartFile);
 
-        // Generate a single UUID for the sheetUniqueId column for all invoices
-        String sheetUniqueId = UUID.randomUUID().toString();
+        Map<String, List<InvoiceDetails>> mappedRowsMap = new HashMap<>();
+        Map<String, String> accountNumberUuidMap = new HashMap<>();
 
-        // HashMap to store unique customers and their UUIDs
-        HashMap<String, String> customerUuidMap = new HashMap<>();
+        LocalDate currentDate = LocalDate.now();
+        String sheetId = UUID.randomUUID().toString();
 
-        for (List<InvoiceDetails> invoiceList : allInvoices) {
-            boolean hasAccountNumber = false;
-
-            for (InvoiceDetails invoiceDetails : invoiceList) {
-                String accountNumber = invoiceDetails.getInvoiceDetailsId().getAccountNumber();
-                if (checkAccountNumberInCustomerTable(accountNumber)) {
-                    hasAccountNumber = true;
-                    break;
-                }
-            }
-
-            if (hasAccountNumber) {
-                invoicesWithAccount.add(invoiceList);
-            } else {
-                // Assign the same UUID for the sheetUniqueId column for all invoices
-                for (InvoiceDetails invoiceDetails : invoiceList) {
-                    invoiceDetails.setSheetUniqueId(sheetUniqueId);
-                    invoiceDetails.setSheetTimesStamp(LocalDate.now());
-                }
-                invoicesWithoutAccount.add(invoiceList);
-            }
-
-            // Ensure each customer has a unique UUID and update the customerUniqueId column
-            for (InvoiceDetails invoiceDetails : invoiceList) {
-                String accountNumber = invoiceDetails.getInvoiceDetailsId().getAccountNumber();
-                if (!customerUuidMap.containsKey(accountNumber)) {
-                    String customerUniqueId = UUID.randomUUID().toString();
-                    customerUuidMap.put(accountNumber, customerUniqueId);
-                }
-                invoiceDetails.setCustomerUniqueId(customerUuidMap.get(accountNumber));
-                invoiceDetails.setCustomerTimestamp(LocalDate.now() );
-            }
+        if (rowsToBeFiltered.size() > 0) {
+            rowsToBeFiltered.remove(0);
         }
 
-        return invoicesWithoutAccount;
-    }
+        for (List<String> row : rowsToBeFiltered) {
+            if (row.size() > 2) {
+                String commonKey = row.get(2);
+                if (!commonKey.isEmpty()) {
+                    // Check if the key is not already in the map
+                    if (!mappedRowsMap.containsKey(commonKey)) {
+                        mappedRowsMap.put(commonKey, new ArrayList<>());
+                    }
 
+                    // Map the fields from the row list to the InvoiceDetails object
+                    InvoiceDetails invoiceDetails = mapToDomain(row);
+                    invoiceDetails.setSheetTimesStamp(currentDate);
+                    invoiceDetails.setSheetUniqueId(sheetId);
 
-    private List<List<InvoiceDetails>> maptoDomain(List<List<String>> rows) {
-        List<List<InvoiceDetails>> invoices = new ArrayList<>();
+                    // Check if the account number exists in the accountNumberUuidMap
+                    String accountNumber = invoiceDetails.getInvoiceDetailsId().getAccountNumber();
+                    if (accountNumberUuidMap.containsKey(accountNumber)) {
+                        // If the UUID already exists for the account number, set it to the InvoiceDetails
+                        String customerUniqueId = accountNumberUuidMap.get(accountNumber);
+                        invoiceDetails.setCustomerUniqueId(customerUniqueId);
+                    } else {
+                        // If the UUID does not exist for the account number, generate a new one and set it
+                        String customerUniqueId = UUID.randomUUID().toString();
+                        accountNumberUuidMap.put(accountNumber, customerUniqueId);
+                        invoiceDetails.setCustomerUniqueId(customerUniqueId);
+                    }
 
-        for (List<String> rowData : rows) {
-            InvoiceDetails invoiceDetails = mapRowToEntity(rowData);
-            invoices.add(Collections.singletonList(invoiceDetails));
+                    // Add the InvoiceDetails object to the list associated with the common key in the map
+                    mappedRowsMap.get(commonKey).add(invoiceDetails);
+
+                    // Check if the invoice has an account number
+                    if (checkAccountNumberInCustomerTable(accountNumber)) {
+                        invoicesWithAccount.add(invoiceDetails);
+                    } else {
+                        invoicesWithoutAccount.add(invoiceDetails);
+                    }
+                }
+            }
         }
-        return invoices;
+        return mappedRowsMap;
     }
     private boolean checkAccountNumberInCustomerTable(String accountNumber) {
         Customer customer = customerRepository.findByAccountNumber(accountNumber);
         return customer != null;
     }
 
-    private InvoiceDetails mapRowToEntity(List<String> rowData) {
+
+
+    private InvoiceDetails mapToDomain(List<String> row) {
         InvoiceDetails invoiceDetails = new InvoiceDetails();
-        InvoiceDetailsId invoiceDetailsId = new InvoiceDetailsId();
 
-        invoiceDetailsId.setMawb(Long.parseLong(rowData.get(0)));
-        invoiceDetailsId.setManifestDate(rowData.get(1));
-        invoiceDetailsId.setAccountNumber(rowData.get(2));
-        invoiceDetailsId.setAwb(Long.parseLong(rowData.get(3)));
+        // Assuming the index format is as follows:
+        invoiceDetails.getInvoiceDetailsId().setMawb(Long.parseLong(row.get(0))); // MAWB
+        invoiceDetails.getInvoiceDetailsId().setManifestDate(row.get(1)); // Manifest Date
+        invoiceDetails.getInvoiceDetailsId().setAccountNumber(row.get(2)); // Account Number
+        invoiceDetails.getInvoiceDetailsId().setAwb(Long.parseLong(row.get(3))); // AWB
 
-        invoiceDetails.setInvoiceDetailsId(invoiceDetailsId);
-        invoiceDetails.setOrderNumber(rowData.get(4));
-        invoiceDetails.setOrigin(rowData.get(5));
-        invoiceDetails.setDestination(rowData.get(6));
-        invoiceDetails.setShippersName(rowData.get(7));
-        invoiceDetails.setConsigneeName(rowData.get(8));
-        invoiceDetails.setWeight(rowData.get(9));
-        invoiceDetails.setDeclaredValue(Long.parseLong(rowData.get(10)));
-        invoiceDetails.setValueCustom(Long.parseLong(rowData.get(11)));
-        invoiceDetails.setVatAmount(Double.parseDouble(rowData.get(12)));
-        invoiceDetails.setCustomFormCharges(Long.parseLong(rowData.get(13)));
-        invoiceDetails.setOther(Long.parseLong(rowData.get(14)));
-        invoiceDetails.setCustomDeclaration(rowData.get(15));
-        if(rowData.get(16).equals("")|| rowData.get(16)==null){
-            invoiceDetails.setCustomDeclarationDate(null);
-        }
-
+        invoiceDetails.setInvoiceDetailsId(invoiceDetails.getInvoiceDetailsId());
+        invoiceDetails.setOrderNumber(row.get(4)); // OrderNumber
+        invoiceDetails.setOrigin(row.get(5)); // Origin
+        invoiceDetails.setDestination(row.get(6)); // Destination
+        invoiceDetails.setShippersName(row.get(7)); // Shipper Name
+        invoiceDetails.setConsigneeName(row.get(8)); // Consignee Name
+        invoiceDetails.setWeight(row.get(9)); // Weight
+        invoiceDetails.setDeclaredValue(Long.parseLong(row.get(10))); // Declared Value
+        invoiceDetails.setValueCustom(Long.parseLong(row.get(11))); // Value (Custom)
+        invoiceDetails.setVatAmount(Double.parseDouble(row.get(12))); // VAT Amount
+        invoiceDetails.setCustomFormCharges(Long.parseLong(row.get(13))); // Custom Form Charges
+        invoiceDetails.setOther(Long.parseLong(row.get(14))); // Other
+        invoiceDetails.setTotalCharges(Double.parseDouble(row.get(15))); // Total Charges
+        invoiceDetails.setCustomDeclaration(row.get(16)); // Custom Declaration #
+        if (row.get(17).equals("")||row.get(17)==null){
+        invoiceDetails.setCustomDeclarationDate(null);} // Custom Declaration Date
 
         return invoiceDetails;
     }
+
+
+    public void print(Map<String, List<List<String>>> filteredRowsMap){
+        for (Map.Entry<String, List<List<String>>> entry : filteredRowsMap.entrySet()) {
+            String commonKey = entry.getKey();
+            List<List<String>> rowsForKey = entry.getValue();
+
+            System.out.println("Common Key: " + commonKey);
+            for (List<String> row : rowsForKey) {
+                // Print each row
+                for (String cellValue : row) {
+                    System.out.print(cellValue + "\t");
+                }
+                System.out.println(); // Newline after printing each row
+            }
+            System.out.println(); // Empty line between each group of rows
+        }
+    }
+
 
     //    public  void  fiterValuesbyMawb(List<List<String>> rowsToBeFilteredByMawb, int secondColumnIndex, String mawb) {
 //
