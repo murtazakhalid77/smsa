@@ -58,7 +58,7 @@ public class CustomerService {
     public CustomerDTO updateCustomerById(CustomerDTO customerDTO) {
         Customer customer = customerRepository.findById(customerDTO.getId()).get();
         customer.setNameEnglish(customerDTO.getNameEnglish());
-        customer.setCustomerNameArabic(customerDTO.getCustomerNameArabic());
+        customer.setNameArabic(customerDTO.getCustomerNameArabic());
         customer.setEmail(customerDTO.getEmail());
         customer.setPresent(customerDTO.isPresent());
         customer.setAddress(customerDTO.getAddress());

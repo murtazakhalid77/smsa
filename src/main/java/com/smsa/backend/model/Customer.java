@@ -24,8 +24,8 @@ public class Customer {
     private Long currencyRateFromSAR;
     private Long smsaServiceFromSAR;
     private String email;
-    private String customerNameArabic;
-    private String NameEnglish;
+    private String nameArabic;
+    private String nameEnglish;
     private String VatNumber;
     private String address;
     private String poBox;

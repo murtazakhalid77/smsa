@@ -35,7 +35,6 @@ public class ExcelService {
     public void saveInvoicesToDatabase(MultipartFile file) {
         Map<String, List<InvoiceDetails>> filterd =filterRowsByAccountNumber(file);
         for (List<InvoiceDetails> invoiceDetailsList : filterd.values()) {
-
             invoiceDetailsRepository.saveAll(invoiceDetailsList);
         }
     }
@@ -87,6 +86,11 @@ public class ExcelService {
                         invoicesWithAccount.add(invoiceDetails);
                     } else {
                         invoicesWithoutAccount.add(invoiceDetails);
+                        Customer  customer=Customer.builder()
+                                .nameEnglish("System").accountNumber(accountNumber)
+                                .status(false).build();
+                        customerRepository.save(customer);
+
                     }
                 }
             }
@@ -98,7 +102,12 @@ public class ExcelService {
         return customer != null;
     }
 
-
+    public List<InvoiceDetails> getInvoicesWithAccount() {
+        return invoicesWithAccount;
+    }
+    public List<InvoiceDetails> getInvoicesWithoutAccount() {
+        return invoicesWithoutAccount;
+    }
 
     private InvoiceDetails mapToDomain(List<String> row) {
         InvoiceDetails invoiceDetails = new InvoiceDetails();

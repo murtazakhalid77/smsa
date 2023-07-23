@@ -1,5 +1,6 @@
 package com.smsa.backend.controller;
 
+import com.smsa.backend.model.InvoiceDetails;
 import com.smsa.backend.security.util.ExcelHelper;
 import com.smsa.backend.service.ExcelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.util.*;
 
 
 @RestController
@@ -22,26 +23,37 @@ public class ExcelController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file) {
+        Map<String, Object> response = new HashMap<>();
+        Set<String> accountNumbers = new HashSet<>();
         String message = "";
 
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
+                fileService.saveInvoicesToDatabase(file);
 
-        fileService.saveInvoicesToDatabase(file);
+                for (InvoiceDetails invoiceDetails : fileService.getInvoicesWithoutAccount()) {
+                    accountNumbers.add(invoiceDetails.getInvoiceDetailsId().getAccountNumber());
+                }
 
                 message = "Uploaded the file successfully: " + file.getOriginalFilename();
-                return ResponseEntity.status(HttpStatus.OK).body(message);
+                response.put("message", message);
+                response.put("accountNumbers", accountNumbers);
+
+                return ResponseEntity.ok(response);
             } catch (Exception e) {
                 message = "Could not upload the file: " + file.getOriginalFilename() + "!";
                 e.printStackTrace();
-                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
+                response.put("message", message);
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(response);
             }
         }
 
-        message = "Please upload an excel file!";
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+        message = "Invalid file format! Please upload an Excel file.";
+        response.put("message", message);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
     public static void printFilteredRows(List<List<String>> filteredRows) {
         for (List<String> row : filteredRows) {
             for (String cellValue : row) {
