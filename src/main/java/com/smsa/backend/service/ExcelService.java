@@ -11,10 +11,12 @@ import com.smsa.backend.security.util.ExcelHelper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.format.DateTimeFormatters;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -110,9 +112,10 @@ public class ExcelService {
     }
 
     private InvoiceDetails mapToDomain(List<String> row) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMM-yy", Locale.ENGLISH);
         InvoiceDetailsId invoiceDetailsId = InvoiceDetailsId.builder()
                 .mawb(row.get(0).equals("-")||row.get(0).equals(null) ? null :Long.parseLong(row.get(0)))
-                .manifestDate(row.get(1).equals("-") || row.get(1).equals(null) ? null :LocalDate.parse(row.get(1)))
+                .manifestDate(row.get(1).equals("-") || row.get(1).equals(null) ? null :LocalDate.parse(row.get(1),formatter))
                 .accountNumber(row.get(2))
                 .awb(row.get(3).equals("-") || row.get(3).equals(null) ? null :Long.parseLong(row.get(3)))
                 .build();
@@ -131,7 +134,7 @@ public class ExcelService {
                 .customFormCharges(row.get(13).equals("-") || row.get(13).equals(null) ? null : Long.parseLong(row.get(13)))
                 .other(Long.parseLong(row.get(14)))
                 .totalCharges(Double.parseDouble(row.get(15)))
-                .customDeclarationNumber(row.get(16).equals("-") || row.get(16).equals(null) ? null :Long.parseLong(row.get(16)))
+                .customDeclarationNumber(row.get(16).equals("") || row.get(16).equals(null) ? null :Long.parseLong(row.get(16)))
                 .customDeclarationDate((row.get(17).equals("") || row.get(17) == null) ? null : LocalDate.parse(row.get(17)))
                 .build();
         // Custom Declaration Date

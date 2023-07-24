@@ -5,7 +5,9 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -33,6 +35,8 @@ public class Customer {
     private Boolean isEmailSent;
     private Boolean status;
     private boolean isPresent;
-
+    @JsonIgnore
+    @OneToMany(mappedBy = "customer")
+    private Set<InvoiceDetails> invoiceDetailsSet = new HashSet<>();
 }
 

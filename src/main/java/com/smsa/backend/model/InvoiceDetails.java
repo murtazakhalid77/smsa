@@ -3,9 +3,7 @@ package com.smsa.backend.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Data
@@ -39,4 +37,8 @@ import java.time.LocalDate;
     private LocalDate sheetTimesStamp;
     private String customerUniqueId;
     private LocalDate CustomerTimestamp;
+
+    @ManyToOne
+    @JoinColumn(name = "accountNumber", referencedColumnName = "accountNumber")
+    Customer customer;
 }
