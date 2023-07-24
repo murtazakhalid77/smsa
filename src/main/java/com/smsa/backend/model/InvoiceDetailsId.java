@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Builder
 public class InvoiceDetailsId implements Serializable {
     private Long mawb;
-    private String manifestDate;
+    private LocalDate manifestDate;
     private String accountNumber;
     private Long awb;
 }

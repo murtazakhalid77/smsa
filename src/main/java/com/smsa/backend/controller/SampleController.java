@@ -2,6 +2,7 @@ package com.smsa.backend.controller;
 
 import com.itextpdf.text.DocumentException;
 
+import com.smsa.backend.service.ExcelSheetService;
 import com.smsa.backend.service.pdfGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +18,13 @@ import java.io.IOException;
 public class SampleController {
     @Autowired
     pdfGenerator pdfGenerator = new pdfGenerator();
+    @Autowired
+    ExcelSheetService sheetGenerator = new ExcelSheetService();
 
 
     @GetMapping("/hello")
     public ResponseEntity<String> sayHello() {
+        sheetGenerator.updateExcelFile();
         return ResponseEntity.ok("Hello from secured endpoint");
     }
 

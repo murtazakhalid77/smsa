@@ -48,9 +48,6 @@ public class ExcelController {
                 return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(response);
             }
         }
-
-        message = "Invalid file format! Please upload an Excel file.";
-        response.put("message", message);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 

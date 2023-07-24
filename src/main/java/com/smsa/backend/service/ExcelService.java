@@ -110,30 +110,31 @@ public class ExcelService {
     }
 
     private InvoiceDetails mapToDomain(List<String> row) {
-        InvoiceDetails invoiceDetails = new InvoiceDetails();
+        InvoiceDetailsId invoiceDetailsId = InvoiceDetailsId.builder()
+                .mawb(row.get(0).equals("-")||row.get(0).equals(null) ? null :Long.parseLong(row.get(0)))
+                .manifestDate(row.get(1).equals("-") || row.get(1).equals(null) ? null :LocalDate.parse(row.get(1)))
+                .accountNumber(row.get(2))
+                .awb(row.get(3).equals("-") || row.get(3).equals(null) ? null :Long.parseLong(row.get(3)))
+                .build();
 
-        // Assuming the index format is as follows:
-        invoiceDetails.getInvoiceDetailsId().setMawb(Long.parseLong(row.get(0))); // MAWB
-        invoiceDetails.getInvoiceDetailsId().setManifestDate(row.get(1)); // Manifest Date
-        invoiceDetails.getInvoiceDetailsId().setAccountNumber(row.get(2)); // Account Number
-        invoiceDetails.getInvoiceDetailsId().setAwb(Long.parseLong(row.get(3))); // AWB
-
-        invoiceDetails.setInvoiceDetailsId(invoiceDetails.getInvoiceDetailsId());
-        invoiceDetails.setOrderNumber(row.get(4)); // OrderNumber
-        invoiceDetails.setOrigin(row.get(5)); // Origin
-        invoiceDetails.setDestination(row.get(6)); // Destination
-        invoiceDetails.setShippersName(row.get(7)); // Shipper Name
-        invoiceDetails.setConsigneeName(row.get(8)); // Consignee Name
-        invoiceDetails.setWeight(row.get(9)); // Weight
-        invoiceDetails.setDeclaredValue(Long.parseLong(row.get(10))); // Declared Value
-        invoiceDetails.setValueCustom(Long.parseLong(row.get(11))); // Value (Custom)
-        invoiceDetails.setVatAmount(Double.parseDouble(row.get(12))); // VAT Amount
-        invoiceDetails.setCustomFormCharges(Long.parseLong(row.get(13))); // Custom Form Charges
-        invoiceDetails.setOther(Long.parseLong(row.get(14))); // Other
-        invoiceDetails.setTotalCharges(Double.parseDouble(row.get(15))); // Total Charges
-        invoiceDetails.setCustomDeclaration(row.get(16)); // Custom Declaration #
-        if (row.get(17).equals("")||row.get(17)==null){
-        invoiceDetails.setCustomDeclarationDate(null);} // Custom Declaration Date
+        InvoiceDetails invoiceDetails = InvoiceDetails.builder()
+                .invoiceDetailsId(invoiceDetailsId)
+                .orderNumber(row.get(4))
+                .origin(row.get(5))
+                .destination(row.get(6))
+                .shippersName(row.get(7))
+                .consigneeName(row.get(8))
+                .weight(row.get(9))
+                .declaredValue(row.get(10).equals("-") || row.get(10).equals(null) ? null: Long.parseLong(row.get(10)))
+                .valueCustom(Long.parseLong(row.get(11)))
+                .vatAmount(Double.parseDouble(row.get(12)))
+                .customFormCharges(row.get(13).equals("-") || row.get(13).equals(null) ? null : Long.parseLong(row.get(13)))
+                .other(Long.parseLong(row.get(14)))
+                .totalCharges(Double.parseDouble(row.get(15)))
+                .customDeclarationNumber(row.get(16).equals("-") || row.get(16).equals(null) ? null :Long.parseLong(row.get(16)))
+                .customDeclarationDate((row.get(17).equals("") || row.get(17) == null) ? null : LocalDate.parse(row.get(17)))
+                .build();
+        // Custom Declaration Date
 
         return invoiceDetails;
     }
