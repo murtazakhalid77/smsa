@@ -54,12 +54,11 @@ public class EmailSchedular {
             invoiceDetailsMap.get(accountNumber).add(invoiceDetails);
         }
 
-        // Iterate over the invoiceDetailsMap and process each InvoiceDetails
-        for (List<InvoiceDetails> invoiceDetailsList : invoiceDetailsMap.values()) {
-            // Assuming the account number is the same for all InvoiceDetails objects in the list
-            String accountNumber = invoiceDetailsList.get(0).getInvoiceDetailsId().getAccountNumber();
+            // Iterate over the invoiceDetailsMap and process each InvoiceDetails
+            for (List<InvoiceDetails> invoiceDetailsList : invoiceDetailsMap.values()) {
+                String accountNumber = invoiceDetailsList.get(0).getInvoiceDetailsId().getAccountNumber();
 
-            // Check if the invoice has an account number
+                // Check if the invoice has an account number
             if (checkAccountNumberInCustomerTable(accountNumber) != null) {
                 Customer customer = customerRepository.findByAccountNumber(accountNumber);
 
