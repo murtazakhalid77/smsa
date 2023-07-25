@@ -4,6 +4,10 @@ import com.smsa.backend.model.InvoiceDetails;
 import com.smsa.backend.model.InvoiceDetailsId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface InvoiceDetailsRepository extends JpaRepository<InvoiceDetails, InvoiceDetailsId> {
+import java.util.List;
 
+public interface InvoiceDetailsRepository extends JpaRepository<InvoiceDetails, InvoiceDetailsId> {
+    List<InvoiceDetails> findBySheetUniqueId(String sheetUniqueId);
+
+    List<InvoiceDetails> findAllBySheetUniqueId(String sheetUniqueId);
 }
