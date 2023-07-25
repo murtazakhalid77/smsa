@@ -32,10 +32,9 @@ public class Customer {
     private String address;
     private String poBox;
     private String country;
-    private Boolean isEmailSent;
     private Boolean status;
     private boolean isPresent;
-    @JsonIgnore
+
     @OneToMany(mappedBy = "customer")
     private Set<InvoiceDetails> invoiceDetailsSet = new HashSet<>();
 }

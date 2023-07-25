@@ -1,24 +1,30 @@
 package com.smsa.backend.service;
 
 
+import com.smsa.backend.Exception.SheetAlreadyExistException;
+import com.smsa.backend.controller.scheduler.EmailSchedular;
 import com.smsa.backend.dto.InvoiceDetailsDto;
 import com.smsa.backend.model.Customer;
 import com.smsa.backend.model.InvoiceDetails;
 import com.smsa.backend.model.InvoiceDetailsId;
+import com.smsa.backend.model.SheetHistory;
 import com.smsa.backend.repository.CustomerRepository;
 import com.smsa.backend.repository.InvoiceDetailsRepository;
+import com.smsa.backend.repository.SheetHistoryRepository;
 import com.smsa.backend.security.util.ExcelHelper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.format.DateTimeFormatters;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 
 @Service
@@ -29,9 +35,18 @@ public class ExcelService {
     @Autowired
     CustomerRepository customerRepository;
     @Autowired
+    SheetHistoryRepository sheetHistoryRepository;
+    @Autowired
     private InvoiceDetailsRepository invoiceDetailsRepository;
+
     List<InvoiceDetails> invoicesWithAccount = new ArrayList<>();
     List<InvoiceDetails>invoicesWithoutAccount = new ArrayList<>();
+    Map<String, List<InvoiceDetails>> mappedRowsMap = new HashMap<>();
+    Map<String, String> accountNumberUuidMap = new HashMap<>();
+
+    LocalDate currentDate = LocalDate.now();
+    String sheetId = UUID.randomUUID().toString();
+    private static final Logger logger = LoggerFactory.getLogger(ExcelService.class);
 
 
     public void saveInvoicesToDatabase(MultipartFile file) {
@@ -43,16 +58,16 @@ public class ExcelService {
     public Map<String, List<InvoiceDetails>> filterRowsByAccountNumber(MultipartFile multipartFile) {
         List<List<String>> rowsToBeFiltered = excelHelper.parseExcelFile(multipartFile);
 
-        Map<String, List<InvoiceDetails>> mappedRowsMap = new HashMap<>();
-        Map<String, String> accountNumberUuidMap = new HashMap<>();
+        String originalFilename = multipartFile.getOriginalFilename();
 
-        LocalDate currentDate = LocalDate.now();
-        String sheetId = UUID.randomUUID().toString();
+        if (sheetHistoryRepository.existsByUniqueUUidAndName(sheetId, originalFilename)) {
+            logger.info(String.format("Sheet with the name %s already exists!",originalFilename));
+            throw new SheetAlreadyExistException(String.format("Sheet with the name %s already exists!",originalFilename));
+        }
 
         if (rowsToBeFiltered.size() > 0) {
             rowsToBeFiltered.remove(0);
         }
-
         for (List<String> row : rowsToBeFiltered) {
             if (row.size() > 2) {
                 String commonKey = row.get(2);
@@ -61,11 +76,11 @@ public class ExcelService {
                     if (!mappedRowsMap.containsKey(commonKey)) {
                         mappedRowsMap.put(commonKey, new ArrayList<>());
                     }
-
                     // Map the fields from the row list to the InvoiceDetails object
                     InvoiceDetails invoiceDetails = mapToDomain(row);
                     invoiceDetails.setSheetTimesStamp(currentDate);
                     invoiceDetails.setSheetUniqueId(sheetId);
+                    invoiceDetails.setCustomerTimestamp(currentDate);
 
                     // Check if the account number exists in the accountNumberUuidMap
                     String accountNumber = invoiceDetails.getInvoiceDetailsId().getAccountNumber();
@@ -88,15 +103,22 @@ public class ExcelService {
                         invoicesWithAccount.add(invoiceDetails);
                     } else {
                         invoicesWithoutAccount.add(invoiceDetails);
-                        Customer  customer=Customer.builder()
+                        Customer customer = Customer.builder()
                                 .nameEnglish("System").accountNumber(accountNumber)
                                 .status(false).build();
                         customerRepository.save(customer);
-
                     }
                 }
             }
         }
+
+        SheetHistory sheetHistory =SheetHistory.builder()
+                .uniqueUUid(sheetId)
+                .name(originalFilename)
+                .isEmailSent(false)
+                .build();
+        sheetHistoryRepository.save(sheetHistory);
+
         return mappedRowsMap;
     }
     private boolean checkAccountNumberInCustomerTable(String accountNumber) {

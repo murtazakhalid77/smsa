@@ -39,6 +39,7 @@ import java.time.LocalDate;
     private LocalDate CustomerTimestamp;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "accountNumber", referencedColumnName = "accountNumber")
     Customer customer;
 }

@@ -23,4 +23,10 @@ public class GlobalExceptionHandler {
                 .body(ex.getMessage()).localDateTime(LocalDateTime.now()).build();
         return new ResponseEntity(errorMessage, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(value = SheetAlreadyExistException.class)
+    public ResponseEntity<ErrorMessage> sheetAlreadyExistException(RecordAlreadyExistException ex){
+        ErrorMessage errorMessage = ErrorMessage.builder()
+                .body(ex.getMessage()).localDateTime(LocalDateTime.now()).build();
+        return new ResponseEntity(errorMessage, HttpStatus.NOT_FOUND);
+    }
 }

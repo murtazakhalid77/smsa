@@ -20,5 +20,5 @@ public class SheetHistory {
     private Long id;
     private String name;
     private String uniqueUUid;
-    private LocalDate date;
+    private Boolean isEmailSent;
 }
