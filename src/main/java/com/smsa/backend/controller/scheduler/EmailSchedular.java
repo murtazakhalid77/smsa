@@ -60,7 +60,7 @@ public class EmailSchedular {
 
                 // Check if the invoice has an account number
             if (checkAccountNumberInCustomerTable(accountNumber) != null) {
-                Customer customer = customerRepository.findByAccountNumber(accountNumber);
+                Customer customer = customerRepository.findByAccountNumber(accountNumber).get();
 
                 // Perform checks to see if all required fields in the Customer entity have values
                 if (customer.getEmail() != null) {
@@ -94,7 +94,7 @@ public class EmailSchedular {
     }
 
     private Customer checkAccountNumberInCustomerTable(String accountNumber) {
-        Customer customer = customerRepository.findByAccountNumber(accountNumber);
+        Customer customer = customerRepository.findByAccountNumber(accountNumber).get();
         return customer;
     }
 

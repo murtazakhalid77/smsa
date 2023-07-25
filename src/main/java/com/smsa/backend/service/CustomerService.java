@@ -51,13 +51,12 @@ public class CustomerService {
 
     CustomerDTO toDto(Customer customer){
         return new CustomerDTO().builder()
-                    .id(customer.getId())
                     .email(customer.getEmail())
                     .address(customer.getAddress())
                     .accountNumber(customer.getAccountNumber())
                     .country(customer.getCountry())
                     .poBox(customer.getPoBox())
-                    .customerNameArabic(customer.getCustomerNameArabic())
+                    .customerNameArabic(customer.getNameArabic())
                     .currencyRateFromSAR(customer.getCurrencyRateFromSAR())
                     .invoiceCurrency(customer.getInvoiceCurrency())
                     .smsaServiceFromSAR(customer.getSmsaServiceFromSAR())
@@ -70,19 +69,18 @@ public class CustomerService {
 
     Customer toDomain(CustomerDTO customerDTO){
         return new Customer().builder()
-                .Id(customerDTO.getId())
                 .email(customerDTO.getEmail())
                 .address(customerDTO.getAddress())
                 .accountNumber(customerDTO.getAccountNumber())
                 .country(customerDTO.getCountry())
                 .poBox(customerDTO.getPoBox())
-                .customerNameArabic(customerDTO.getCustomerNameArabic())
+                .nameArabic(customerDTO.getCustomerNameArabic())
                 .currencyRateFromSAR(customerDTO.getCurrencyRateFromSAR())
                 .invoiceCurrency(customerDTO.getInvoiceCurrency())
                 .smsaServiceFromSAR(customerDTO.getSmsaServiceFromSAR())
                 .isPresent(customerDTO.isPresent())
                 .invoiceCurrency(customerDTO.getInvoiceCurrency())
-                .NameEnglish(customerDTO.getNameEnglish())
+                .nameEnglish(customerDTO.getNameEnglish())
                 .VatNumber(customerDTO.getVatNumber())
                 .build();
     }
