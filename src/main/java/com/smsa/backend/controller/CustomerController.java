@@ -9,16 +9,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin
 @RestController
-@RequestMapping("/api/customer")
+@RequestMapping("/api")
+@CrossOrigin("*")
 public class CustomerController {
     @Autowired
     CustomerService customerService;
     @GetMapping("/customer")
-   ResponseEntity<List<CustomerDTO>> getAllCustomer(){
+    ResponseEntity<List<CustomerDTO>> getAllCustomer(){
     return ResponseEntity.ok(customerService.getAllCustomer());
-}
+    }
     @PostMapping("/customer")
     ResponseEntity<CustomerDTO> addCustomer(@RequestBody CustomerDTO customerDTO){
         return  ResponseEntity.ok(customerService.addCustomer(customerDTO));
@@ -32,7 +32,7 @@ public class CustomerController {
     ResponseEntity<CustomerDTO> updateCustomerById(@RequestBody CustomerDTO customerDTO){
         return  ResponseEntity.ok(customerService.updateCustomerById(customerDTO));
     }
-    @PutMapping("/customer/{id}")
+    @DeleteMapping("/customer/{id}")
     ResponseEntity<CustomerDTO> deleteCustomerById(@PathVariable Long id){
         return  ResponseEntity.ok(customerService.deleteCustomerById(id));
     }

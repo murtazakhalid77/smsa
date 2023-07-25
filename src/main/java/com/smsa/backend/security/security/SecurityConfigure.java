@@ -35,7 +35,9 @@ public class SecurityConfigure extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 // dont authenticate this particular request
-                .authorizeRequests().antMatchers("/api/login").permitAll().
+                .authorizeRequests()
+                .antMatchers("/api/login").permitAll()
+                .antMatchers("/api/customer/**").permitAll().
                 // all other requests need to be authenticated
                         anyRequest().authenticated()
                 // make sure we use stateless session; session won't be used to

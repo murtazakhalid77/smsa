@@ -122,8 +122,12 @@ public class ExcelService {
         return mappedRowsMap;
     }
     private boolean checkAccountNumberInCustomerTable(String accountNumber) {
-        Customer customer = customerRepository.findByAccountNumber(accountNumber);
-        return customer != null;
+        Optional<Customer> customer = customerRepository.findByAccountNumber(accountNumber);
+        if(customer.get()!=null){
+            return true;
+        }
+        return false;
+//        return customer != null;
     }
 
     public List<InvoiceDetails> getInvoicesWithAccount() {
