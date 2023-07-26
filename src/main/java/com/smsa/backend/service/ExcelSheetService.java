@@ -1,10 +1,8 @@
 package com.smsa.backend.service;
 
+import com.smsa.backend.model.Customer;
 import com.smsa.backend.model.InvoiceDetails;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
@@ -13,7 +11,7 @@ import java.util.List;
 
 @Service
 public class ExcelSheetService {
-    public void updateExcelFile() {
+    public void updateExcelFile(List<InvoiceDetails> invoiceDetailsList , Customer customer) {
 
         System.out.println("inside update excel file method");
 
@@ -21,29 +19,100 @@ public class ExcelSheetService {
 
         try {
             FileInputStream fileInputStream = new FileInputStream(excelFilePath);
-
             Workbook workbook = WorkbookFactory.create(fileInputStream);
             Sheet sheet = workbook.getSheetAt(0);
+            int rowCount = sheet.getLastRowNum();
 
-            int lastRowCount = sheet.getLastRowNum();
-            System.out.println("lastRowCount.. "  +  lastRowCount);
+            for (InvoiceDetails invoiceDetails : invoiceDetailsList) {
+                Row row = sheet.createRow(++rowCount);
+                int columnCount = 0;
 
-            InvoiceDetails userList = InvoiceDetails.builder().consigneeName("Murtaza").shippersName("khalid").build();
+                // Row Count
+                Cell cell = row.createCell(columnCount);
+                cell.setCellValue(rowCount);
 
-                Row dataRow = sheet.createRow(++lastRowCount);
-                dataRow.createCell(8).setCellValue(userList.getConsigneeName());
-                dataRow.createCell(7).setCellValue(userList.getShippersName());
+                // MAWB
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getInvoiceDetailsId().getMawb());
+
+                // Manifest Date
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getInvoiceDetailsId().getManifestDate().toString());
+
+                // Account Number
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getInvoiceDetailsId().getAccountNumber());
+
+                // AWB
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getInvoiceDetailsId().getAwb());
+
+                // Order Number
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getOrderNumber());
+
+                // Origin
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getOrigin());
+
+                // Destination
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getDestination());
+
+                // Shipper Name
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getShippersName());
+
+                // Consignee Name
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getConsigneeName());
+
+                // Weight
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getWeight());
+
+                // Declared Value
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getDeclaredValue());
+
+                // Value (Custom)
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getValueCustom());
+
+                // VAT Amount
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getVatAmount());
+
+                // Custom Form Charges
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getCustomFormCharges());
+
+                // Other
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getOther());
+
+                // Total Charges
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getTotalCharges());
+
+                // Custom Declaration #
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getCustomDeclarationNumber());
 
 
+                // Custom Declaration Date
+                cell = row.createCell(++columnCount);
+                cell.setCellValue(invoiceDetails.getCustomDeclarationDate().toString());
 
-            System.out.println("lastRowCount after excel sheet modified.. "  +  lastRowCount);
+            }
+
             fileInputStream.close();
 
             FileOutputStream fileOutputStream = new FileOutputStream(excelFilePath);
             workbook.write(fileOutputStream);
+            workbook.close();
             fileOutputStream.close();
-            System.out.println("excel sheet updated successfully........");
-
+            System.out.println("Excel sheet updated successfully........");
 
         } catch (Exception e) {
             e.printStackTrace();

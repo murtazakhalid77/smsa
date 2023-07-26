@@ -1,9 +1,15 @@
 package com.smsa.backend.Exception;
 
-public class RecordNotFoundException extends RuntimeException{
+import org.apache.poi.ss.formula.functions.T;
+
+import java.util.function.Supplier;
+
+public class RecordNotFoundException extends RuntimeException {
     public  RecordNotFoundException(String message){
 
         super(message);
     }
+
+
 
 }

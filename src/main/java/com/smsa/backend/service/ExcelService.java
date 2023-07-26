@@ -60,7 +60,8 @@ public class ExcelService {
 
         String originalFilename = multipartFile.getOriginalFilename();
 
-        if (sheetHistoryRepository.existsByUniqueUUidAndName(sheetId, originalFilename)) {
+        //TODO: UPDATE WORK OF SHEET
+        if (sheetHistoryRepository.existsByName(originalFilename)) {
             logger.info(String.format("Sheet with the name %s already exists!",originalFilename));
             throw new SheetAlreadyExistException(String.format("Sheet with the name %s already exists!",originalFilename));
         }
@@ -77,9 +78,12 @@ public class ExcelService {
                         mappedRowsMap.put(commonKey, new ArrayList<>());
                     }
                     // Map the fields from the row list to the InvoiceDetails object
+
                     InvoiceDetails invoiceDetails = mapToDomain(row);
+
                     invoiceDetails.setSheetTimesStamp(currentDate);
                     invoiceDetails.setSheetUniqueId(sheetId);
+                    invoiceDetails.setIsSentInMail(Boolean.FALSE);
                     invoiceDetails.setCustomerTimestamp(currentDate);
 
                     // Check if the account number exists in the accountNumberUuidMap
@@ -103,9 +107,12 @@ public class ExcelService {
                         invoicesWithAccount.add(invoiceDetails);
                     } else {
                         invoicesWithoutAccount.add(invoiceDetails);
-                        Customer customer = Customer.builder()
-                                .nameEnglish("System").accountNumber(accountNumber)
-                                .status(false).build();
+                        Customer customer = Customer
+                                .builder()
+                                .nameEnglish("System")
+                                .accountNumber(accountNumber)
+                                .status(false)
+                                .build();
                         customerRepository.save(customer);
                     }
                 }
@@ -123,11 +130,7 @@ public class ExcelService {
     }
     private boolean checkAccountNumberInCustomerTable(String accountNumber) {
         Optional<Customer> customer = customerRepository.findByAccountNumber(accountNumber);
-        if(customer.get()!=null){
-            return true;
-        }
-        return false;
-//        return customer != null;
+        return customer.isPresent();
     }
 
     public List<InvoiceDetails> getInvoicesWithAccount() {
@@ -138,30 +141,31 @@ public class ExcelService {
     }
 
     private InvoiceDetails mapToDomain(List<String> row) {
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMM-yy", Locale.ENGLISH);
         InvoiceDetailsId invoiceDetailsId = InvoiceDetailsId.builder()
-                .mawb(row.get(0).equals("-")||row.get(0).equals(null) ? null :Long.parseLong(row.get(0)))
-                .manifestDate(row.get(1).equals("-") || row.get(1).equals(null) ? null :LocalDate.parse(row.get(1),formatter))
-                .accountNumber(row.get(2))
-                .awb(row.get(3).equals("-") || row.get(3).equals(null) ? null :Long.parseLong(row.get(3)))
+                .mawb(row.get(0).equals("-")||row.get(0).equals("") ? Long.parseLong("") :Long.parseLong(row.get(0)))
+                .manifestDate(row.get(1).equals("-") || row.get(1).equals("") ? LocalDate.parse("") :LocalDate.parse(row.get(1),formatter))
+                .accountNumber(row.get(2).equals("-") || row.get(2).equals("") ? "" :row.get(2))
+                .awb(row.get(3).equals("-") || row.get(3).equals("") ? Long.parseLong("") :Long.parseLong(row.get(3)))
                 .build();
 
         InvoiceDetails invoiceDetails = InvoiceDetails.builder()
                 .invoiceDetailsId(invoiceDetailsId)
-                .orderNumber(row.get(4))
-                .origin(row.get(5))
-                .destination(row.get(6))
-                .shippersName(row.get(7))
-                .consigneeName(row.get(8))
-                .weight(row.get(9))
-                .declaredValue(row.get(10).equals("-") || row.get(10).equals(null) ? null: Long.parseLong(row.get(10)))
-                .valueCustom(Long.parseLong(row.get(11)))
-                .vatAmount(Double.parseDouble(row.get(12)))
-                .customFormCharges(row.get(13).equals("-") || row.get(13).equals(null) ? null : Long.parseLong(row.get(13)))
-                .other(Long.parseLong(row.get(14)))
-                .totalCharges(Double.parseDouble(row.get(15)))
-                .customDeclarationNumber(row.get(16).equals("") || row.get(16).equals(null) ? null :Long.parseLong(row.get(16)))
-                .customDeclarationDate((row.get(17).equals("") || row.get(17) == null) ? null : LocalDate.parse(row.get(17)))
+                .orderNumber(row.get(4).equals("-") || row.get(4).equals("") ? "" : row.get(4))
+                .origin(row.get(5).equals("-") || row.get(5).equals("") ? "" : row.get(5))
+                .destination(row.get(6).equals("-") || row.get(6).equals("") ? "" : row.get(6))
+                .shippersName(row.get(7).equals("-") || row.get(7).equals("") ? "" : row.get(7))
+                .consigneeName(row.get(8).equals("-") || row.get(8).equals("") ? "" : row.get(8))
+                .weight(row.get(9).equals("-") || row.get(9).equals("") ? "" : row.get(9))
+                .declaredValue(row.get(10).equals("-") || row.get(10).equals("") ? Long.parseLong("") : Long.parseLong(row.get(10)))
+                .valueCustom(row.get(11).equals("-") || row.get(11).equals("") ? Long.parseLong("") : Long.parseLong(row.get(11)))
+                .vatAmount(row.get(12).equals("-") || row.get(12).equals("") ? Double.parseDouble("") : Double.parseDouble(row.get(12)))
+                .customFormCharges(row.get(13).equals("-") || row.get(13).equals("") ? Long.parseLong("") : Long.parseLong(row.get(13)))
+                .other(row.get(14).equals("-") || row.get(14).equals("") ? Long.parseLong("") : Long.parseLong(row.get(14)))
+                .totalCharges(row.get(15).equals("-") || row.get(15).equals("") ? Double.parseDouble("") : Double.parseDouble(row.get(15)))
+                .customDeclarationNumber(row.get(16).equals("") || row.get(16).equals("") ? Long.parseLong("") : Long.parseLong(row.get(16)))
+                .customDeclarationDate(row.get(17).equals("") || row.get(17).equals("") ? LocalDate.parse("") : LocalDate.parse(row.get(17), formatter))
                 .build();
         // Custom Declaration Date
 

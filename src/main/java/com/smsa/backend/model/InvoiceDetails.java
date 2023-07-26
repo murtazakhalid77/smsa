@@ -37,9 +37,9 @@ import java.time.LocalDate;
     private LocalDate sheetTimesStamp;
     private String customerUniqueId;
     private LocalDate CustomerTimestamp;
-
-    @ManyToOne
+    private Boolean isSentInMail;
     @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "accountNumber", referencedColumnName = "accountNumber")
     Customer customer;
 }
