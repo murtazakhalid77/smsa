@@ -13,8 +13,8 @@ public interface InvoiceDetailsRepository extends JpaRepository<InvoiceDetails, 
     List<InvoiceDetails> findBySheetUniqueId(String sheetUniqueId);
     @Transactional
     @Modifying
-    @Query("UPDATE InvoiceDetails i SET i.isSentInMail = true WHERE i.invoiceDetailsId.accountNumber = ?1")
-    void updateIsSentInMailByAccountNumber(String accountNumber);
+    @Query("UPDATE InvoiceDetails i SET i.isSentInMail = true WHERE i.invoiceDetailsId.accountNumber = ?1 AND i.sheetUniqueId = ?2")
+    void updateIsSentInMailByAccountNumberAndSheetUniqueId(String accountNumber, String sheetUniqueId);
 
     List<InvoiceDetails> findAllBySheetUniqueId(String sheetUniqueId);
 }

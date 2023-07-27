@@ -1,6 +1,5 @@
-package com.smsa.backend.controller.scheduler;
+package com.smsa.backend.scheduler;
 
-import com.smsa.backend.Exception.RecordNotFoundException;
 import com.smsa.backend.model.Customer;
 import com.smsa.backend.model.InvoiceDetails;
 import com.smsa.backend.model.SheetHistory;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.*;
 
 @Component
@@ -43,39 +43,45 @@ public class EmailSchedular {
             processInvoicesForSheet(sheetUniqueId);
         }
     }
-
     public void processInvoicesForSheet(String sheetUniqueId) {
-        // Get all InvoiceDetails objects for the given sheetUniqueId from the database
         boolean anyUnsentInvoice = false;
 
         List<InvoiceDetails> invoicesForSheet = invoiceDetailsRepository.findAllBySheetUniqueId(sheetUniqueId);
         invoiceDetailsMap = new HashMap<>();
         invoiceDetailsMap = groupInvoicesByAccountNumber(invoicesForSheet);
 
-        // Iterate over the invoiceDetailsMap and process each InvoiceDetails for each account number
         for (String accountNumber : invoiceDetailsMap.keySet()) {
             List<InvoiceDetails> invoiceDetailsList = invoiceDetailsMap.get(accountNumber);
 
-            // Check if the isSentInMail flag is false for this account number
+            if (invoiceDetailsList == null) {
+                logger.warn("No invoice details found for account number: " + accountNumber);
+                anyUnsentInvoice = true;
+                continue; // Skip processing for this account number
+            }
+
             if (!checkIsSentInMail(accountNumber)) {
                 Optional<Customer> customer = customerRepository.findByAccountNumber(accountNumber);
 
-                // Check if the customer exists and has a valid email
-                if (customer != null && customer.get().getEmail() != null) {
-                   logger.info("Making excel");
-                   excelSheetService.updateExcelFile(invoiceDetailsList,customer.get());
+                if (customer.isPresent() && customer.get().getEmail() != null) {
+                    logger.info("Making excel");
+                    try {
+                        excelSheetService.updateExcelFile(invoiceDetailsList, customer.get());
 
-                    invoiceDetailsRepository.updateIsSentInMailByAccountNumber(accountNumber);
-
+                        invoiceDetailsRepository.updateIsSentInMailByAccountNumberAndSheetUniqueId(accountNumber, sheetUniqueId);
+                    }
+                     catch (IOException e) {
+                        throw new RuntimeException("Error while creating Excel");
+                    }
                 } else {
-                    anyUnsentInvoice = true; // Mark anyUnsentInvoice as true if any invoice doesn't have the required fields
+                    logger.warn("Customer not found or no email provided for account number: " + accountNumber);
+                    anyUnsentInvoice = true;
                 }
             }
-
         }
-        // If any unsent invoice is found, set the isEmailSent flag in SheetHistory to false; otherwise, set it to true
-        updateSheetHistoryStatus(sheetUniqueId,anyUnsentInvoice);
+
+        updateSheetHistoryStatus(sheetUniqueId, anyUnsentInvoice);
     }
+
     private void updateSheetHistoryStatus(String sheetUniqueId, boolean anyUnsentInvoice) {
         SheetHistory sheetHistory = sheetHistoryRepository.findByUniqueUUid(sheetUniqueId);
         if (sheetHistory != null) {
@@ -100,19 +106,6 @@ public class EmailSchedular {
         return invoiceDetailsList != null && !invoiceDetailsList.isEmpty()
                 && invoiceDetailsList.get(0).getIsSentInMail();
     }
-
-
-
-    private void sendEmail(InvoiceDetails invoiceDetails, Customer customer) {
-
-    }
-
-    private Customer checkAccountNumberInCustomerTable(String accountNumber) {
-        Customer customer = customerRepository.findByAccountNumber(accountNumber).get();
-        return customer;
-    }
-
-
 }
 
 

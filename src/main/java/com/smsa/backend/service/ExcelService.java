@@ -2,7 +2,6 @@ package com.smsa.backend.service;
 
 
 import com.smsa.backend.Exception.SheetAlreadyExistException;
-import com.smsa.backend.controller.scheduler.EmailSchedular;
 import com.smsa.backend.dto.InvoiceDetailsDto;
 import com.smsa.backend.model.Customer;
 import com.smsa.backend.model.InvoiceDetails;
@@ -145,7 +144,7 @@ public class ExcelService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMM-yy", Locale.ENGLISH);
         InvoiceDetailsId invoiceDetailsId = InvoiceDetailsId.builder()
                 .mawb(row.get(0).equals("-")||row.get(0).equals("") ? Long.parseLong("") :Long.parseLong(row.get(0)))
-                .manifestDate(row.get(1).equals("-") || row.get(1).equals("") ? LocalDate.parse("") :LocalDate.parse(row.get(1),formatter))
+                .manifestDate(row.get(1).equals("-") || row.get(1).equals("") ? null :LocalDate.parse(row.get(1),formatter))
                 .accountNumber(row.get(2).equals("-") || row.get(2).equals("") ? "" :row.get(2))
                 .awb(row.get(3).equals("-") || row.get(3).equals("") ? Long.parseLong("") :Long.parseLong(row.get(3)))
                 .build();
@@ -158,14 +157,15 @@ public class ExcelService {
                 .shippersName(row.get(7).equals("-") || row.get(7).equals("") ? "" : row.get(7))
                 .consigneeName(row.get(8).equals("-") || row.get(8).equals("") ? "" : row.get(8))
                 .weight(row.get(9).equals("-") || row.get(9).equals("") ? "" : row.get(9))
-                .declaredValue(row.get(10).equals("-") || row.get(10).equals("") ? Long.parseLong("") : Long.parseLong(row.get(10)))
-                .valueCustom(row.get(11).equals("-") || row.get(11).equals("") ? Long.parseLong("") : Long.parseLong(row.get(11)))
-                .vatAmount(row.get(12).equals("-") || row.get(12).equals("") ? Double.parseDouble("") : Double.parseDouble(row.get(12)))
-                .customFormCharges(row.get(13).equals("-") || row.get(13).equals("") ? Long.parseLong("") : Long.parseLong(row.get(13)))
-                .other(row.get(14).equals("-") || row.get(14).equals("") ? Long.parseLong("") : Long.parseLong(row.get(14)))
-                .totalCharges(row.get(15).equals("-") || row.get(15).equals("") ? Double.parseDouble("") : Double.parseDouble(row.get(15)))
-                .customDeclarationNumber(row.get(16).equals("") || row.get(16).equals("") ? Long.parseLong("") : Long.parseLong(row.get(16)))
-                .customDeclarationDate(row.get(17).equals("") || row.get(17).equals("") ? LocalDate.parse("") : LocalDate.parse(row.get(17), formatter))
+                .declaredValue(row.get(10).equals("-") || row.get(10).equals("") ? 0 : Long.parseLong(row.get(10)))
+                .valueCustom(row.get(11).equals("-") || row.get(11).equals("") ? 0 : Long.parseLong(row.get(11)))
+                .vatAmount(row.get(12).equals("-") || row.get(12).equals("") ? 0.0 : Double.parseDouble(row.get(12)))
+                .customFormCharges(row.get(13).equals("-") || row.get(13).equals("") ? 0 : Long.parseLong(row.get(13)))
+                .other(row.get(14).equals("-") || row.get(14).equals("") ? 0 : Long.parseLong(row.get(14)))
+                .totalCharges(row.get(15).equals("-") || row.get(15).equals("") ? 0.0 : Double.parseDouble(row.get(15)))
+                .customDeclarationNumber(row.get(16).equals("-") || row.get(16).equals("") ? 0 : Long.parseLong(row.get(16)))
+                .customDeclarationDate(row.get(17).equals("-") || row.get(17).equals("") ? null : LocalDate.parse(row.get(17), formatter))
+
                 .build();
         // Custom Declaration Date
 
