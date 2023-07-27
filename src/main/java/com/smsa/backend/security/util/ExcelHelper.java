@@ -26,13 +26,18 @@ public class ExcelHelper {
     static String SHEET = "Tutorials";
 
     public static boolean hasExcelFormat(MultipartFile file) {
-
-        if (!TYPE.equals(file.getContentType())) {
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null) {
             return false;
         }
 
-        return true;
+        // Convert the file name to lowercase to ensure case-insensitivity
+        String lowercaseFilename = originalFilename.toLowerCase();
+
+        // Check if the file has an Excel extension
+        return lowercaseFilename.endsWith(".xlsx") || lowercaseFilename.endsWith(".xls");
     }
+
 
 
 
