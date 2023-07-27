@@ -24,7 +24,7 @@ public class SampleController {
 
     @GetMapping("/hello")
     public ResponseEntity<String> sayHello() {
-        sheetGenerator.updateExcelFile();
+        //sheetGenerator.updateExcelFile();
         return ResponseEntity.ok("Hello from secured endpoint");
     }
 
