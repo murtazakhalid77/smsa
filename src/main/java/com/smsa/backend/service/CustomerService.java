@@ -4,16 +4,12 @@ import com.smsa.backend.Exception.RecordAlreadyExistException;
 import com.smsa.backend.Exception.RecordNotFoundException;
 import com.smsa.backend.dto.CustomerDTO;
 import com.smsa.backend.model.Customer;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 import com.smsa.backend.repository.CustomerRepository;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -34,19 +30,15 @@ public class CustomerService {
     }
 
     public CustomerDTO addCustomer(CustomerDTO customerDTO) {
-            if (customerDTO.getId()!=null){
-                Optional<Customer> duplicateCustomer = customerRepository.findById(customerDTO.getId());
-                if(duplicateCustomer.isPresent()){
-                    return toDto(customerRepository.save(toDomain(customerDTO)));
-                }else{
-                    throw new RecordAlreadyExistException(String.format("Customer Record Already Exist =>%s",customerDTO));
-                }
-            }else{
-                Customer customer = toDomain(customerDTO);
-                System.out.println(customer);
-                return toDto(customerRepository.save(toDomain(customerDTO)));
-            }
 
+        Optional<Customer> duplicateCustomer = customerRepository.findByAccountNumber(customerDTO.getAccountNumber());
+        if(duplicateCustomer.isPresent()){
+            throw new RecordAlreadyExistException(String.format("Customer Record Already Exist =>%s",customerDTO));
+        }else{
+            Customer customer = toDomain(customerDTO);
+            System.out.println(customer);
+            return toDto(customerRepository.save(toDomain(customerDTO)));
+        }
     }
 
     CustomerDTO toDto(Customer customer){
@@ -56,7 +48,7 @@ public class CustomerService {
                     .accountNumber(customer.getAccountNumber())
                     .country(customer.getCountry())
                     .poBox(customer.getPoBox())
-                    .customerNameArabic(customer.getNameArabic())
+                    .nameArabic(customer.getNameArabic())
                     .currencyRateFromSAR(customer.getCurrencyRateFromSAR())
                     .invoiceCurrency(customer.getInvoiceCurrency())
                     .smsaServiceFromSAR(customer.getSmsaServiceFromSAR())
@@ -74,7 +66,7 @@ public class CustomerService {
                 .accountNumber(customerDTO.getAccountNumber())
                 .country(customerDTO.getCountry())
                 .poBox(customerDTO.getPoBox())
-                .nameArabic(customerDTO.getCustomerNameArabic())
+                .nameArabic(customerDTO.getNameArabic())
                 .currencyRateFromSAR(customerDTO.getCurrencyRateFromSAR())
                 .invoiceCurrency(customerDTO.getInvoiceCurrency())
                 .smsaServiceFromSAR(customerDTO.getSmsaServiceFromSAR())
@@ -86,31 +78,32 @@ public class CustomerService {
     }
 
 
-    public CustomerDTO getCustomerById(Long id) {
-        Optional<Customer> coupon = customerRepository.findById(id);
-        if (coupon.isPresent()){
-            return toDto(coupon.get());
+    public CustomerDTO getCustomerById(String accountNumber) {
+        Optional<Customer> customer = customerRepository.findByAccountNumber(accountNumber);
+        if (customer.isPresent()){
+            return toDto(customer.get());
         }
 
-        throw new RecordNotFoundException(String.format("Customer Not Found On this Id => %d",id));
+        throw new RecordNotFoundException(String.format("Customer Not Found On this Id => %d",accountNumber));
     }
 
-    public CustomerDTO updateCustomerById(CustomerDTO customerDTO) {
-        Customer customer = customerRepository.findById(customerDTO.getId()).get();
-        customer.setNameEnglish(customerDTO.getNameEnglish());
-        customer.setNameArabic(customerDTO.getCustomerNameArabic());
-        customer.setEmail(customerDTO.getEmail());
-        customer.setPresent(customerDTO.isPresent());
-        customer.setAddress(customerDTO.getAddress());
-        customer.setVatNumber(customerDTO.getAccountNumber());
-        customer.setSmsaServiceFromSAR(customerDTO.getSmsaServiceFromSAR());
-        customer.setAccountNumber(customerDTO.getAccountNumber());
-        customer.setInvoiceCurrency(customerDTO.getInvoiceCurrency());
-        customer.setCurrencyRateFromSAR(customerDTO.getCurrencyRateFromSAR());
-        customer.setPoBox(customerDTO.getPoBox());
-
-        customerRepository.save(customer);
-        return toDto(customerRepository.save(customer));
+    public CustomerDTO updateCustomerById(String accountNumber, CustomerDTO customerDTO) {
+        Optional<Customer> customer = customerRepository.findByAccountNumber(accountNumber);
+        if(customer.isPresent()){
+            customer.get().setNameEnglish(customerDTO.getNameEnglish());
+            customer.get().setNameArabic(customerDTO.getNameArabic());
+            customer.get().setEmail(customerDTO.getEmail());
+            customer.get().setPresent(customerDTO.isPresent());
+            customer.get().setAddress(customerDTO.getAddress());
+            customer.get().setVatNumber(customerDTO.getAccountNumber());
+            customer.get().setSmsaServiceFromSAR(customerDTO.getSmsaServiceFromSAR());
+            customer.get().setAccountNumber(customerDTO.getAccountNumber());
+            customer.get().setInvoiceCurrency(customerDTO.getInvoiceCurrency());
+            customer.get().setCurrencyRateFromSAR(customerDTO.getCurrencyRateFromSAR());
+            customer.get().setPoBox(customerDTO.getPoBox());
+            return toDto(this.customerRepository.save(customer.get()));
+        }
+        throw new RecordNotFoundException(String.format("Customer Not Found On this Id => %d",accountNumber));
     }
 
     public CustomerDTO deleteCustomerById(Long id) {
