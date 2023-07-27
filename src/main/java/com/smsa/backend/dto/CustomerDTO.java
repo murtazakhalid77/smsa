@@ -39,7 +39,7 @@ public class CustomerDTO {
     private String email;
 
     @NotBlank(message = "Customer name (Arabic) is required")
-    private String customerNameArabic;
+    private String nameArabic;
 
     @NotBlank(message = "Name (English) is required")
     private String nameEnglish;

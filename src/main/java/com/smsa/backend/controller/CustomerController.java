@@ -23,14 +23,14 @@ public class CustomerController {
     ResponseEntity<CustomerDTO> addCustomer(@RequestBody CustomerDTO customerDTO){
         return  ResponseEntity.ok(customerService.addCustomer(customerDTO));
     }
-    @GetMapping("/customer/{id}")
-    ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Long id){
-        return  ResponseEntity.ok(customerService.getCustomerById(id));
+    @GetMapping("/customer/{accountNumber}")
+    ResponseEntity<CustomerDTO> getCustomerById(@PathVariable String accountNumber){
+        return  ResponseEntity.ok(customerService.getCustomerById(accountNumber));
     }
 
-    @PatchMapping("/customer/{id}")
-    ResponseEntity<CustomerDTO> updateCustomerById(@RequestBody CustomerDTO customerDTO){
-        return  ResponseEntity.ok(customerService.updateCustomerById(customerDTO));
+    @PatchMapping("/customer/{accountNumber}")
+    ResponseEntity<CustomerDTO> updateCustomerById(@PathVariable String accountNumber, @RequestBody CustomerDTO customerDTO){
+        return  ResponseEntity.ok(customerService.updateCustomerById(accountNumber, customerDTO));
     }
     @DeleteMapping("/customer/{id}")
     ResponseEntity<CustomerDTO> deleteCustomerById(@PathVariable Long id){
