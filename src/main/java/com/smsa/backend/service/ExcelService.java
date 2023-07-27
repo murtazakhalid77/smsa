@@ -106,26 +106,33 @@ public class ExcelService {
                         invoicesWithAccount.add(invoiceDetails);
                     } else {
                         invoicesWithoutAccount.add(invoiceDetails);
-                        Customer customer = Customer
-                                .builder()
-                                .nameEnglish("System")
-                                .accountNumber(accountNumber)
-                                .status(false)
-                                .build();
+                        Customer customer = createPsedoCustomer(accountNumber);
                         customerRepository.save(customer);
                     }
                 }
             }
         }
 
-        SheetHistory sheetHistory =SheetHistory.builder()
+        SheetHistory sheetHistory = createSheetHistory(originalFilename);
+        sheetHistoryRepository.save(sheetHistory);
+
+        return mappedRowsMap;
+    }
+
+    private SheetHistory createSheetHistory(String originalFilename){
+        return  SheetHistory.builder()
                 .uniqueUUid(sheetId)
                 .name(originalFilename)
                 .isEmailSent(false)
                 .build();
-        sheetHistoryRepository.save(sheetHistory);
-
-        return mappedRowsMap;
+    }
+    private Customer createPsedoCustomer(String accountNumber){
+        return  Customer
+                .builder()
+                .nameEnglish("System")
+                .accountNumber(accountNumber)
+                .status(false)
+                .build();
     }
     private boolean checkAccountNumberInCustomerTable(String accountNumber) {
         Optional<Customer> customer = customerRepository.findByAccountNumber(accountNumber);
@@ -165,9 +172,7 @@ public class ExcelService {
                 .totalCharges(row.get(15).equals("-") || row.get(15).equals("") ? 0.0 : Double.parseDouble(row.get(15)))
                 .customDeclarationNumber(row.get(16).equals("-") || row.get(16).equals("") ? 0 : Long.parseLong(row.get(16)))
                 .customDeclarationDate(row.get(17).equals("-") || row.get(17).equals("") ? null : LocalDate.parse(row.get(17), formatter))
-
                 .build();
-        // Custom Declaration Date
 
         return invoiceDetails;
     }
@@ -191,40 +196,6 @@ public class ExcelService {
     }
 
 
-    //    public  void  fiterValuesbyMawb(List<List<String>> rowsToBeFilteredByMawb, int secondColumnIndex, String mawb) {
-//
-//        List<String> pdfRow= new ArrayList<>();
-//        for (List<String> row : rowsToBeFilteredByMawb) {
-//            if (row.size() > secondColumnIndex) {
-//                String secondColumnValue = row.get(secondColumnIndex);
-//                if (mawb.equals(secondColumnValue)) {
-//                    weight+=Double.parseDouble(row.get(9));
-//                    awbsCount+=1;
-//                    devalaredValueSAR+=Double.parseDouble(row.get(10));
-//                    vatAmount+=Double.parseDouble(row.get(11));
-//                    documentation+=Double.parseDouble(row.get(12));
-//
-//
-//                }
-//            }
-//        }
-//        pdfRow.add(mawb);
-//        pdfRow.add(String.valueOf(weight));
-//        pdfRow.add(String.valueOf(awbsCount));
-//        pdfRow.add(String.valueOf(devalaredValueSAR));
-//        pdfRow.add(String.valueOf(vatAmount));
-//        pdfRow.add(String.valueOf(documentation));
-//
-//        pdfRows.add(pdfRow);
-//        pdfRow.clear();
-//
-//        awbsCount=0.0;
-//        weight=0.0;
-//        devalaredValueSAR=0.0;
-//        vatAmount=0.0;
-//        documentation=0.0;
-//
-//    }
     public  Map<String, Map<String, List<List<String>>>> filterRowsByCommonKeyAndMawbNumber(MultipartFile multipartFile) {
 
         List<List<String>> rowsToBeFiltered = excelHelper.parseExcelFile(multipartFile);
@@ -274,14 +245,6 @@ public class ExcelService {
             System.out.println(); // Empty line between each group of rows with the same account number
         }
     }
-    public List<InvoiceDetails> toDomain(List<InvoiceDetailsDto> invoiceDetailsDtoList) {
-        java.lang.reflect.Type targetListType = new TypeToken<List<InvoiceDetails>>() {}.getType();
-        return modelMapper.map(invoiceDetailsDtoList, targetListType);
-    }
-    public  InvoiceDetailsDto toDto(InvoiceDetails invoiceDetails){
-        return modelMapper.map(invoiceDetails,InvoiceDetailsDto.class);
-    }
-
 }
 
 
