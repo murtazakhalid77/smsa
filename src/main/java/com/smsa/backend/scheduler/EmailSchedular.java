@@ -51,6 +51,7 @@ public class EmailSchedular {
         invoiceDetailsMap = groupInvoicesByAccountNumber(invoicesForSheet);
 
         for (String accountNumber : invoiceDetailsMap.keySet()) {
+
             List<InvoiceDetails> invoiceDetailsList = invoiceDetailsMap.get(accountNumber);
 
             if (invoiceDetailsList == null) {
@@ -62,8 +63,8 @@ public class EmailSchedular {
             if (!checkIsSentInMail(accountNumber)) {
                 Optional<Customer> customer = customerRepository.findByAccountNumber(accountNumber);
 
-                if (customer.isPresent() && customer.get().getEmail() != null) {
-                    logger.info("Making excel");
+                if (customer.isPresent() && customer.get().getEmail() != null && customer.get().getStatus().equals(true)) {
+                    logger.info("Making excel for Account Number: "+accountNumber);
                     try {
                         excelSheetService.updateExcelFile(invoiceDetailsList, customer.get());
 
@@ -73,7 +74,7 @@ public class EmailSchedular {
                         throw new RuntimeException("Error while creating Excel");
                     }
                 } else {
-                    logger.warn("Customer not found or no email provided for account number: " + accountNumber);
+                    logger.warn("Kindly update customer's email and status: " + accountNumber);
                     anyUnsentInvoice = true;
                 }
             }
