@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 
@@ -30,7 +31,6 @@ import java.util.*;
 public class ExcelService {
     @Autowired
     ExcelHelper excelHelper;
-    ModelMapper modelMapper;
     @Autowired
     CustomerRepository customerRepository;
     @Autowired
@@ -47,27 +47,44 @@ public class ExcelService {
     String sheetId = UUID.randomUUID().toString();
     private static final Logger logger = LoggerFactory.getLogger(ExcelService.class);
 
-
     public void saveInvoicesToDatabase(MultipartFile file) {
         Map<String, List<InvoiceDetails>> filterd =filterRowsByAccountNumber(file);
         for (List<InvoiceDetails> invoiceDetailsList : filterd.values()) {
             invoiceDetailsRepository.saveAll(invoiceDetailsList);
         }
     }
-    public Map<String, List<InvoiceDetails>> filterRowsByAccountNumber(MultipartFile multipartFile) {
-        List<List<String>> rowsToBeFiltered = excelHelper.parseExcelFile(multipartFile);
+    private void validateSheetName(String sheetName) {
+        if (sheetHistoryRepository.existsByName(sheetName)) {
+            logger.info(String.format("Sheet with the name %s already exists!", sheetName));
+            throw new SheetAlreadyExistException(String.format("Sheet with the name %s already exists!", sheetName));
+        }
+    }
 
+    public Map<String, List<InvoiceDetails>> filterRowsByAccountNumber(MultipartFile multipartFile) {
+        List<List<String>> rowsToBeFiltered;
         String originalFilename = multipartFile.getOriginalFilename();
 
-        //TODO: UPDATE WORK OF SHEET
-        if (sheetHistoryRepository.existsByName(originalFilename)) {
-            logger.info(String.format("Sheet with the name %s already exists!",originalFilename));
-            throw new SheetAlreadyExistException(String.format("Sheet with the name %s already exists!",originalFilename));
+        try {
+            rowsToBeFiltered = excelHelper.parseExcelFile(multipartFile);
+        } catch (Exception e) {
+            // Handle the exception, log the error, and return an empty map or null as appropriate
+            logger.error("Error parsing Excel file: " + e.getMessage(), e);
+            return Collections.emptyMap();
         }
 
-        if (rowsToBeFiltered.size() > 0) {
+        //TODO: UPDATE WORK OF SHEET
+        try {
+            validateSheetName(originalFilename);
+        } catch (SheetAlreadyExistException e) {
+            // Handle the exception, log the error, and throw a new exception or return as appropriate
+            logger.error("Sheet with the name " + originalFilename + " already exists!", e);
+            throw e;
+        }
+
+        if (!rowsToBeFiltered.isEmpty()) {
             rowsToBeFiltered.remove(0);
         }
+
         for (List<String> row : rowsToBeFiltered) {
             if (row.size() > 2) {
                 String commonKey = row.get(2);
@@ -76,38 +93,26 @@ public class ExcelService {
                     if (!mappedRowsMap.containsKey(commonKey)) {
                         mappedRowsMap.put(commonKey, new ArrayList<>());
                     }
-                    // Map the fields from the row list to the InvoiceDetails object
 
-                    InvoiceDetails invoiceDetails = mapToDomain(row);
+                    try {
+                        // Map the fields from the row list to the InvoiceDetails object
+                        InvoiceDetails invoiceDetails = mapToDomain(row);
+                        mapHelperFields(invoiceDetails);
 
-                    invoiceDetails.setSheetTimesStamp(currentDate);
-                    invoiceDetails.setSheetUniqueId(sheetId);
-                    invoiceDetails.setIsSentInMail(Boolean.FALSE);
-                    invoiceDetails.setCustomerTimestamp(currentDate);
+                        // Check if the account number exists in the accountNumberUuidMap
+                        String accountNumber = invoiceDetails.getInvoiceDetailsId().getAccountNumber();
+                        String customerUniqueId = generateCustomerUniqueId(accountNumber);
 
-                    // Check if the account number exists in the accountNumberUuidMap
-                    String accountNumber = invoiceDetails.getInvoiceDetailsId().getAccountNumber();
-                    if (accountNumberUuidMap.containsKey(accountNumber)) {
-                        // If the UUID already exists for the account number, set it to the InvoiceDetails
-                        String customerUniqueId = accountNumberUuidMap.get(accountNumber);
                         invoiceDetails.setCustomerUniqueId(customerUniqueId);
-                    } else {
-                        // If the UUID does not exist for the account number, generate a new one and set it
-                        String customerUniqueId = UUID.randomUUID().toString();
-                        accountNumberUuidMap.put(accountNumber, customerUniqueId);
-                        invoiceDetails.setCustomerUniqueId(customerUniqueId);
-                    }
 
-                    // Add the InvoiceDetails object to the list associated with the common key in the map
-                    mappedRowsMap.get(commonKey).add(invoiceDetails);
+                        // Add the InvoiceDetails object to the list associated with the common key in the map
+                        mappedRowsMap.get(commonKey).add(invoiceDetails);
 
-                    // Check if the invoice has an account number
-                    if (checkAccountNumberInCustomerTable(accountNumber)) {
-                        invoicesWithAccount.add(invoiceDetails);
-                    } else {
-                        invoicesWithoutAccount.add(invoiceDetails);
-                        Customer customer = createPsedoCustomer(accountNumber);
-                        customerRepository.save(customer);
+                        filterAccountAndNonAccountInvoice(invoiceDetails, accountNumber);
+
+                    } catch (Exception e) {
+                        // Handle the exception, log the error, and continue processing the next row
+                        logger.error("Error mapping row to InvoiceDetails: " + e.getMessage(), e);
                     }
                 }
             }
@@ -117,6 +122,37 @@ public class ExcelService {
         sheetHistoryRepository.save(sheetHistory);
 
         return mappedRowsMap;
+
+    }
+
+    private void filterAccountAndNonAccountInvoice(InvoiceDetails invoiceDetails, String accountNumber) {
+
+        if (checkAccountNumberInCustomerTable(accountNumber)) {
+            invoicesWithAccount.add(invoiceDetails);
+        } else {
+            invoicesWithoutAccount.add(invoiceDetails);
+            Customer customer = createPsedoCustomer(accountNumber);
+            customerRepository.save(customer);
+        }
+    }
+
+    private String generateCustomerUniqueId(String accountNumber) {
+        if (accountNumberUuidMap.containsKey(accountNumber)) {
+            // If the UUID already exists for the account number, return it
+            return accountNumberUuidMap.get(accountNumber);
+        } else {
+            // If the UUID does not exist for the account number, generate a new one and store it in the map
+            String customerUniqueId = UUID.randomUUID().toString();
+            accountNumberUuidMap.put(accountNumber, customerUniqueId);
+            return customerUniqueId;
+        }
+    }
+    private InvoiceDetails mapHelperFields(InvoiceDetails invoiceDetails) {
+        invoiceDetails.setSheetTimesStamp(currentDate);
+        invoiceDetails.setSheetUniqueId(sheetId);
+        invoiceDetails.setIsSentInMail(Boolean.FALSE);
+        invoiceDetails.setCustomerTimestamp(currentDate);
+        return invoiceDetails;
     }
 
     private SheetHistory createSheetHistory(String originalFilename){
@@ -147,34 +183,60 @@ public class ExcelService {
     }
 
     private InvoiceDetails mapToDomain(List<String> row) {
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMM-yy", Locale.ENGLISH);
         InvoiceDetailsId invoiceDetailsId = InvoiceDetailsId.builder()
-                .mawb(row.get(0).equals("-")||row.get(0).equals("") ? Long.parseLong("") :Long.parseLong(row.get(0)))
-                .manifestDate(row.get(1).equals("-") || row.get(1).equals("") ? null :LocalDate.parse(row.get(1),formatter))
-                .accountNumber(row.get(2).equals("-") || row.get(2).equals("") ? "" :row.get(2))
-                .awb(row.get(3).equals("-") || row.get(3).equals("") ? Long.parseLong("") :Long.parseLong(row.get(3)))
+                .mawb(parseLongOrDefault(row.get(0), 0L))
+                .manifestDate(parseLocalDateOrDefault(row.get(1), null, formatter))
+                .accountNumber(row.get(2))
+                .awb(parseLongOrDefault(row.get(3), 0L))
                 .build();
 
         InvoiceDetails invoiceDetails = InvoiceDetails.builder()
                 .invoiceDetailsId(invoiceDetailsId)
-                .orderNumber(row.get(4).equals("-") || row.get(4).equals("") ? "" : row.get(4))
-                .origin(row.get(5).equals("-") || row.get(5).equals("") ? "" : row.get(5))
-                .destination(row.get(6).equals("-") || row.get(6).equals("") ? "" : row.get(6))
-                .shippersName(row.get(7).equals("-") || row.get(7).equals("") ? "" : row.get(7))
-                .consigneeName(row.get(8).equals("-") || row.get(8).equals("") ? "" : row.get(8))
-                .weight(row.get(9).equals("-") || row.get(9).equals("") ? "" : row.get(9))
-                .declaredValue(row.get(10).equals("-") || row.get(10).equals("") ? 0 : Long.parseLong(row.get(10)))
-                .valueCustom(row.get(11).equals("-") || row.get(11).equals("") ? 0 : Long.parseLong(row.get(11)))
-                .vatAmount(row.get(12).equals("-") || row.get(12).equals("") ? 0.0 : Double.parseDouble(row.get(12)))
-                .customFormCharges(row.get(13).equals("-") || row.get(13).equals("") ? 0 : Long.parseLong(row.get(13)))
-                .other(row.get(14).equals("-") || row.get(14).equals("") ? 0 : Long.parseLong(row.get(14)))
-                .totalCharges(row.get(15).equals("-") || row.get(15).equals("") ? 0.0 : Double.parseDouble(row.get(15)))
-                .customDeclarationNumber(row.get(16).equals("-") || row.get(16).equals("") ? 0 : Long.parseLong(row.get(16)))
-                .customDeclarationDate(row.get(17).equals("-") || row.get(17).equals("") ? null : LocalDate.parse(row.get(17), formatter))
+                .orderNumber(row.get(4))
+                .origin(row.get(5))
+                .destination(row.get(6))
+                .shippersName(row.get(7))
+                .consigneeName(row.get(8))
+                .weight(row.get(9))
+                .declaredValue(parseLongOrDefault(row.get(10), 0L))
+                .valueCustom(parseLongOrDefault(row.get(11), 0L))
+                .vatAmount(parseDoubleOrDefault(row.get(12), 0.0))
+                .customFormCharges(parseLongOrDefault(row.get(13), 0L))
+                .other(parseLongOrDefault(row.get(14), 0L))
+                .totalCharges(parseDoubleOrDefault(row.get(15), 0.0))
+                .customDeclarationNumber(parseLongOrDefault(row.get(16), 0L))
+                .customDeclarationDate(parseLocalDateOrDefault(row.get(17), null, formatter))
                 .build();
 
         return invoiceDetails;
+    }
+
+    // Helper method to parse long values with default value on exception
+    private Long parseLongOrDefault(String value, Long defaultValue) {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    // Helper method to parse double values with default value on exception
+    private Double parseDoubleOrDefault(String value, Double defaultValue) {
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    // Helper method to parse LocalDate values with default value on exception
+    private LocalDate parseLocalDateOrDefault(String value, LocalDate defaultValue, DateTimeFormatter formatter) {
+        try {
+            return LocalDate.parse(value, formatter);
+        } catch (DateTimeParseException e) {
+            return defaultValue;
+        }
     }
 
 

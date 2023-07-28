@@ -21,10 +21,6 @@ import java.util.Locale;
 
 @Service
 public class ExcelHelper {
-    public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    static String[] HEADERs = {"Id", "Title", "Description", "Published"};
-    static String SHEET = "Tutorials";
-
     public static boolean hasExcelFormat(MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null) {
@@ -35,7 +31,7 @@ public class ExcelHelper {
         String lowercaseFilename = originalFilename.toLowerCase();
 
         // Check if the file has an Excel extension
-        return lowercaseFilename.endsWith(".xlsx") || lowercaseFilename.endsWith(".xls");
+        return lowercaseFilename.endsWith(".xlsx");
     }
 
 
