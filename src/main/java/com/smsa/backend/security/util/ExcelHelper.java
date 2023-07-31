@@ -35,7 +35,7 @@ public class ExcelHelper {
         String lowercaseFilename = originalFilename.toLowerCase();
 
         // Check if the file has an Excel extension
-        return lowercaseFilename.endsWith(".xlsx") || lowercaseFilename.endsWith(".xls");
+        return lowercaseFilename.endsWith(".xlsx");
     }
 
 
