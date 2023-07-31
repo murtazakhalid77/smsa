@@ -28,11 +28,11 @@ public class CustomerDTO {
 
     @NotNull(message = "Currency rate from SAR is required")
     @Min(value = 0, message = "Currency rate from SAR must be greater than or equal to 0")
-    private Long currencyRateFromSAR;
+    private Double currencyRateFromSAR;
 
     @NotNull(message = "SMSA service from SAR is required")
     @Min(value = 0, message = "SMSA service from SAR must be greater than or equal to 0")
-    private Long smsaServiceFromSAR;
+    private Double smsaServiceFromSAR;
 
     @NotBlank(message = "Emails are required")
     @Email(message = "Invalid email format")

@@ -21,8 +21,8 @@ public class Customer {
     @Id
     private String accountNumber;
     private String invoiceCurrency;
-    private Long currencyRateFromSAR;
-    private Long smsaServiceFromSAR;
+    private Double currencyRateFromSAR;
+    private Double smsaServiceFromSAR;
     private String email;
     private String nameArabic;
     private String nameEnglish;
@@ -42,6 +42,23 @@ public class Customer {
         return new CustomerBuilder();
     }
 
+    public Customer(final String accountNumber, final String invoiceCurrency, final Double currencyRateFromSAR, final Double smsaServiceFromSAR, final String email, final String nameArabic, final String nameEnglish, final String VatNumber, final String address, final String poBox, final String country, final Boolean status, final boolean isPresent, final Set<InvoiceDetails> invoiceDetailsSet) {
+        this.accountNumber = accountNumber;
+        this.invoiceCurrency = invoiceCurrency;
+        this.currencyRateFromSAR = currencyRateFromSAR;
+        this.smsaServiceFromSAR = smsaServiceFromSAR;
+        this.email = email;
+        this.nameArabic = nameArabic;
+        this.nameEnglish = nameEnglish;
+        this.VatNumber = VatNumber;
+        this.address = address;
+        this.poBox = poBox;
+        this.country = country;
+        this.status = status;
+        this.isPresent = isPresent;
+        this.invoiceDetailsSet = invoiceDetailsSet;
+    }
+
     public String getAccountNumber() {
         return this.accountNumber;
     }
@@ -50,11 +67,11 @@ public class Customer {
         return this.invoiceCurrency;
     }
 
-    public Long getCurrencyRateFromSAR() {
+    public Double getCurrencyRateFromSAR() {
         return this.currencyRateFromSAR;
     }
 
-    public Long getSmsaServiceFromSAR() {
+    public Double getSmsaServiceFromSAR() {
         return this.smsaServiceFromSAR;
     }
 
@@ -106,11 +123,11 @@ public class Customer {
         this.invoiceCurrency = invoiceCurrency;
     }
 
-    public void setCurrencyRateFromSAR(final Long currencyRateFromSAR) {
+    public void setCurrencyRateFromSAR(final Double currencyRateFromSAR) {
         this.currencyRateFromSAR = currencyRateFromSAR;
     }
 
-    public void setSmsaServiceFromSAR(final Long smsaServiceFromSAR) {
+    public void setSmsaServiceFromSAR(final Double smsaServiceFromSAR) {
         this.smsaServiceFromSAR = smsaServiceFromSAR;
     }
 
@@ -167,55 +184,51 @@ public class Customer {
             } else if (this.isPresent() != other.isPresent()) {
                 return false;
             } else {
-                label157: {
+                label169: {
                     Object this$currencyRateFromSAR = this.getCurrencyRateFromSAR();
                     Object other$currencyRateFromSAR = other.getCurrencyRateFromSAR();
                     if (this$currencyRateFromSAR == null) {
                         if (other$currencyRateFromSAR == null) {
-                            break label157;
+                            break label169;
                         }
                     } else if (this$currencyRateFromSAR.equals(other$currencyRateFromSAR)) {
-                        break label157;
+                        break label169;
                     }
 
                     return false;
                 }
 
-                label150: {
-                    Object this$smsaServiceFromSAR = this.getSmsaServiceFromSAR();
-                    Object other$smsaServiceFromSAR = other.getSmsaServiceFromSAR();
-                    if (this$smsaServiceFromSAR == null) {
-                        if (other$smsaServiceFromSAR == null) {
-                            break label150;
-                        }
-                    } else if (this$smsaServiceFromSAR.equals(other$smsaServiceFromSAR)) {
-                        break label150;
-                    }
-
-                    return false;
-                }
-
-                Object this$status = this.getStatus();
-                Object other$status = other.getStatus();
-                if (this$status == null) {
-                    if (other$status != null) {
+                Object this$smsaServiceFromSAR = this.getSmsaServiceFromSAR();
+                Object other$smsaServiceFromSAR = other.getSmsaServiceFromSAR();
+                if (this$smsaServiceFromSAR == null) {
+                    if (other$smsaServiceFromSAR != null) {
                         return false;
                     }
-                } else if (!this$status.equals(other$status)) {
+                } else if (!this$smsaServiceFromSAR.equals(other$smsaServiceFromSAR)) {
                     return false;
                 }
 
-                label136: {
-                    Object this$accountNumber = this.getAccountNumber();
-                    Object other$accountNumber = other.getAccountNumber();
-                    if (this$accountNumber == null) {
-                        if (other$accountNumber == null) {
-                            break label136;
+                label155: {
+                    Object this$status = this.getStatus();
+                    Object other$status = other.getStatus();
+                    if (this$status == null) {
+                        if (other$status == null) {
+                            break label155;
                         }
-                    } else if (this$accountNumber.equals(other$accountNumber)) {
-                        break label136;
+                    } else if (this$status.equals(other$status)) {
+                        break label155;
                     }
 
+                    return false;
+                }
+
+                Object this$accountNumber = this.getAccountNumber();
+                Object other$accountNumber = other.getAccountNumber();
+                if (this$accountNumber == null) {
+                    if (other$accountNumber != null) {
+                        return false;
+                    }
+                } else if (!this$accountNumber.equals(other$accountNumber)) {
                     return false;
                 }
 
@@ -229,27 +242,31 @@ public class Customer {
                     return false;
                 }
 
-                label122: {
+                label134: {
                     Object this$email = this.getEmail();
                     Object other$email = other.getEmail();
                     if (this$email == null) {
                         if (other$email == null) {
-                            break label122;
+                            break label134;
                         }
                     } else if (this$email.equals(other$email)) {
-                        break label122;
+                        break label134;
                     }
 
                     return false;
                 }
 
-                Object this$nameArabic = this.getNameArabic();
-                Object other$nameArabic = other.getNameArabic();
-                if (this$nameArabic == null) {
-                    if (other$nameArabic != null) {
-                        return false;
+                label127: {
+                    Object this$nameArabic = this.getNameArabic();
+                    Object other$nameArabic = other.getNameArabic();
+                    if (this$nameArabic == null) {
+                        if (other$nameArabic == null) {
+                            break label127;
+                        }
+                    } else if (this$nameArabic.equals(other$nameArabic)) {
+                        break label127;
                     }
-                } else if (!this$nameArabic.equals(other$nameArabic)) {
+
                     return false;
                 }
 
@@ -273,29 +290,29 @@ public class Customer {
                     return false;
                 }
 
-                label94: {
+                label106: {
                     Object this$address = this.getAddress();
                     Object other$address = other.getAddress();
                     if (this$address == null) {
                         if (other$address == null) {
-                            break label94;
+                            break label106;
                         }
                     } else if (this$address.equals(other$address)) {
-                        break label94;
+                        break label106;
                     }
 
                     return false;
                 }
 
-                label87: {
+                label99: {
                     Object this$poBox = this.getPoBox();
                     Object other$poBox = other.getPoBox();
                     if (this$poBox == null) {
                         if (other$poBox == null) {
-                            break label87;
+                            break label99;
                         }
                     } else if (this$poBox.equals(other$poBox)) {
-                        break label87;
+                        break label99;
                     }
 
                     return false;
@@ -308,6 +325,16 @@ public class Customer {
                         return false;
                     }
                 } else if (!this$country.equals(other$country)) {
+                    return false;
+                }
+
+                Object this$invoiceDetailsSet = this.getInvoiceDetailsSet();
+                Object other$invoiceDetailsSet = other.getInvoiceDetailsSet();
+                if (this$invoiceDetailsSet == null) {
+                    if (other$invoiceDetailsSet != null) {
+                        return false;
+                    }
+                } else if (!this$invoiceDetailsSet.equals(other$invoiceDetailsSet)) {
                     return false;
                 }
 
@@ -348,38 +375,19 @@ public class Customer {
         result = result * 59 + ($poBox == null ? 43 : $poBox.hashCode());
         Object $country = this.getCountry();
         result = result * 59 + ($country == null ? 43 : $country.hashCode());
+        Object $invoiceDetailsSet = this.getInvoiceDetailsSet();
+        result = result * 59 + ($invoiceDetailsSet == null ? 43 : $invoiceDetailsSet.hashCode());
         return result;
-    }
-
-    public Customer(final String accountNumber, final String invoiceCurrency, final Long currencyRateFromSAR, final Long smsaServiceFromSAR, final String email, final String nameArabic, final String nameEnglish, final String VatNumber, final String address, final String poBox, final String country, final Boolean status, final boolean isPresent, final Set<InvoiceDetails> invoiceDetailsSet) {
-        this.accountNumber = accountNumber;
-        this.invoiceCurrency = invoiceCurrency;
-        this.currencyRateFromSAR = currencyRateFromSAR;
-        this.smsaServiceFromSAR = smsaServiceFromSAR;
-        this.email = email;
-        this.nameArabic = nameArabic;
-        this.nameEnglish = nameEnglish;
-        this.VatNumber = VatNumber;
-        this.address = address;
-        this.poBox = poBox;
-        this.country = country;
-        this.status = status;
-        this.isPresent = isPresent;
-        this.invoiceDetailsSet = invoiceDetailsSet;
     }
 
     public Customer() {
     }
 
-    public String toString() {
-        return "Customer(accountNumber=" + this.getAccountNumber() + ", invoiceCurrency=" + this.getInvoiceCurrency() + ", currencyRateFromSAR=" + this.getCurrencyRateFromSAR() + ", smsaServiceFromSAR=" + this.getSmsaServiceFromSAR() + ", email=" + this.getEmail() + ", nameArabic=" + this.getNameArabic() + ", nameEnglish=" + this.getNameEnglish() + ", VatNumber=" + this.getVatNumber() + ", address=" + this.getAddress() + ", poBox=" + this.getPoBox() + ", country=" + this.getCountry() + ", status=" + this.getStatus() + ", isPresent=" + this.isPresent() + ")";
-    }
-
     public static class CustomerBuilder {
         private String accountNumber;
         private String invoiceCurrency;
-        private Long currencyRateFromSAR;
-        private Long smsaServiceFromSAR;
+        private Double currencyRateFromSAR;
+        private Double smsaServiceFromSAR;
         private String email;
         private String nameArabic;
         private String nameEnglish;
@@ -404,12 +412,12 @@ public class Customer {
             return this;
         }
 
-        public CustomerBuilder currencyRateFromSAR(final Long currencyRateFromSAR) {
+        public CustomerBuilder currencyRateFromSAR(final Double currencyRateFromSAR) {
             this.currencyRateFromSAR = currencyRateFromSAR;
             return this;
         }
 
-        public CustomerBuilder smsaServiceFromSAR(final Long smsaServiceFromSAR) {
+        public CustomerBuilder smsaServiceFromSAR(final Double smsaServiceFromSAR) {
             this.smsaServiceFromSAR = smsaServiceFromSAR;
             return this;
         }
@@ -468,7 +476,6 @@ public class Customer {
         public Customer build() {
             return new Customer(this.accountNumber, this.invoiceCurrency, this.currencyRateFromSAR, this.smsaServiceFromSAR, this.email, this.nameArabic, this.nameEnglish, this.VatNumber, this.address, this.poBox, this.country, this.status, this.isPresent, this.invoiceDetailsSet);
         }
-
 
     }
 }

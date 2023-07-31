@@ -6,7 +6,9 @@ import com.smsa.backend.model.SheetHistory;
 import com.smsa.backend.repository.CustomerRepository;
 import com.smsa.backend.repository.InvoiceDetailsRepository;
 import com.smsa.backend.repository.SheetHistoryRepository;
+import com.smsa.backend.service.EmailService;
 import com.smsa.backend.service.ExcelSheetService;
+import com.smsa.backend.service.PdfGenerator;
 import org.slf4j.Logger;
 
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,10 @@ public class EmailSchedular {
     CustomerRepository customerRepository;
     @Autowired
     ExcelSheetService excelSheetService;
+    @Autowired
+    PdfGenerator pdfGenerator;
+    @Autowired
+    EmailService emailService;
 
     private static final Logger logger = LoggerFactory.getLogger(EmailSchedular.class);
     private Map<String, List<InvoiceDetails>> invoiceDetailsMap;
@@ -51,6 +57,7 @@ public class EmailSchedular {
         invoiceDetailsMap = groupInvoicesByAccountNumber(invoicesForSheet);
 
         for (String accountNumber : invoiceDetailsMap.keySet()) {
+
             List<InvoiceDetails> invoiceDetailsList = invoiceDetailsMap.get(accountNumber);
 
             if (invoiceDetailsList == null) {
@@ -62,18 +69,19 @@ public class EmailSchedular {
             if (!checkIsSentInMail(accountNumber)) {
                 Optional<Customer> customer = customerRepository.findByAccountNumber(accountNumber);
 
-                if (customer.isPresent() && customer.get().getEmail() != null) {
-                    logger.info("Making excel");
+                if (customer.isPresent() && customer.get().getEmail() != null && customer.get().getStatus().equals(true)) {
+                    logger.info("Making excel for Account Number: "+accountNumber);
                     try {
-                        excelSheetService.updateExcelFile(invoiceDetailsList, customer.get());
-
+                        excelSheetService.updateExcelFile(invoiceDetailsList, customer.get(),sheetUniqueId);
+                        pdfGenerator.makePdf(invoiceDetailsList,customer.get(),sheetUniqueId);
+                        emailService.sendMailWithAttachment(customer.get());
                         invoiceDetailsRepository.updateIsSentInMailByAccountNumberAndSheetUniqueId(accountNumber, sheetUniqueId);
                     }
                      catch (IOException e) {
-                        throw new RuntimeException("Error while creating Excel");
+                        throw new RuntimeException("Error while creating Excel ");
                     }
                 } else {
-                    logger.warn("Customer not found or no email provided for account number: " + accountNumber);
+                    logger.warn("Kindly update customer's email and status: " + accountNumber);
                     anyUnsentInvoice = true;
                 }
             }
