@@ -42,7 +42,7 @@ public class PdfGenerator {
     Document document = new Document(PageSize.A4, 10, 10, 30, 50);
 
     try {
-        PdfWriter.getInstance(document, new FileOutputStream("C:\\Users\\Bionic Computer\\IdeaProjects\\untitled5\\header_table.pdf"));
+        PdfWriter.getInstance(document, new FileOutputStream("C:\\Users\\Bionic Computer\\Desktop\\backend\\src\\main\\java\\com\\smsa\\backend\\assets\\testFile.pdf"));
         document.open();
 
         PdfPTable headerTable = new PdfPTable(2);
@@ -68,7 +68,7 @@ public class PdfGenerator {
         Font arabicFont = FontFactory.getFont("C:\\Users\\Bionic Computer\\IdeaProjects\\untitled5\\src\\main\\java\\org\\example\\NotoNaskhArabic-VariableFont_wght.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         arabicFont.setSize(10);
 
-        String test = customer.getVatNumber()+": ﻟﺮﻗﻢ ﺍﻟﻀﺮﻳﺒﻲ:";
+        String test = ": ﻟﺮﻗﻢ ﺍﻟﻀﺮﻳﺒﻲ:"+customer.getVatNumber();
         arabicCell.addElement(new Paragraph("ﺷﺮﻛﺔ ﺳﻤﺴﺎ ﻟﻠﻨﻘﻞ ﺍﻟﺴﺮﻳﻊ ﺍﻟﻤﺤﺪﻭﺩﺓ", arabicFont));
         arabicCell.addElement(new Paragraph(test, arabicFont));
 
@@ -105,6 +105,7 @@ public class PdfGenerator {
         englishCell.setBorder(Rectangle.NO_BORDER);
 
         Font englishFont = new Font(Font.FontFamily.TIMES_ROMAN, 10);
+        Font pdfFont = new Font(Font.FontFamily.TIMES_ROMAN, 8);
         Font englishBoldFont = new Font(Font.FontFamily.TIMES_ROMAN, 10,Font.BOLD);
         Font columnFontBold = new Font(Font.FontFamily.TIMES_ROMAN, 8,Font.BOLD);
         englishCell.addElement(new Paragraph("Invoice To.", englishBoldFont));
@@ -120,7 +121,7 @@ public class PdfGenerator {
         arabicContentCell.addElement(new Paragraph("الفاتورة  إلى.", arabicFont));
         arabicContentCell.addElement(new Paragraph(	"اسم الشركة: "+customer.getNameArabic(), arabicFont));
         arabicContentCell.addElement(new Paragraph("\tالرقم الضريبي #:"+customer.getVatNumber(), arabicFont));
-        arabicContentCell.addElement(new Paragraph("\tالرياض,  المملكة العربية السعودية", arabicFont));
+        arabicContentCell.addElement(new Paragraph("\t"+customer.getAddress(), arabicFont));
 
         invoiceTable.addCell(englishCell);
         invoiceTable.addCell(arabicContentCell);
@@ -145,7 +146,7 @@ public class PdfGenerator {
         arabicAdditionalCell.setRunDirection(PdfWriter.RUN_DIRECTION_RTL);
 
         arabicAdditionalCell.addElement(new Paragraph("رقم حساب العميل: "+customer.getAccountNumber(), arabicFont));
-        arabicAdditionalCell.addElement(new Paragraph("رقم  الفاتورة:" + arabicFont)); //TODO:invoice work
+        arabicAdditionalCell.addElement(new Paragraph("رقم  الفاتورة:" ,arabicFont)); //TODO:invoice work
         arabicAdditionalCell.addElement(new Paragraph("تاريخ الفاتورة:\t"+LocalDate.now(), arabicFont));
         arabicAdditionalCell.addElement(new Paragraph("عملة الفاتورة:"+customer.getInvoiceCurrency(), arabicFont));
 
@@ -190,7 +191,7 @@ public class PdfGenerator {
 
 
         // Create the table with specified columns and cell properties
-        PdfPTable dataTable = new PdfPTable(11  );
+        PdfPTable dataTable = new PdfPTable(11 );
         dataTable.setWidthPercentage(100);
         dataTable.setSpacingBefore(20); // Add space before the table
 
@@ -228,6 +229,7 @@ public class PdfGenerator {
         columnMapping.put("SMSA Fee Charges", "SMSAFeeCharges");
         columnMapping.put("Total Amount", "TotalAmount");
         columnMapping.put("Custom Port", "CustomPort");
+        columnMapping.put("VAT on SMSA Fee","VatOnSmsaFees");
 
 
         // Add the column names to the table
@@ -252,8 +254,8 @@ public class PdfGenerator {
                 Object value = rowDataMap.get(keyName);
 
                 // Get the data as strings and add them to the table cells
-                PdfPCell cell = new PdfPCell(new Paragraph(value != null ? value.toString() : "", arabicFont));
-                cell.setVerticalAlignment(Element.ALIGN_MIDDLE); // Align content in the middle
+                PdfPCell cell = new PdfPCell(new Paragraph(value != null ? value.toString() : "", pdfFont));
+                cell.setVerticalAlignment(Element.ALIGN_CENTER); // Align content in the middle
                 dataTable.addCell(cell);
             }
         }

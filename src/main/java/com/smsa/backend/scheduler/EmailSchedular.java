@@ -6,6 +6,7 @@ import com.smsa.backend.model.SheetHistory;
 import com.smsa.backend.repository.CustomerRepository;
 import com.smsa.backend.repository.InvoiceDetailsRepository;
 import com.smsa.backend.repository.SheetHistoryRepository;
+import com.smsa.backend.service.EmailService;
 import com.smsa.backend.service.ExcelSheetService;
 import com.smsa.backend.service.PdfGenerator;
 import org.slf4j.Logger;
@@ -31,6 +32,8 @@ public class EmailSchedular {
     ExcelSheetService excelSheetService;
     @Autowired
     PdfGenerator pdfGenerator;
+    @Autowired
+    EmailService emailService;
 
     private static final Logger logger = LoggerFactory.getLogger(EmailSchedular.class);
     private Map<String, List<InvoiceDetails>> invoiceDetailsMap;
@@ -71,8 +74,8 @@ public class EmailSchedular {
                     try {
                         excelSheetService.updateExcelFile(invoiceDetailsList, customer.get(),sheetUniqueId);
                         pdfGenerator.makePdf(invoiceDetailsList,customer.get(),sheetUniqueId);
-
-                       // invoiceDetailsRepository.updateIsSentInMailByAccountNumberAndSheetUniqueId(accountNumber, sheetUniqueId);
+                        emailService.sendMailWithAttachment(customer.get());
+                        invoiceDetailsRepository.updateIsSentInMailByAccountNumberAndSheetUniqueId(accountNumber, sheetUniqueId);
                     }
                      catch (IOException e) {
                         throw new RuntimeException("Error while creating Excel ");

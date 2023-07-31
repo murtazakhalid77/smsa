@@ -9,17 +9,17 @@ import java.util.*;
 
 @Component
 public class HashMapHelper {
-    Long totalAwbCount = 0L;
-    Double customerShipmentValue = 0.0;
-    Double vatAmountCustomDeclartionForm = 0.0;
-    Double customFormChares = 0.0;
-    Double others = 0.0;
-    Double totalValue=0.0;
-    Set<Long> customDecarationNumberSet = new HashSet<>();
-    Map<String, List<InvoiceDetails>> filteredRowsMap  = new HashMap<>();
 
-    public List<Map<String, Object>> calculateValues(Map<String, List<InvoiceDetails>> filteredRowsMap, Customer customer, Custom custom) {
+
+    public List<Map<String, Object>>    calculateValues(Map<String, List<InvoiceDetails>> filteredRowsMap, Customer customer, Custom custom) {
         List<Map<String, Object>> resultList = new ArrayList<>();
+
+        Long totalAwbCount = 0L;
+        Double customerShipmentValue = 0.0;
+        Double vatAmountCustomDeclartionForm = 0.0;
+        Double customFormChares = 0.0;
+        Double others = 0.0;
+        Double totalValue=0.0;
 
         for (Map.Entry<String, List<InvoiceDetails>> entry : filteredRowsMap.entrySet()) {
             String mawbNumber = entry.getKey();
@@ -27,7 +27,14 @@ public class HashMapHelper {
 
             Map<String, Object> calculatedValuesMap = new HashMap<>(); // Create a new Map for each iteration
 
-            customDecarationNumberSet.clear();
+            Set<Long> customDecarationNumberSet = new HashSet<>();
+
+            totalAwbCount = 0L;
+            customerShipmentValue = 0.0;
+            vatAmountCustomDeclartionForm = 0.0;
+            customFormChares = 0.0;
+            others = 0.0;
+            totalValue=0.0;
 
             for (InvoiceDetails invoiceDetails : filterInvoiceDetails) {
                 totalAwbCount += 1;
@@ -58,13 +65,16 @@ public class HashMapHelper {
             calculatedValuesMap.put("SMSAFeeCharges", customer.getSmsaServiceFromSAR());
             calculatedValuesMap.put("TotalAmount", calculateTotalAmount(calculatedValuesMap.get("VatAmountCustomDeclarationForm").toString(), calculatedValuesMap.get("CustomFormCharges").toString(), calculatedValuesMap.get("Others").toString(), calculatedValuesMap.get("SMSAFeeCharges").toString(), custom.getSmsaFeeVat()));
             calculatedValuesMap.put("CustomPort",custom.getCustomPort());
+            calculatedValuesMap.put("VatOnSmsaFees", calculateVatOnSmsaFees(Double.valueOf(calculatedValuesMap.get("SMSAFeeCharges").toString()),custom.getSmsaFeeVat()));
+
             resultList.add(calculatedValuesMap);
         }
 
         return resultList;
     }
-
-
+    public Double calculateVatOnSmsaFees(Double smsaFeesCharges,Double smsaFeeVat){
+        return (smsaFeesCharges * smsaFeeVat) / 100;
+    }
     private Double calculateTotalAmount(String vatChargesAsPerCustomDeclarationForm, String customFormCharges, String otherCharges, String smsaFeesCharges, Double vatOnSmsaFees) {
         Double vatCharges = Double.valueOf(vatChargesAsPerCustomDeclarationForm);
         Double customFormChargesValue = Double.valueOf(customFormCharges);
@@ -72,7 +82,7 @@ public class HashMapHelper {
         Double smsaFeesChargesValue = Double.valueOf(smsaFeesCharges);
 
         // Calculate the VAT amount on SMSA fees based on the percentage
-        Double vatAmountOnSmsaFees = (smsaFeesChargesValue * vatOnSmsaFees) / 100;
+        Double vatAmountOnSmsaFees =  calculateVatOnSmsaFees(smsaFeesChargesValue ,vatOnSmsaFees);
 
         // Calculate the total amount by summing up all the charges
         Double totalAmount = vatCharges + customFormChargesValue + otherChargesValue + smsaFeesChargesValue + vatAmountOnSmsaFees;
@@ -82,6 +92,7 @@ public class HashMapHelper {
 
 
     public Map<String, List<InvoiceDetails>> filterRowsByMawbNumber(List<InvoiceDetails> invoiceDetailsList) {
+        Map<String, List<InvoiceDetails>> filteredRowsMap  = new HashMap<>();
 
         for (InvoiceDetails invoiceDetails : invoiceDetailsList) {
             String mawbNumber = invoiceDetails.getInvoiceDetailsId().getMawb().toString();
