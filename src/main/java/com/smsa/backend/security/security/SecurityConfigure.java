@@ -33,16 +33,14 @@ public class SecurityConfigure extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.headers().cacheControl();
         http.csrf().disable()
-                // dont authenticate this particular request
                 .authorizeRequests()
-                .antMatchers("/api/**").permitAll().
-                // all other requests need to be authenticated
+                .antMatchers("/api/login").permitAll().
                         anyRequest().authenticated()
-                // make sure we use stateless session; session won't be used to
-                // store user's state.
                         .and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.cors();
 
 
         http.addFilterBefore(jwtRequestFilter,UsernamePasswordAuthenticationFilter.class);

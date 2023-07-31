@@ -22,7 +22,7 @@ public class ExcelController {
     @Autowired
     ExcelService fileService;
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/upload")
     public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("custom") String customName) {
         Map<String, Object> response = new HashMap<>();
