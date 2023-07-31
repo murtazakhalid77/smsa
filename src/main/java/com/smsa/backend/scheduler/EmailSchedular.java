@@ -7,6 +7,7 @@ import com.smsa.backend.repository.CustomerRepository;
 import com.smsa.backend.repository.InvoiceDetailsRepository;
 import com.smsa.backend.repository.SheetHistoryRepository;
 import com.smsa.backend.service.ExcelSheetService;
+import com.smsa.backend.service.PdfGenerator;
 import org.slf4j.Logger;
 
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,8 @@ public class EmailSchedular {
     CustomerRepository customerRepository;
     @Autowired
     ExcelSheetService excelSheetService;
+    @Autowired
+    PdfGenerator pdfGenerator;
 
     private static final Logger logger = LoggerFactory.getLogger(EmailSchedular.class);
     private Map<String, List<InvoiceDetails>> invoiceDetailsMap;
@@ -66,12 +69,13 @@ public class EmailSchedular {
                 if (customer.isPresent() && customer.get().getEmail() != null && customer.get().getStatus().equals(true)) {
                     logger.info("Making excel for Account Number: "+accountNumber);
                     try {
-                        excelSheetService.updateExcelFile(invoiceDetailsList, customer.get());
+                        excelSheetService.updateExcelFile(invoiceDetailsList, customer.get(),sheetUniqueId);
+                        pdfGenerator.makePdf(invoiceDetailsList,customer.get(),sheetUniqueId);
 
-                        invoiceDetailsRepository.updateIsSentInMailByAccountNumberAndSheetUniqueId(accountNumber, sheetUniqueId);
+                       // invoiceDetailsRepository.updateIsSentInMailByAccountNumberAndSheetUniqueId(accountNumber, sheetUniqueId);
                     }
                      catch (IOException e) {
-                        throw new RuntimeException("Error while creating Excel");
+                        throw new RuntimeException("Error while creating Excel ");
                     }
                 } else {
                     logger.warn("Kindly update customer's email and status: " + accountNumber);

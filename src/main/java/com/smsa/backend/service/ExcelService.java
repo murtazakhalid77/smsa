@@ -3,10 +3,8 @@ package com.smsa.backend.service;
 
 import com.smsa.backend.Exception.SheetAlreadyExistException;
 import com.smsa.backend.dto.InvoiceDetailsDto;
-import com.smsa.backend.model.Customer;
-import com.smsa.backend.model.InvoiceDetails;
-import com.smsa.backend.model.InvoiceDetailsId;
-import com.smsa.backend.model.SheetHistory;
+import com.smsa.backend.model.*;
+import com.smsa.backend.repository.CustomRepository;
 import com.smsa.backend.repository.CustomerRepository;
 import com.smsa.backend.repository.InvoiceDetailsRepository;
 import com.smsa.backend.repository.SheetHistoryRepository;
@@ -37,6 +35,10 @@ public class ExcelService {
     SheetHistoryRepository sheetHistoryRepository;
     @Autowired
     private InvoiceDetailsRepository invoiceDetailsRepository;
+    @Autowired
+    private PdfGenerator pdfGenerator;
+    @Autowired
+    private CustomRepository customRepository;
 
     List<InvoiceDetails> invoicesWithAccount = new ArrayList<>();
     List<InvoiceDetails>invoicesWithoutAccount = new ArrayList<>();
@@ -47,8 +49,8 @@ public class ExcelService {
     String sheetId = UUID.randomUUID().toString();
     private static final Logger logger = LoggerFactory.getLogger(ExcelService.class);
 
-    public void saveInvoicesToDatabase(MultipartFile file) {
-        Map<String, List<InvoiceDetails>> filterd =filterRowsByAccountNumber(file);
+    public void saveInvoicesToDatabase(MultipartFile file, String customName) {
+        Map<String, List<InvoiceDetails>> filterd =filterRowsByAccountNumber(file ,customName);
         for (List<InvoiceDetails> invoiceDetailsList : filterd.values()) {
             invoiceDetailsRepository.saveAll(invoiceDetailsList);
         }
@@ -60,7 +62,7 @@ public class ExcelService {
         }
     }
 
-    public Map<String, List<InvoiceDetails>> filterRowsByAccountNumber(MultipartFile multipartFile) {
+    public Map<String, List<InvoiceDetails>> filterRowsByAccountNumber(MultipartFile multipartFile,String customName) {
         List<List<String>> rowsToBeFiltered;
         String originalFilename = multipartFile.getOriginalFilename();
 
@@ -118,7 +120,7 @@ public class ExcelService {
             }
         }
 
-        SheetHistory sheetHistory = createSheetHistory(originalFilename);
+        SheetHistory sheetHistory = createSheetHistory(originalFilename,customName);
         sheetHistoryRepository.save(sheetHistory);
 
         return mappedRowsMap;
@@ -155,11 +157,14 @@ public class ExcelService {
         return invoiceDetails;
     }
 
-    private SheetHistory createSheetHistory(String originalFilename){
+    private SheetHistory createSheetHistory(String originalFilename,String customName){
+        Optional<Custom> custom = customRepository.findByCustom(customName);
+
         return  SheetHistory.builder()
                 .uniqueUUid(sheetId)
                 .name(originalFilename)
                 .isEmailSent(false)
+                .custom(custom.get())
                 .build();
     }
     private Customer createPsedoCustomer(String accountNumber){
@@ -198,15 +203,16 @@ public class ExcelService {
                 .destination(row.get(6))
                 .shippersName(row.get(7))
                 .consigneeName(row.get(8))
-                .weight(row.get(9))
-                .declaredValue(parseLongOrDefault(row.get(10), 0L))
-                .valueCustom(parseLongOrDefault(row.get(11), 0L))
+                .weight(parseDoubleOrDefault(row.get(9),0.0))
+                .declaredValue(parseDoubleOrDefault(row.get(10), 0.0))
+                .valueCustom(parseDoubleOrDefault(row.get(11), 0.0))
                 .vatAmount(parseDoubleOrDefault(row.get(12), 0.0))
-                .customFormCharges(parseLongOrDefault(row.get(13), 0L))
-                .other(parseLongOrDefault(row.get(14), 0L))
+                .customFormCharges(parseDoubleOrDefault(row.get(13), 0.0))
+                .other(parseDoubleOrDefault(row.get(14), 0.0))
                 .totalCharges(parseDoubleOrDefault(row.get(15), 0.0))
                 .customDeclarationNumber(parseLongOrDefault(row.get(16), 0L))
-                .customDeclarationDate(parseLocalDateOrDefault(row.get(17), null, formatter))
+                .ref(row.get(17))
+                .customDeclarationDate(parseLocalDateOrDefault(row.get(18), null, formatter))
                 .build();
 
         return invoiceDetails;

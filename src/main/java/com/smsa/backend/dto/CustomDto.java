@@ -12,6 +12,6 @@ public class CustomDto {
     private Long id;
     private String customPort;
     private String custom;
-    private Long smsaFeeVat;
+    private Double smsaFeeVat;
     private boolean isPresent;
 }

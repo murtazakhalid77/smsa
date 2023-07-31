@@ -5,16 +5,40 @@ import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import org.springframework.stereotype.Component;
+import com.smsa.backend.model.Custom;
+import com.smsa.backend.model.Customer;
+import com.smsa.backend.model.InvoiceDetails;
+import com.smsa.backend.model.SheetHistory;
+import com.smsa.backend.repository.SheetHistoryRepository;
+import com.smsa.backend.security.util.HashMapHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@Component
-public class pdfGenerator {
-public void makePdf(){
+@Service
+public class PdfGenerator {
+    Map<String, List<InvoiceDetails>> filteredRowsMap;
+    @Autowired
+    HashMapHelper hashMapHelper;
+
+    @Autowired
+    SheetHistoryRepository sheetHistoryRepository;
+    Custom custom;
+    public SheetHistory getCustom(String sheetUniqueUUid){
+      return  sheetHistoryRepository.findByUniqueUUid(sheetUniqueUUid);
+    }
+
+    public void makePdf(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId){
+
+        this.custom =getCustom(sheetUniqueId).getCustom();
+
     Document document = new Document(PageSize.A4, 10, 10, 30, 50);
 
     try {
@@ -44,7 +68,7 @@ public void makePdf(){
         Font arabicFont = FontFactory.getFont("C:\\Users\\Bionic Computer\\IdeaProjects\\untitled5\\src\\main\\java\\org\\example\\NotoNaskhArabic-VariableFont_wght.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         arabicFont.setSize(10);
 
-        String test = ""+"ﻟﺮﻗﻢ ﺍﻟﻀﺮﻳﺒﻲ:34567890";
+        String test = customer.getVatNumber()+": ﻟﺮﻗﻢ ﺍﻟﻀﺮﻳﺒﻲ:";
         arabicCell.addElement(new Paragraph("ﺷﺮﻛﺔ ﺳﻤﺴﺎ ﻟﻠﻨﻘﻞ ﺍﻟﺴﺮﻳﻊ ﺍﻟﻤﺤﺪﻭﺩﺓ", arabicFont));
         arabicCell.addElement(new Paragraph(test, arabicFont));
 
@@ -84,9 +108,9 @@ public void makePdf(){
         Font englishBoldFont = new Font(Font.FontFamily.TIMES_ROMAN, 10,Font.BOLD);
         Font columnFontBold = new Font(Font.FontFamily.TIMES_ROMAN, 8,Font.BOLD);
         englishCell.addElement(new Paragraph("Invoice To.", englishBoldFont));
-        englishCell.addElement(new Paragraph("Customer Name:\tSMSA Express Transportation Company Ltd.", englishFont));
-        englishCell.addElement(new Paragraph("Customer VAT#\t\t300057426900003", englishFont));
-        englishCell.addElement(new Paragraph("\t\t\tRiyadh, Kingdom of Saudi Arabia", englishFont));
+        englishCell.addElement(new Paragraph("Customer Name:\t"+customer.getNameEnglish(), englishFont));
+        englishCell.addElement(new Paragraph("Customer VAT#\t\t+"+customer.getVatNumber(), englishFont));
+        englishCell.addElement(new Paragraph("\t\t\t"+customer.getAddress(), englishFont));
 
         // Right column: Arabic content
         PdfPCell arabicContentCell = new PdfPCell();
@@ -94,8 +118,8 @@ public void makePdf(){
         arabicContentCell.setRunDirection(PdfWriter.RUN_DIRECTION_RTL);
 
         arabicContentCell.addElement(new Paragraph("الفاتورة  إلى.", arabicFont));
-        arabicContentCell.addElement(new Paragraph(	"اسم الشركة: "+"شركة سمسا اكسبريس للنقل المحدودة.", arabicFont));
-        arabicContentCell.addElement(new Paragraph("\tالرقم الضريبي #", arabicFont));
+        arabicContentCell.addElement(new Paragraph(	"اسم الشركة: "+customer.getNameArabic(), arabicFont));
+        arabicContentCell.addElement(new Paragraph("\tالرقم الضريبي #:"+customer.getVatNumber(), arabicFont));
         arabicContentCell.addElement(new Paragraph("\tالرياض,  المملكة العربية السعودية", arabicFont));
 
         invoiceTable.addCell(englishCell);
@@ -110,20 +134,20 @@ public void makePdf(){
         PdfPCell englishAdditionalCell = new PdfPCell();
         englishAdditionalCell.setBorder(Rectangle.NO_BORDER);
 
-        englishAdditionalCell.addElement(new Paragraph("Customer Account Number:", englishFont));
-        englishAdditionalCell.addElement(new Paragraph("Invoice#", englishFont));
-        englishAdditionalCell.addElement(new Paragraph("Invocie Date:\t30-Mar-23", englishFont));
-        englishAdditionalCell.addElement(new Paragraph("Invoice Currency: USD", englishFont));
+        englishAdditionalCell.addElement(new Paragraph("Customer Account Number:"+customer.getAccountNumber(), englishFont));
+        englishAdditionalCell.addElement(new Paragraph("Invoice#", englishFont)); //TODO: invoice work
+        englishAdditionalCell.addElement(new Paragraph("Invocie Date:\t"+ LocalDate.now(), englishFont));
+        englishAdditionalCell.addElement(new Paragraph("Invoice Currency:"+customer.getInvoiceCurrency(), englishFont));
 
         // Right column: Arabic content
         PdfPCell arabicAdditionalCell = new PdfPCell();
         arabicAdditionalCell.setBorder(Rectangle.NO_BORDER);
         arabicAdditionalCell.setRunDirection(PdfWriter.RUN_DIRECTION_RTL);
 
-        arabicAdditionalCell.addElement(new Paragraph("رقم حساب العميل:", arabicFont));
-        arabicAdditionalCell.addElement(new Paragraph("رقم  الفاتورة:", arabicFont));
-        arabicAdditionalCell.addElement(new Paragraph("تاريخ الفاتورة:\t30-Mar-23", arabicFont));
-        arabicAdditionalCell.addElement(new Paragraph("عملة الفاتورة: USD", arabicFont));
+        arabicAdditionalCell.addElement(new Paragraph("رقم حساب العميل: "+customer.getAccountNumber(), arabicFont));
+        arabicAdditionalCell.addElement(new Paragraph("رقم  الفاتورة:" + arabicFont)); //TODO:invoice work
+        arabicAdditionalCell.addElement(new Paragraph("تاريخ الفاتورة:\t"+LocalDate.now(), arabicFont));
+        arabicAdditionalCell.addElement(new Paragraph("عملة الفاتورة:"+customer.getInvoiceCurrency(), arabicFont));
 
         additionalContentTable.addCell(englishAdditionalCell);
         additionalContentTable.addCell(arabicAdditionalCell);
@@ -173,8 +197,9 @@ public void makePdf(){
         // Set column height to 50 points
         float columnHeight = 50;
 
+
         // List to store column names
-        java.util.List<String> columnNames = new ArrayList<>();
+        List<String> columnNames = new ArrayList<>();
         columnNames.add("Custom Port");
         columnNames.add("Invoice Type");
         columnNames.add("Invoice No");
@@ -186,6 +211,24 @@ public void makePdf(){
         columnNames.add("SMSA Fee Charges");
         columnNames.add("VAT on SMSA Fee");
         columnNames.add("Total Amount");
+
+        Map<String, String> columnMapping = new HashMap<>();
+        columnMapping.put("MAWB No.", "MawbNumber");
+        columnMapping.put("Total AWB Count", "TotalAwbCount");
+        columnMapping.put("Customer Shipment Value", "CustomerShipmentValue");
+        columnMapping.put("VAT Charges as per Custom Declaration Form", "VatAmountCustomDeclarationForm");
+        columnMapping.put("Custom Form Charges", "CustomFormCharges");
+        columnMapping.put("Other Charges", "Others");
+        columnMapping.put("Total Charges", "TotalCharges");
+        columnMapping.put("Total Value", "TotalValue");
+        columnMapping.put("Custom Declaration Number", "CustomDeclarationNumber");
+        columnMapping.put("Customer Account Number", "CustomerAccountNumber");
+        columnMapping.put("Invoice Number", "InvoiceNumber");
+        columnMapping.put("Invoice Type", "InvoiceType");
+        columnMapping.put("SMSA Fee Charges", "SMSAFeeCharges");
+        columnMapping.put("Total Amount", "TotalAmount");
+        columnMapping.put("Custom Port", "CustomPort");
+
 
         // Add the column names to the table
         for (String columnName : columnNames) {
@@ -199,22 +242,17 @@ public void makePdf(){
             dataTable.addCell(cell);
         }
 
-        List<String[]> dummyDataList = new ArrayList<>();
-        dummyDataList.add(new String[]{"Port A", "Type 1", "INV001", "MAWB001", "DECL001", "100", "50", "20","88","66","66","55"});
-        dummyDataList.add(new String[]{"Port A", "Type 1", "INV001", "MAWB001", "DECL001", "100", "50", "20","88","66","66","55"});
-        dummyDataList.add(new String[]{"Port A", "Type 1", "INV001", "MAWB001", "DECL001", "100", "50", "20","88","66","66","55"});
-        dummyDataList.add(new String[]{"Port A", "Type 1", "INV001", "MAWB001", "DECL001", "100", "50", "20","88","66","66","55"});
-        dummyDataList.add(new String[]{"Port A", "Type 1", "INV001", "MAWB001", "DECL001", "100", "50", "20","88","66","66","55"});
-        dummyDataList.add(new String[]{"Port A", "Type 1", "INV001", "MAWB001", "DECL001", "100", "50", "20","88","66","66","55"});
-        dummyDataList.add(new String[]{"Port A", "Type 1", "INV001", "MAWB001", "DECL001", "100", "50", "20","88","66","66","55"});
-        dummyDataList.add(new String[]{"Port A", "Type 1", "INV001", "MAWB001", "DECL001", "100", "50", "20","88","66","66","55"});
-        dummyDataList.add(new String[]{"Port A", "Type 1", "INV001", "MAWB001", "DECL001", "100", "50", "20","88","66","66","55"});
-        dummyDataList.add(new String[]{"Port A", "Type 1", "INV001", "MAWB001", "DECL001", "100", "50", "20","88","66","66","55"});
-        dummyDataList.add(new String[]{"Port A", "Type 1", "INV001", "MAWB001", "DECL001", "100", "50", "20","88","66","66","55"});
-        dummyDataList.add(new String[]{"Port A", "Type 1", "INV001", "MAWB001", "DECL001", "100", "50", "20","88","66","66","55"});
-        for (String[] rowData : dummyDataList) {
-            for (String data : rowData) {
-                PdfPCell cell = new PdfPCell(new Paragraph(data, arabicFont));
+        filteredRowsMap = hashMapHelper.filterRowsByMawbNumber(invoiceDetailsList);
+
+        List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap, customer,this.custom);
+
+        for (Map<String, Object> rowDataMap : calculatedValuesList) {
+            for (String columnName : columnNames) {
+                String keyName = columnMapping.get(columnName);
+                Object value = rowDataMap.get(keyName);
+
+                // Get the data as strings and add them to the table cells
+                PdfPCell cell = new PdfPCell(new Paragraph(value != null ? value.toString() : "", arabicFont));
                 cell.setVerticalAlignment(Element.ALIGN_MIDDLE); // Align content in the middle
                 dataTable.addCell(cell);
             }

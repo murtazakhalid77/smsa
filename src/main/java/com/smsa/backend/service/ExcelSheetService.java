@@ -1,10 +1,15 @@
 package com.smsa.backend.service;
 
+import com.smsa.backend.model.Custom;
 import com.smsa.backend.model.Customer;
 import com.smsa.backend.model.InvoiceDetails;
+import com.smsa.backend.model.SheetHistory;
+import com.smsa.backend.repository.SheetHistoryRepository;
+import com.smsa.backend.security.util.HashMapHelper;
 import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -16,10 +21,22 @@ import java.util.stream.Collectors;
 public class ExcelSheetService {
 
     Map<String, List<InvoiceDetails>> filteredRowsMap;
+
+    @Autowired
+    HashMapHelper hashMapHelper;
+    @Autowired
+    SheetHistoryRepository sheetHistoryRepository;
     private static final Logger logger = LoggerFactory.getLogger(ExcelSheetService.class);
 
+    Custom custom;
+    public SheetHistory getCustom(String sheetUniqueUUid){
+        return  sheetHistoryRepository.findByUniqueUUid(sheetUniqueUUid);
+    }
 
-    public void updateExcelFile (List<InvoiceDetails> invoiceDetailsList, Customer customer) throws IOException {
+
+    public void updateExcelFile (List<InvoiceDetails> invoiceDetailsList, Customer customer,String sheetUniqueId) throws IOException {
+
+        this.custom=getCustom(sheetUniqueId).getCustom();
 
         logger.info("Inside update excel method");
 
@@ -34,6 +51,7 @@ public class ExcelSheetService {
         CellStyle style = makeStyleForTheSheet(existingWorkbook);
 
         int rowCount = 1;
+
 
         // Iterate through the invoiceDetailsList for the current group
         for (InvoiceDetails invoiceDetails : invoiceDetailsList) {
@@ -81,15 +99,15 @@ public class ExcelSheetService {
 
             // Weight
             cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getWeight());
+            cell.setCellValue(invoiceDetails.getWeight().toString());
 
             // Declared Value
             cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getDeclaredValue());
+            cell.setCellValue(invoiceDetails.getDeclaredValue().toString());
 
             // Value (Custom)
             cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getValueCustom());
+            cell.setCellValue(invoiceDetails.getValueCustom().toString());
 
             // VAT Amount
             cell = row.createCell(++columnCount);
@@ -97,11 +115,11 @@ public class ExcelSheetService {
 
             // Custom Form Charges
             cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getCustomFormCharges());
+            cell.setCellValue(invoiceDetails.getCustomFormCharges().toString());
 
             // Other
             cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getOther());
+            cell.setCellValue(invoiceDetails.getOther().toString());
 
             // Total Charges
             cell = row.createCell(++columnCount);
@@ -128,10 +146,11 @@ public class ExcelSheetService {
         Cell invoiceDateCell = summarySheet.getRow(6).getCell(9);
         invoiceDateCell.setCellValue(LocalDate.now());
 
-        filteredRowsMap = new HashMap<>();
-        filteredRowsMap = filterRowsByMawbNumber(invoiceDetailsList);
 
-        List<Map<String, Object>> calculatedValuesList = calculateValues(filteredRowsMap, customer.getAccountNumber());
+        //filter against mawb
+        filteredRowsMap = hashMapHelper.filterRowsByMawbNumber(invoiceDetailsList);
+
+        List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap, customer,this.custom);
 
         int startingRow = 9;
         for (Map<String, Object> calculatedValuesMap : calculatedValuesList) {
@@ -165,22 +184,22 @@ public class ExcelSheetService {
             totalAwbCountCell.setCellValue(Long.parseLong(calculatedValuesMap.get("TotalAwbCount").toString()));
 
             Cell totalValueCell = row.createCell(5);
-            totalValueCell.setCellValue(Long.parseLong(calculatedValuesMap.get("TotalValue").toString()));
+            totalValueCell.setCellValue(Double.parseDouble(calculatedValuesMap.get("TotalValue").toString()));
 
             Cell customerShipmentValueCell = row.createCell(6);
-            customerShipmentValueCell.setCellValue(Long.parseLong(calculatedValuesMap.get("CustomerShipmentValue").toString()));
+            customerShipmentValueCell.setCellValue(Double.parseDouble(calculatedValuesMap.get("CustomerShipmentValue").toString()));
 
             Cell vatAmountCell = row.createCell(7);
             vatAmountCell.setCellValue(Double.parseDouble(calculatedValuesMap.get("VatAmountCustomDeclarationForm").toString()));
 
             Cell customFormChargesCell = row.createCell(8);
-            customFormChargesCell.setCellValue(Long.parseLong(calculatedValuesMap.get("CustomFormCharges").toString()));
+            customFormChargesCell.setCellValue(Double.parseDouble(calculatedValuesMap.get("CustomFormCharges").toString()));
 
             Cell othersCell = row.createCell(9);
-            othersCell.setCellValue(Long.parseLong(calculatedValuesMap.get("Others").toString()));
+            othersCell.setCellValue(Double.parseDouble(calculatedValuesMap.get("Others").toString()));
 
             Cell totalChargesCell = row.createCell(10);
-            totalChargesCell.setCellValue(Long.parseLong(calculatedValuesMap.get("TotalCharges").toString()));
+            totalChargesCell.setCellValue(Double.parseDouble(calculatedValuesMap.get("TotalCharges").toString()));
 
             // Move to the next row
             startingRow++;
@@ -219,74 +238,9 @@ public class ExcelSheetService {
         return style;
     }
 
-    public List<Map<String, Object>> calculateValues(Map<String, List<InvoiceDetails>> filteredRowsMap, String accountNumber) {
-        List<Map<String, Object>>  testList = new ArrayList<>();
-
-        Set<Long> customDecarationNumberSet = new HashSet<>();
-
-        Map<String, Object> calculatedValuesMap = new HashMap<>();
-
-        Long totalAwbCount = 0L;
-        Long customerShipmentValue = 0L;
-        Double vatAmountCustomDeclartionForm = 0.0;
-        Long customFormChares = 0L;
-        Long others = 0L;
-
-        for (Map.Entry<String, List<InvoiceDetails>> entry : filteredRowsMap.entrySet()) {
-            String mawbNumber = entry.getKey();
-            List<InvoiceDetails> filterInvoiceDetails = entry.getValue();
-            customDecarationNumberSet.clear();
-
-            totalAwbCount = 0L;
-            customerShipmentValue = 0L;
-            vatAmountCustomDeclartionForm = 0.0;
-            customFormChares = 0L;
-            others = 0L;
-
-            for (InvoiceDetails invoiceDetails : filterInvoiceDetails) {
-                totalAwbCount += 1;
-                customerShipmentValue += invoiceDetails.getValueCustom();
-                vatAmountCustomDeclartionForm += invoiceDetails.getVatAmount();
-                customFormChares += invoiceDetails.getCustomFormCharges();
-                others += invoiceDetails.getOther();
-                customDecarationNumberSet.add(invoiceDetails.getCustomDeclarationNumber());
-            }
-            // Put the MAWB number into the calculatedValuesMap for each iteration
-            calculatedValuesMap.put("MawbNumber", mawbNumber);
-            Long totalCharges = customFormChares + others;
-
-            // Put the calculated values into the result map
-            calculatedValuesMap.put("TotalAwbCount", totalAwbCount);
-            calculatedValuesMap.put("CustomerShipmentValue", customerShipmentValue);
-            calculatedValuesMap.put("VatAmountCustomDeclarationForm", vatAmountCustomDeclartionForm);
-            calculatedValuesMap.put("CustomFormCharges", customFormChares);
-            calculatedValuesMap.put("Others", others);
-            calculatedValuesMap.put("TotalCharges", totalCharges);
-            calculatedValuesMap.put("CustomDeclarationNumber", customDecarationNumberSet);
-            calculatedValuesMap.put("CustomerAccountNumber", accountNumber);
-            calculatedValuesMap.put("InvoiceNumber","dummy");
-
-            testList.add(calculatedValuesMap);
-        }
-
-        // Calculate total charges
 
 
-        return testList;
-    }
 
-    public Map<String, List<InvoiceDetails>> filterRowsByMawbNumber(List<InvoiceDetails> invoiceDetailsList) {
-
-        for (InvoiceDetails invoiceDetails : invoiceDetailsList) {
-            String mawbNumber = invoiceDetails.getInvoiceDetailsId().getMawb().toString();
-
-            if (!mawbNumber.isEmpty()) {
-                filteredRowsMap.putIfAbsent(mawbNumber, new ArrayList<>());
-                filteredRowsMap.get(mawbNumber).add(invoiceDetails);
-            }
-        }
-        return filteredRowsMap;
-    }
 
 
 

@@ -1,5 +1,6 @@
 package com.smsa.backend.controller;
 
+import com.smsa.backend.model.Custom;
 import com.smsa.backend.model.InvoiceDetails;
 import com.smsa.backend.security.util.ExcelHelper;
 import com.smsa.backend.service.ExcelService;
@@ -23,14 +24,14 @@ public class ExcelController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/upload")
-    public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("custom") String customName) {
         Map<String, Object> response = new HashMap<>();
         Set<String> accountNumbers = new HashSet<>();
         String message = "";
 
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
-                fileService.saveInvoicesToDatabase(file);
+                fileService.saveInvoicesToDatabase(file,customName);
 
                 for (InvoiceDetails invoiceDetails : fileService.getInvoicesWithoutAccount()) {
                     accountNumbers.add(invoiceDetails.getInvoiceDetailsId().getAccountNumber());
