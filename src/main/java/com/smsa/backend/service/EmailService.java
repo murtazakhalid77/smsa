@@ -10,9 +10,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Component;
 
 import javax.mail.internet.MimeMessage;
-
+@Component
 public class EmailService {
     private static final Logger logger = LoggerFactory.getLogger(EmailSchedular.class);
     @Autowired
@@ -26,17 +27,15 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
             helper.setFrom(sender);
-            helper.setTo(customer.getNameEnglish());
-            //helper.setSubject(details.getSubject());
-
-            helper.setText("Hello world");
+            helper.setTo(customer.getEmail());
+            helper.setSubject("Invoice Generated");
 
             // Add attachment
-            FileSystemResource excel = new FileSystemResource("C:\\Users\\Bionic Computer\\Desktop\\backend\\src\\main\\java\\com\\smsa\\backend\\assets\\testFile.xlsx");
+            FileSystemResource excel = new FileSystemResource("src/main/resources/static/invoice.xlsx");
             helper.addAttachment(excel.getFilename(), excel);
-            FileSystemResource pdf = new FileSystemResource("C:\\Users\\Bionic Computer\\Desktop\\backend\\src\\main\\java\\com\\smsa\\backend\\assets\\testFile.pdf");
+            FileSystemResource pdf = new FileSystemResource("src/main/resources/static/invoice.pdf");
             helper.addAttachment(pdf.getFilename(), pdf);;
-            logger.info("Email Sent to ");
+            logger.info("Email Sent to: " +customer.getNameEnglish()+ " "+ customer.getAccountNumber());
             javaMailSender.send(message);
             return "Mail sent successfully with attachment.";
         } catch (Exception e) {

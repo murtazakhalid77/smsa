@@ -30,17 +30,21 @@ public class PdfGenerator {
 
     @Autowired
     SheetHistoryRepository sheetHistoryRepository;
+
+    Font arabicFont = FontFactory.getFont("C:\\Users\\Bionic Computer\\IdeaProjects\\untitled5\\src\\main\\java\\org\\example\\NotoNaskhArabic-VariableFont_wght.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+
+
+    Font englishFont = new Font(Font.FontFamily.TIMES_ROMAN, 10);
+    Font pdfFont = new Font(Font.FontFamily.TIMES_ROMAN, 8);
+    Font englishBoldFont = new Font(Font.FontFamily.TIMES_ROMAN, 10,Font.BOLD);
+    Font columnFontBold = new Font(Font.FontFamily.TIMES_ROMAN, 8,Font.BOLD);
     Custom custom;
-    public SheetHistory getCustom(String sheetUniqueUUid){
-      return  sheetHistoryRepository.findByUniqueUUid(sheetUniqueUUid);
-    }
 
     public void makePdf(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId){
-
         this.custom =getCustom(sheetUniqueId).getCustom();
 
     Document document = new Document(PageSize.A4, 10, 10, 30, 50);
-
+        arabicFont.setSize(10);
     try {
         PdfWriter.getInstance(document, new FileOutputStream("C:\\Users\\Bionic Computer\\Desktop\\backend\\src\\main\\java\\com\\smsa\\backend\\assets\\testFile.pdf"));
         document.open();
@@ -65,8 +69,6 @@ public class PdfGenerator {
         arabicCell.setBorder(Rectangle.NO_BORDER);
         arabicCell.setRunDirection(PdfWriter.RUN_DIRECTION_RTL);
 
-        Font arabicFont = FontFactory.getFont("C:\\Users\\Bionic Computer\\IdeaProjects\\untitled5\\src\\main\\java\\org\\example\\NotoNaskhArabic-VariableFont_wght.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-        arabicFont.setSize(10);
 
         String test = ": ﻟﺮﻗﻢ ﺍﻟﻀﺮﻳﺒﻲ:"+customer.getVatNumber();
         arabicCell.addElement(new Paragraph("ﺷﺮﻛﺔ ﺳﻤﺴﺎ ﻟﻠﻨﻘﻞ ﺍﻟﺴﺮﻳﻊ ﺍﻟﻤﺤﺪﻭﺩﺓ", arabicFont));
@@ -104,10 +106,6 @@ public class PdfGenerator {
         PdfPCell englishCell = new PdfPCell();
         englishCell.setBorder(Rectangle.NO_BORDER);
 
-        Font englishFont = new Font(Font.FontFamily.TIMES_ROMAN, 10);
-        Font pdfFont = new Font(Font.FontFamily.TIMES_ROMAN, 8);
-        Font englishBoldFont = new Font(Font.FontFamily.TIMES_ROMAN, 10,Font.BOLD);
-        Font columnFontBold = new Font(Font.FontFamily.TIMES_ROMAN, 8,Font.BOLD);
         englishCell.addElement(new Paragraph("Invoice To.", englishBoldFont));
         englishCell.addElement(new Paragraph("Customer Name:\t"+customer.getNameEnglish(), englishFont));
         englishCell.addElement(new Paragraph("Customer VAT#\t\t+"+customer.getVatNumber(), englishFont));
@@ -198,22 +196,11 @@ public class PdfGenerator {
         // Set column height to 50 points
         float columnHeight = 50;
 
-
+        List<String> columnNames =getColumnNamesList();
         // List to store column names
-        List<String> columnNames = new ArrayList<>();
-        columnNames.add("Custom Port");
-        columnNames.add("Invoice Type");
-        columnNames.add("Invoice No");
-        columnNames.add("MAWB No.");
-        columnNames.add("Custom Declaration No");
-        columnNames.add("VAT Charges as per Custom Declaration Form");
-        columnNames.add("Custom Form Charges");
-        columnNames.add("Other Charges");
-        columnNames.add("SMSA Fee Charges");
-        columnNames.add("VAT on SMSA Fee");
-        columnNames.add("Total Amount");
 
         Map<String, String> columnMapping = new HashMap<>();
+
         columnMapping.put("MAWB No.", "MawbNumber");
         columnMapping.put("Total AWB Count", "TotalAwbCount");
         columnMapping.put("Customer Shipment Value", "CustomerShipmentValue");
@@ -316,5 +303,23 @@ public class PdfGenerator {
         e.printStackTrace();
     }
 }
+    private List<String> getColumnNamesList() {
+        List<String> columnNames = new ArrayList<>();
+        columnNames.add("Custom Port");
+        columnNames.add("Invoice Type");
+        columnNames.add("Invoice No");
+        columnNames.add("MAWB No.");
+        columnNames.add("Custom Declaration No");
+        columnNames.add("VAT Charges as per Custom Declaration Form");
+        columnNames.add("Custom Form Charges");
+        columnNames.add("Other Charges");
+        columnNames.add("SMSA Fee Charges");
+        columnNames.add("VAT on SMSA Fee");
+        columnNames.add("Total Amount");
+        return columnNames;
+    }
+    public SheetHistory getCustom(String sheetUniqueUUid){
+        return  sheetHistoryRepository.findByUniqueUUid(sheetUniqueUUid);
+    }
 }
 

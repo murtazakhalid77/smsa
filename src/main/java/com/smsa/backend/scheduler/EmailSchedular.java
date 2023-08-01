@@ -1,11 +1,13 @@
 package com.smsa.backend.scheduler;
 
+import com.smsa.backend.constants.Paths;
 import com.smsa.backend.model.Customer;
 import com.smsa.backend.model.InvoiceDetails;
 import com.smsa.backend.model.SheetHistory;
 import com.smsa.backend.repository.CustomerRepository;
 import com.smsa.backend.repository.InvoiceDetailsRepository;
 import com.smsa.backend.repository.SheetHistoryRepository;
+import com.smsa.backend.security.util.ExcelMaker;
 import com.smsa.backend.service.EmailService;
 import com.smsa.backend.service.ExcelSheetService;
 import com.smsa.backend.service.PdfGenerator;
@@ -32,6 +34,8 @@ public class EmailSchedular {
     ExcelSheetService excelSheetService;
     @Autowired
     PdfGenerator pdfGenerator;
+    @Autowired
+    ExcelMaker excelMaker;
     @Autowired
     EmailService emailService;
 
@@ -70,15 +74,23 @@ public class EmailSchedular {
                 Optional<Customer> customer = customerRepository.findByAccountNumber(accountNumber);
 
                 if (customer.isPresent() && customer.get().getEmail() != null && customer.get().getStatus().equals(true)) {
-                    logger.info("Making excel for Account Number: "+accountNumber);
+                    logger.info("Making excel for Account Number: " + accountNumber);
                     try {
-                        excelSheetService.updateExcelFile(invoiceDetailsList, customer.get(),sheetUniqueId);
-                        pdfGenerator.makePdf(invoiceDetailsList,customer.get(),sheetUniqueId);
+                        //make a clean sheet
+                        ExcelMaker.cleanExcel(Paths.SRC_FILE_PATH.getPath());
+
+                        excelSheetService.updateExcelFile(invoiceDetailsList, customer.get(), sheetUniqueId);
+
+                        pdfGenerator.makePdf(invoiceDetailsList, customer.get(), sheetUniqueId);
+
                         emailService.sendMailWithAttachment(customer.get());
+
                         invoiceDetailsRepository.updateIsSentInMailByAccountNumberAndSheetUniqueId(accountNumber, sheetUniqueId);
-                    }
-                     catch (IOException e) {
-                        throw new RuntimeException("Error while creating Excel ");
+                    } catch (IOException e) {
+                        // Log the error and continue to the next iteration
+                        logger.error("Error while creating Excel for Account Number: " + accountNumber, e);
+                        anyUnsentInvoice = true;
+                        continue;
                     }
                 } else {
                     logger.warn("Kindly update customer's email and status: " + accountNumber);
@@ -87,7 +99,10 @@ public class EmailSchedular {
             }
         }
 
-        updateSheetHistoryStatus(sheetUniqueId, anyUnsentInvoice);
+        // Update sheet history status only if there were no exceptions during the process
+        if (!anyUnsentInvoice) {
+            updateSheetHistoryStatus(sheetUniqueId, anyUnsentInvoice);
+        }
     }
 
     private void updateSheetHistoryStatus(String sheetUniqueId, boolean anyUnsentInvoice) {

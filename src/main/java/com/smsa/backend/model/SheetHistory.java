@@ -21,6 +21,7 @@ public class SheetHistory {
     private String name;
     private String uniqueUUid;
     private Boolean isEmailSent;
+    private String invoiceDate;
     @OneToOne
     @JoinColumn(name = "custom_id", referencedColumnName = "id")
     private Custom custom;
