@@ -1,5 +1,6 @@
 package com.smsa.backend.service;
 
+import com.smsa.backend.constants.Paths;
 import com.smsa.backend.model.Custom;
 import com.smsa.backend.model.Customer;
 import com.smsa.backend.model.InvoiceDetails;
@@ -29,207 +30,98 @@ public class ExcelSheetService {
     private static final Logger logger = LoggerFactory.getLogger(ExcelSheetService.class);
 
     Custom custom;
-    public SheetHistory getCustom(String sheetUniqueUUid){
+    public SheetHistory getSheetHistory(String sheetUniqueUUid){
         return  sheetHistoryRepository.findByUniqueUUid(sheetUniqueUUid);
     }
 
 
     public void updateExcelFile (List<InvoiceDetails> invoiceDetailsList, Customer customer,String sheetUniqueId) throws IOException {
 
-        this.custom=getCustom(sheetUniqueId).getCustom();
+        this.custom=getSheetHistory(sheetUniqueId).getCustom();
 
         logger.info("Inside update excel method");
 
-        String excelFilePath = "C:\\Users\\Bionic Computer\\Desktop\\backend\\src\\main\\java\\com\\smsa\\backend\\assets\\testFile.xlsx";
+        FileInputStream fileInputStream = new FileInputStream(Paths.SRC_FILE_PATH.getPath());
+        Workbook newWorkBook = WorkbookFactory.create(fileInputStream);
 
-        logger.info("Inside update excel method");
+        Sheet invoiceDetailSheet = newWorkBook.getSheetAt(1);
 
-        FileInputStream fileInputStream = new FileInputStream(excelFilePath);
-        Workbook existingWorkbook = WorkbookFactory.create(fileInputStream);
+        CellStyle style = makeStyleForTheSheet(newWorkBook);
 
-        Sheet invoiceDetailSheet = existingWorkbook.getSheetAt(1);
-        CellStyle style = makeStyleForTheSheet(existingWorkbook);
+        setInvoiceDetailsCellValues(invoiceDetailSheet,invoiceDetailsList,style);
 
-        int rowCount = 1;
+        Sheet summarySheet = newWorkBook.getSheetAt(0);
 
+        setSummarySheetCellValues(summarySheet,customer,sheetUniqueId);
 
-        // Iterate through the invoiceDetailsList for the current group
-        for (InvoiceDetails invoiceDetails : invoiceDetailsList) {
-
-            Row row = invoiceDetailSheet.createRow(rowCount);
-            row.setRowStyle(style);
-            int columnCount = 0;
-
-
-            Cell cell;
-            // MAWB
-            cell = row.createCell(columnCount);
-            cell.setCellValue(invoiceDetails.getInvoiceDetailsId().getMawb().toString());
-
-            // Manifest Date
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getInvoiceDetailsId().getManifestDate().toString());
-
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getInvoiceDetailsId().getAccountNumber());
-
-            // AWB
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getInvoiceDetailsId().getAwb().toString());
-
-            // Order Number
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getOrderNumber());
-
-            // Origin
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getOrigin());
-
-            // Destination
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getDestination());
-
-            // Shipper Name
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getShippersName());
-
-            // Consignee Name
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getConsigneeName());
-
-            // Weight
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getWeight().toString());
-
-            // Declared Value
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getDeclaredValue().toString());
-
-            // Value (Custom)
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getValueCustom().toString());
-
-            // VAT Amount
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getVatAmount());
-
-            // Custom Form Charges
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getCustomFormCharges().toString());
-
-            // Other
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getOther().toString());
-
-            // Total Charges
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getTotalCharges());
-
-            // Custom Declaration #
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getCustomDeclarationNumber());
-
-            // Custom Declaration Date
-            cell = row.createCell(++columnCount);
-            cell.setCellValue(invoiceDetails.getCustomDeclarationDate().toString());
-
-            rowCount++;
-        }
-
-        Sheet summarySheet = existingWorkbook.getSheetAt(0);
-        Cell nameCell = summarySheet.getRow(5).getCell(1);
-        nameCell.setCellValue(customer.getNameEnglish().toString());
-
-        Cell accountNumberCell = summarySheet.getRow(6).getCell(1);
-        accountNumberCell.setCellValue(customer.getAccountNumber().toString());
-
-        Cell invoiceDateCell = summarySheet.getRow(6).getCell(9);
-        invoiceDateCell.setCellValue(LocalDate.now());
-
-
-        //filter against mawb
         filteredRowsMap = hashMapHelper.filterRowsByMawbNumber(invoiceDetailsList);
 
         List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap, customer,this.custom);
 
-        int startingRow = 9;
-        for (Map<String, Object> calculatedValuesMap : calculatedValuesList) {
-            // Set the Invoice#
-            String invoiceNumber = calculatedValuesMap.get("InvoiceNumber").toString();
-            Row row = summarySheet.createRow(startingRow);
-            Cell invoiceNumberCell = row.createCell(0);
-            invoiceNumberCell.setCellValue(invoiceNumber);
-
-            // Set the Custom Declaration#
-            Set<Long> customDeclarationNumbers = (Set<Long>) calculatedValuesMap.get("CustomDeclarationNumber");
-            String customDeclarationNumbersString = customDeclarationNumbers.stream()
-                    .map(Object::toString)
-                    .collect(Collectors.joining("/"));
-
-            Cell customDeclarationNumberCell = row.createCell(1);
-            customDeclarationNumberCell.setCellValue(customDeclarationNumbersString);
-
-            // Set the Customer Account
-            String customerAccountNumber = calculatedValuesMap.get("CustomerAccountNumber").toString();
-            Cell customerAccountNumberCell = row.createCell(2);
-            customerAccountNumberCell.setCellValue(customerAccountNumber);
-
-            // Set the MAWB Number
-            String mawbNumber = calculatedValuesMap.get("MawbNumber").toString();
-            Cell mawbNumberCell = row.createCell(3);
-            mawbNumberCell.setCellValue(mawbNumber);
-
-            // Set other calculated values
-            Cell totalAwbCountCell = row.createCell(4);
-            totalAwbCountCell.setCellValue(Long.parseLong(calculatedValuesMap.get("TotalAwbCount").toString()));
-
-            Cell totalValueCell = row.createCell(5);
-            totalValueCell.setCellValue(Double.parseDouble(calculatedValuesMap.get("TotalValue").toString()));
-
-            Cell customerShipmentValueCell = row.createCell(6);
-            customerShipmentValueCell.setCellValue(Double.parseDouble(calculatedValuesMap.get("CustomerShipmentValue").toString()));
-
-            Cell vatAmountCell = row.createCell(7);
-            vatAmountCell.setCellValue(Double.parseDouble(calculatedValuesMap.get("VatAmountCustomDeclarationForm").toString()));
-
-            Cell customFormChargesCell = row.createCell(8);
-            customFormChargesCell.setCellValue(Double.parseDouble(calculatedValuesMap.get("CustomFormCharges").toString()));
-
-            Cell othersCell = row.createCell(9);
-            othersCell.setCellValue(Double.parseDouble(calculatedValuesMap.get("Others").toString()));
-
-            Cell totalChargesCell = row.createCell(10);
-            totalChargesCell.setCellValue(Double.parseDouble(calculatedValuesMap.get("TotalCharges").toString()));
-
-            // Move to the next row
-            startingRow++;
-        }
-
-
-
+        populateCalculatedValues(summarySheet,calculatedValuesList);
 
         fileInputStream.close();
 
-            FileOutputStream fileOutputStream = new FileOutputStream(excelFilePath);
-            existingWorkbook.write(fileOutputStream);
-            existingWorkbook.close();
-            fileOutputStream.close();
+        FileOutputStream fileOutputStream = new FileOutputStream(Paths.DEST_FILE_PATH.getPath());
+        newWorkBook.write(fileOutputStream);
+        newWorkBook.close();
+        fileOutputStream.close();
 
-            logger.info("Excel sheet updated successfully......");
+        logger.info("Excel sheet updated successfully......");
 
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
         }
+    private void setSummarySheetCellValues(Sheet summarySheet, Customer customer, String sheetUniqueId) {
+        Cell nameCell = summarySheet.getRow(3).getCell(1);
+        setCellValue(nameCell, customer.getNameEnglish());
+
+        Cell accountNumberCell = summarySheet.getRow(4).getCell(1);
+        setCellValue(accountNumberCell, customer.getAccountNumber());
+
+        Cell invoiceDateCell = summarySheet.getRow(3).getCell(9);
+        setCellValue(invoiceDateCell, getSheetHistory(sheetUniqueId).getInvoiceDate());
+    }
+
+    private void setInvoiceDetailsCellValues(Sheet invoiceDetailSheet, List<InvoiceDetails> invoiceDetailsList,CellStyle style) {
+        int rowCount = 1;
+
+
+        for (InvoiceDetails invoiceDetails : invoiceDetailsList) {
+            Row row = invoiceDetailSheet.createRow(rowCount);
+            int columnCount = 0;
+            Cell cell;
+
+            setCellValue(row, columnCount, invoiceDetails.getInvoiceDetailsId().getMawb());
+            setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getManifestDate());
+            setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getAccountNumber());
+            setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getAwb());
+            setCellValue(row, ++columnCount, invoiceDetails.getOrderNumber());
+            setCellValue(row, ++columnCount, invoiceDetails.getOrigin());
+            setCellValue(row, ++columnCount, invoiceDetails.getDestination());
+            setCellValue(row, ++columnCount, invoiceDetails.getShippersName());
+            setCellValue(row, ++columnCount, invoiceDetails.getConsigneeName());
+            setCellValue(row, ++columnCount, invoiceDetails.getWeight());
+            setCellValue(row, ++columnCount, invoiceDetails.getDeclaredValue());
+            setCellValue(row, ++columnCount, invoiceDetails.getValueCustom());
+            setCellValue(row, ++columnCount, invoiceDetails.getVatAmount());
+            setCellValue(row, ++columnCount, invoiceDetails.getCustomFormCharges());
+            setCellValue(row, ++columnCount, invoiceDetails.getOther());
+            setCellValue(row, ++columnCount, invoiceDetails.getTotalCharges());
+            setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationNumber());
+            setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationDate());
+
+            rowCount++;
+        }
+    }
+
 
     private CellStyle makeStyleForTheSheet(Workbook existingWorkbook){
 
         CellStyle style = existingWorkbook.createCellStyle();
         style.setAlignment(HorizontalAlignment.CENTER);
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setBorderLeft(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
-        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderBottom(BorderStyle.THICK);
+        style.setBorderLeft(BorderStyle.THICK);
+        style.setBorderRight(BorderStyle.THICK);
+        style.setBorderTop(BorderStyle.THICK);
         style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
         style.setTopBorderColor(IndexedColors.BLACK.getIndex());
         style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
@@ -238,13 +130,43 @@ public class ExcelSheetService {
         return style;
     }
 
+    private void populateCalculatedValues(Sheet summarySheet,List<Map<String, Object>> calculatedValuesList) {
+        int startingRow=6;
+        for (Map<String, Object> calculatedValuesMap : calculatedValuesList) {
+            Row row = summarySheet.createRow(startingRow);
 
+            setCellValue(row.createCell(0), calculatedValuesMap.get("InvoiceNumber"));
+            setCellValue(row.createCell(1), calculatedValuesMap.get("CustomDeclarationNumber"));
+            setCellValue(row.createCell(2), calculatedValuesMap.get("CustomerAccountNumber"));
+            setCellValue(row.createCell(3), calculatedValuesMap.get("MawbNumber"));
+            setCellValue(row.createCell(4), calculatedValuesMap.get("TotalAwbCount"));
+            setCellValue(row.createCell(5), calculatedValuesMap.get("TotalValue"));
+            setCellValue(row.createCell(6), calculatedValuesMap.get("CustomerShipmentValue"));
+            setCellValue(row.createCell(7), calculatedValuesMap.get("VatAmountCustomDeclarationForm"));
+            setCellValue(row.createCell(8), calculatedValuesMap.get("CustomFormCharges"));
+            setCellValue(row.createCell(9), calculatedValuesMap.get("Others"));
+            setCellValue(row.createCell(10), calculatedValuesMap.get("TotalCharges"));
 
+            // Move to the next row
+            startingRow++;
+        }
+    }
 
+    private void setCellValue(Cell cell, Object value) {
+        if (value == null) {
+            cell.setCellValue("");
+        } else if (value instanceof String) {
+            cell.setCellValue((String) value);
+        } else if (value instanceof Long) {
+            cell.setCellValue((Long) value);
+        } else if (value instanceof Double) {
+            cell.setCellValue((Double) value);
+        }
+    }
 
-
-
-
-
+    private void setCellValue(Row row, int columnCount, Object value) {
+        Cell cell = row.createCell(columnCount);
+        cell.setCellValue(value != null ? value.toString() : "");
+    }
 }
 

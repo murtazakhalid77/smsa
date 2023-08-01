@@ -56,16 +56,23 @@ public class HashMapHelper {
             calculatedValuesMap.put("VatAmountCustomDeclarationForm", vatAmountCustomDeclartionForm);
             calculatedValuesMap.put("CustomFormCharges", customFormChares);
             calculatedValuesMap.put("Others", others);
-            calculatedValuesMap.put("TotalCharges", totalCharges);
-            calculatedValuesMap.put("TotalValue", totalValue);
+            calculatedValuesMap.put("TotalCharges", totalCharges); //for excel
+            calculatedValuesMap.put("TotalValue", totalValue);   //for excel
             calculatedValuesMap.put("CustomDeclarationNumber", customDecarationNumberSet);
             calculatedValuesMap.put("CustomerAccountNumber", customer.getAccountNumber());
             calculatedValuesMap.put("InvoiceNumber", "dummy");
             calculatedValuesMap.put("InvoiceType", "dummy");
             calculatedValuesMap.put("SMSAFeeCharges", customer.getSmsaServiceFromSAR());
-            calculatedValuesMap.put("TotalAmount", calculateTotalAmount(calculatedValuesMap.get("VatAmountCustomDeclarationForm").toString(), calculatedValuesMap.get("CustomFormCharges").toString(), calculatedValuesMap.get("Others").toString(), calculatedValuesMap.get("SMSAFeeCharges").toString(), custom.getSmsaFeeVat()));
+            calculatedValuesMap.put("TotalAmount", calculateTotalAmount(calculatedValuesMap
+                    .get("VatAmountCustomDeclarationForm").toString(),
+                    calculatedValuesMap.get("CustomFormCharges").toString(),
+                    calculatedValuesMap.get("Others").toString(),
+                    calculatedValuesMap.get("SMSAFeeCharges").toString(),
+                    custom.getSmsaFeeVat())); //for pdf
             calculatedValuesMap.put("CustomPort",custom.getCustomPort());
-            calculatedValuesMap.put("VatOnSmsaFees", calculateVatOnSmsaFees(Double.valueOf(calculatedValuesMap.get("SMSAFeeCharges").toString()),custom.getSmsaFeeVat()));
+            calculatedValuesMap.put("VatOnSmsaFees",
+                    calculateVatOnSmsaFees(Double.valueOf(calculatedValuesMap.
+                            get("SMSAFeeCharges").toString()),custom.getSmsaFeeVat())); //for pdf
 
             resultList.add(calculatedValuesMap);
         }
