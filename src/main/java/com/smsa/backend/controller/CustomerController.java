@@ -29,8 +29,8 @@ public class CustomerController {
     }
 
     @PatchMapping("/customer/{accountNumber}")
-    ResponseEntity<CustomerDTO> updateCustomerById(@PathVariable String accountNumber, @RequestBody CustomerDTO customerDTO){
-        return  ResponseEntity.ok(customerService.updateCustomerById(accountNumber, customerDTO));
+    ResponseEntity<CustomerDTO> updateCustomerByAccountNumber(@PathVariable String accountNumber, @RequestBody CustomerDTO customerDTO){
+        return  ResponseEntity.ok(customerService.updateCustomerByAccountNumber(accountNumber, customerDTO));
     }
     @DeleteMapping("/customer/{id}")
     ResponseEntity<CustomerDTO> deleteCustomerById(@PathVariable Long id){

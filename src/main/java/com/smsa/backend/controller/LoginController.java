@@ -22,7 +22,7 @@ public class LoginController {
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
-    private JwtUtil jwtUtil;
+    private JwtUtil jwtUtil;    
     @Autowired
     private MyUserDetailService myUserDetailService;
     @Autowired

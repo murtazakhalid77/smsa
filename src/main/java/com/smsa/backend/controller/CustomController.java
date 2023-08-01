@@ -28,6 +28,11 @@ public class CustomController {
         return ResponseEntity.ok(this.customService.getAllCustoms());
     }
 
+    @GetMapping("/custom-import")
+    ResponseEntity<List<CustomDto>> getAllCustomForImport(){
+        return ResponseEntity.ok(this.customService.getAllCustomForImport());
+    }
+
     @GetMapping("/custom/{id}")
     ResponseEntity<CustomDto> getCustomById(@PathVariable Long id){
         return ResponseEntity.ok(this.customService.getCustomById(id));

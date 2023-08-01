@@ -54,6 +54,7 @@ public class CustomerDTO {
 
     @NotBlank(message = "Country is required")
     private String country;
+    private Boolean status;
 
     private boolean isPresent=Boolean.TRUE;
 

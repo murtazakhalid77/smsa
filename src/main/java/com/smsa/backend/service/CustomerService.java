@@ -21,7 +21,7 @@ public class CustomerService {
     CustomerRepository customerRepository;
 
     public List<CustomerDTO> getAllCustomer() {
-        List<Customer> customer = this.customerRepository.findAllByIsPresent(true);
+        List<Customer> customer = this.customerRepository.findAll();
         if(!customer.isEmpty()){
           return   customer.stream().map(c->toDto(c)).collect(Collectors.toList());
         }
@@ -56,6 +56,7 @@ public class CustomerService {
                     .nameEnglish(customer.getNameEnglish())
                     .invoiceCurrency(customer.getInvoiceCurrency())
                     .vatNumber(customer.getVatNumber())
+                    .status(customer.getStatus())
                     .build();
     }
 
@@ -74,6 +75,7 @@ public class CustomerService {
                 .invoiceCurrency(customerDTO.getInvoiceCurrency())
                 .nameEnglish(customerDTO.getNameEnglish())
                 .VatNumber(customerDTO.getVatNumber())
+                .status(customerDTO.getStatus())
                 .build();
     }
 
@@ -87,20 +89,22 @@ public class CustomerService {
         throw new RecordNotFoundException(String.format("Customer Not Found On this Id => %d",accountNumber));
     }
 
-    public CustomerDTO updateCustomerById(String accountNumber, CustomerDTO customerDTO) {
+    public CustomerDTO updateCustomerByAccountNumber(String accountNumber, CustomerDTO customerDTO) {
         Optional<Customer> customer = customerRepository.findByAccountNumber(accountNumber);
         if(customer.isPresent()){
+            customer.get().setAccountNumber(accountNumber);
             customer.get().setNameEnglish(customerDTO.getNameEnglish());
             customer.get().setNameArabic(customerDTO.getNameArabic());
             customer.get().setEmail(customerDTO.getEmail());
             customer.get().setPresent(customerDTO.isPresent());
             customer.get().setAddress(customerDTO.getAddress());
-            customer.get().setVatNumber(customerDTO.getAccountNumber());
+            customer.get().setVatNumber(customerDTO.getVatNumber());
             customer.get().setSmsaServiceFromSAR(customerDTO.getSmsaServiceFromSAR());
-            customer.get().setAccountNumber(customerDTO.getAccountNumber());
             customer.get().setInvoiceCurrency(customerDTO.getInvoiceCurrency());
             customer.get().setCurrencyRateFromSAR(customerDTO.getCurrencyRateFromSAR());
             customer.get().setPoBox(customerDTO.getPoBox());
+            customer.get().setStatus(customerDTO.getStatus());
+            customer.get().setCountry(customerDTO.getCountry());
             return toDto(this.customerRepository.save(customer.get()));
         }
         throw new RecordNotFoundException(String.format("Customer Not Found On this Id => %d",accountNumber));

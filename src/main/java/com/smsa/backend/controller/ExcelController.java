@@ -1,5 +1,7 @@
 package com.smsa.backend.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smsa.backend.dto.CustomDto;
 import com.smsa.backend.model.Custom;
 import com.smsa.backend.model.InvoiceDetails;
 import com.smsa.backend.security.util.ExcelHelper;
@@ -12,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -24,14 +27,22 @@ public class ExcelController {
 
 //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/upload")
-    public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("custom") String customName) {
+    public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("custom") String custom) {
         Map<String, Object> response = new HashMap<>();
         Set<String> accountNumbers = new HashSet<>();
         String message = "";
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        CustomDto customDto;
+        try {
+            customDto = objectMapper.readValue(custom, CustomDto.class);
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
-                fileService.saveInvoicesToDatabase(file,customName);
+                fileService.saveInvoicesToDatabase(file, customDto.getCustom());
 
                 for (InvoiceDetails invoiceDetails : fileService.getInvoicesWithoutAccount()) {
                     accountNumbers.add(invoiceDetails.getInvoiceDetailsId().getAccountNumber());

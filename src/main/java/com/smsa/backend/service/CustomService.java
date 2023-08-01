@@ -32,6 +32,16 @@ public class CustomService {
         return customDtos;
     }
 
+    public List<CustomDto> getAllCustomForImport() {
+        try {
+            List<CustomDto> customDtos = this.customRepository.findByIsPresent();
+            return customDtos;
+        }catch(Exception ex){
+            System.out.println(ex);
+        }
+        return null;
+    }
+
     public CustomDto getCustomById(Long id) {
         Optional<Custom> custom = this.customRepository.findById(id);
         if(custom.isPresent()){
