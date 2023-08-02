@@ -1,23 +1,29 @@
 package com.smsa.backend.service;
 
 
+import com.smsa.backend.Exception.ExcelMakingException;
+import com.smsa.backend.Exception.ParsingExcelException;
 import com.smsa.backend.Exception.SheetAlreadyExistException;
-import com.smsa.backend.dto.InvoiceDetailsDto;
 import com.smsa.backend.model.*;
 import com.smsa.backend.repository.CustomRepository;
 import com.smsa.backend.repository.CustomerRepository;
 import com.smsa.backend.repository.InvoiceDetailsRepository;
 import com.smsa.backend.repository.SheetHistoryRepository;
-import com.smsa.backend.security.util.ExcelHelper;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
+import com.smsa.backend.security.util.ExcelImportHelper;
+import com.smsa.backend.security.util.HashMapHelper;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -28,7 +34,7 @@ import java.util.*;
 @Service
 public class ExcelService {
     @Autowired
-    ExcelHelper excelHelper;
+    ExcelImportHelper excelImportHelper;
     @Autowired
     CustomerRepository customerRepository;
     @Autowired
@@ -36,52 +42,59 @@ public class ExcelService {
     @Autowired
     private InvoiceDetailsRepository invoiceDetailsRepository;
     @Autowired
-    private PdfGenerator pdfGenerator;
+    private PdfService pdfService;
     @Autowired
     private CustomRepository customRepository;
-
+    Map<String, List<InvoiceDetails>> filteredRowsMap;
+    @Autowired
+    HashMapHelper hashMapHelper;
+    @Autowired
+    ResourceLoader resourceLoader;
     List<InvoiceDetails> invoicesWithAccount = new ArrayList<>();
     List<InvoiceDetails>invoicesWithoutAccount = new ArrayList<>();
     Map<String, List<InvoiceDetails>> mappedRowsMap = new HashMap<>();
     Map<String, String> accountNumberUuidMap = new HashMap<>();
-
     LocalDate currentDate = LocalDate.now();
     String sheetId = UUID.randomUUID().toString();
+    Custom custom;
+
+    @Value("${smsa.file.location}")
+    private String smsaFolderLocation;
     private static final Logger logger = LoggerFactory.getLogger(ExcelService.class);
 
-    public void saveInvoicesToDatabase(MultipartFile file, String customName) {
-        Map<String, List<InvoiceDetails>> filterd =filterRowsByAccountNumber(file ,customName);
+    public void saveInvoicesToDatabase(MultipartFile file, String customName) throws Exception {
+        Map<String, List<InvoiceDetails>> filterd;
+        try{
+            filterd =filterRowsByAccountNumber(file ,customName);
+        }catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+
         for (List<InvoiceDetails> invoiceDetailsList : filterd.values()) {
             invoiceDetailsRepository.saveAll(invoiceDetailsList);
-        }
-    }
-    private void validateSheetName(String sheetName) {
-        if (sheetHistoryRepository.existsByName(sheetName)) {
-            logger.info(String.format("Sheet with the name %s already exists!", sheetName));
-            throw new SheetAlreadyExistException(String.format("Sheet with the name %s already exists!", sheetName));
         }
     }
 
     public Map<String, List<InvoiceDetails>> filterRowsByAccountNumber(MultipartFile multipartFile,String customName) {
         List<List<String>> rowsToBeFiltered;
-        String originalFilename = multipartFile.getOriginalFilename();
-
+        String originalFilename=null;
         try {
-            rowsToBeFiltered = excelHelper.parseExcelFile(multipartFile);
-        } catch (Exception e) {
-            // Handle the exception, log the error, and return an empty map or null as appropriate
-            logger.error("Error parsing Excel file: " + e.getMessage(), e);
-            return Collections.emptyMap();
-        }
-
-        //TODO: UPDATE WORK OF SHEET
-        try {
+             originalFilename = multipartFile.getOriginalFilename();
             validateSheetName(originalFilename);
         } catch (SheetAlreadyExistException e) {
             // Handle the exception, log the error, and throw a new exception or return as appropriate
-            logger.error("Sheet with the name " + originalFilename + " already exists!", e);
-            throw e;
+            logger.error("Sheet with the name " + originalFilename + " already exists!");
+            throw new SheetAlreadyExistException(String.format("Sheet with the name %S already exists!" ,originalFilename));
         }
+
+        try {
+            rowsToBeFiltered = excelImportHelper.parseExcelFile(multipartFile);
+        } catch (Exception e) {
+            logger.error("Error parsing Excel file: " + e.getMessage(), e);
+           throw new ParsingExcelException(String.format("There was an issue in parsing the file %S",originalFilename));
+        }
+
+        //TODO: UPDATE WORK OF SHEET
 
         if (!rowsToBeFiltered.isEmpty()) {
             rowsToBeFiltered.remove(0);
@@ -95,10 +108,10 @@ public class ExcelService {
                     if (!mappedRowsMap.containsKey(commonKey)) {
                         mappedRowsMap.put(commonKey, new ArrayList<>());
                     }
-
                     try {
                         // Map the fields from the row list to the InvoiceDetails object
                         InvoiceDetails invoiceDetails = mapToDomain(row);
+
                         mapHelperFields(invoiceDetails);
 
                         // Check if the account number exists in the accountNumberUuidMap
@@ -113,8 +126,8 @@ public class ExcelService {
                         filterAccountAndNonAccountInvoice(invoiceDetails, accountNumber);
 
                     } catch (Exception e) {
-                        // Handle the exception, log the error, and continue processing the next row
-                        logger.error("Error mapping row to InvoiceDetails: " + e.getMessage(), e);
+                        logger.error("Error mapping row to InvoiceDetails: " + e.getMessage());
+                        throw new RuntimeException("There was a problem in filtering Invoices against account Numbers");
                     }
                 }
             }
@@ -125,6 +138,12 @@ public class ExcelService {
 
         return mappedRowsMap;
 
+    }
+    private void validateSheetName(String sheetName) {
+        if (sheetHistoryRepository.existsByName(sheetName)) {
+            logger.info(String.format("Sheet with the name %s already exists!", sheetName));
+            throw new SheetAlreadyExistException(String.format("Sheet with the name %s already exists!", sheetName));
+        }
     }
 
     private void filterAccountAndNonAccountInvoice(InvoiceDetails invoiceDetails, String accountNumber) {
@@ -172,6 +191,7 @@ public class ExcelService {
                 .builder()
                 .nameEnglish("System")
                 .accountNumber(accountNumber)
+                .isPresent(true) //soft delete
                 .status(false)
                 .build();
     }
@@ -245,73 +265,249 @@ public class ExcelService {
         }
     }
 
+    public  void cleanExcel(String filePath) throws IOException {
+        Resource resource = resourceLoader.getResource("classpath:"+filePath);
+        FileInputStream fileInputStream = new FileInputStream(resource.getFile());
+        Workbook workbook = new XSSFWorkbook(fileInputStream);
+        fileInputStream.close();
 
-    public void print(Map<String, List<List<String>>> filteredRowsMap){
-        for (Map.Entry<String, List<List<String>>> entry : filteredRowsMap.entrySet()) {
-            String commonKey = entry.getKey();
-            List<List<String>> rowsForKey = entry.getValue();
+        // Process the first sheet
+        Sheet firstSheet = workbook.getSheetAt(0);
+        overwriteSpecificCells(firstSheet, 2, 9);
+        overwriteSpecificCells(firstSheet, 3, 1);
+        overwriteSpecificCells(firstSheet, 3, 9);
+        overwriteSpecificCells(firstSheet, 4, 1);
+        overwriteSpecificCells(firstSheet, 4, 9);
+        clearRows(firstSheet, 6);
 
-            System.out.println("Common Key: " + commonKey);
-            for (List<String> row : rowsForKey) {
-                // Print each row
-                for (String cellValue : row) {
-                    System.out.print(cellValue + "\t");
-                }
-                System.out.println(); // Newline after printing each row
+
+        Sheet secondSheet = workbook.getSheetAt(1);
+        clearRows(secondSheet, 1);
+
+
+        FileOutputStream fileOutputStream = new FileOutputStream(filePath);
+        workbook.write(fileOutputStream);
+        fileOutputStream.close();
+        workbook.close();
+    }
+
+    private static void overwriteSpecificCells(Sheet sheet, int rowIndex, int cellIndex) {
+        Row row = sheet.getRow(rowIndex);
+        if (row == null) {
+            row = sheet.createRow(rowIndex);
+        }
+        Cell cell = row.getCell(cellIndex);
+        if (cell == null) {
+            cell = row.createCell(cellIndex);
+        }
+        // Set the value you want to overwrite here (e.g., "xxxx")
+        cell.setCellValue("XXXX");
+    }
+
+    private static void clearRows(Sheet sheet, int startRowToClear) {
+        // Clear rows after the specified row index
+        for (int rowIndex = startRowToClear; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+            Row row = sheet.getRow(rowIndex);
+            if (row != null) {
+                sheet.removeRow(row);
             }
-            System.out.println(); // Empty line between each group of rows
+        }
+    }
+    public SheetHistory getSheetHistory(String sheetUniqueUUid){
+        return  sheetHistoryRepository.findByUniqueUUid(sheetUniqueUUid);
+    }
+
+
+    public  byte[] updateExcelFile (List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId) throws Exception {
+        logger.info(String.format("Inside update excel method for account ",customer.getAccountNumber()));
+        try {
+            this.custom= getSheetHistory(sheetUniqueId).getCustom();
+            Resource resource =resourceLoader.getResource("classpath:sample.xlsx");
+            FileInputStream fileInputStream = new FileInputStream(resource.getFile());
+
+            Workbook newWorkBook = WorkbookFactory.create(fileInputStream);
+
+            Sheet invoiceDetailSheet = newWorkBook.getSheetAt(1);
+
+            CellStyle style = makeStyleForTheSheet(newWorkBook);
+
+            setInvoiceDetailsCellValues(invoiceDetailSheet, invoiceDetailsList, style);
+
+            Sheet summarySheet = newWorkBook.getSheetAt(0);
+
+            setSummarySheetCellValues(summarySheet, customer, sheetUniqueId);
+
+            filteredRowsMap = hashMapHelper.filterRowsByMawbNumber(invoiceDetailsList);
+
+            List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap, customer, this.custom);
+
+            Map<String, Double> sumMap = hashMapHelper.sumNumericColumns(calculatedValuesList);
+
+            populateCalculatedValues(summarySheet, calculatedValuesList);
+
+            populateSumValues(summarySheet,sumMap);
+
+            fileInputStream.close();
+
+
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                newWorkBook.write(outputStream);
+                return outputStream.toByteArray();
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new Exception("Failed to create Excel file.");
+            }
+
+
+        }catch (Exception e) {
+            logger.warn(e.getMessage());
+            throw new Exception(e.getMessage());
+        }
+
+
+    }
+
+    private void populateSumValues(Sheet summarySheet, Map<String, Double> sumMap) {
+        try {
+            int startingRow = summarySheet.getLastRowNum() + 1; // Start from the next row after the existing data
+
+            Row row = summarySheet.createRow(startingRow);
+            setCellValue(row.createCell(6), sumMap.get("CustomerShipmentValueSum"));
+            setCellValue(row.createCell(7), sumMap.get("VatAmountCustomDeclarationFormSum"));
+            setCellValue(row.createCell(8), sumMap.get("CustomFormChargesSum"));
+            setCellValue(row.createCell(9), sumMap.get("OthersSum"));
+            setCellValue(row.createCell(10), sumMap.get("TotalChargesSum"));
+        } catch (ExcelMakingException e) {
+
+            throw new RuntimeException("There was an issue in populating sum values in summary file");
         }
     }
 
 
-    public  Map<String, Map<String, List<List<String>>>> filterRowsByCommonKeyAndMawbNumber(MultipartFile multipartFile) {
+    private void setCellValue(Cell cell, Double value) {
+        cell.setCellValue(value);
+    }
+    private void setSummarySheetCellValues(Sheet summarySheet, Customer customer, String sheetUniqueId) throws RuntimeException {
+        try {
+            Cell invoiceNumberCell = summarySheet.getRow(2).getCell(9);
+            setCellValue(invoiceNumberCell,"Inv-"+LocalDate.now()+"-"+customer.getAccountNumber());
 
-        List<List<String>> rowsToBeFiltered = excelHelper.parseExcelFile(multipartFile);
-        Map<String, Map<String, List<List<String>>>> filteredRowsMap = new HashMap<>();
+            Cell nameCell = summarySheet.getRow(3).getCell(1);
+            setCellValue(nameCell, customer.getNameEnglish());
 
-        for (List<String> row : rowsToBeFiltered) {
-            if (row.size() > 23 && row.size() > 0) {
-                String commonKey = row.get(23);
-                String mawbNumber = row.get(0);
+            Cell currencyCell = summarySheet.getRow(3).getCell(9);
+            setCellValue(currencyCell, customer.getInvoiceCurrency());
 
-                if (!commonKey.isEmpty()) {
-                    filteredRowsMap.putIfAbsent(commonKey, new HashMap<>());
+            Cell accountNumberCell = summarySheet.getRow(4).getCell(1);
+            setCellValue(accountNumberCell, customer.getAccountNumber());
 
-                    Map<String, List<List<String>>> mawbFilteredRowsMap = filteredRowsMap.get(commonKey);
-                    mawbFilteredRowsMap.putIfAbsent(mawbNumber, new ArrayList<>());
-                    mawbFilteredRowsMap.get(mawbNumber).add(row);
-                }
-            }
+            Cell invoiceDateCell = summarySheet.getRow(3).getCell(9);
+            setCellValue(invoiceDateCell, getSheetHistory(sheetUniqueId).getInvoiceDate());
+        }catch (Exception e){
+            logger.warn("The name,account,invoiceDate cell in the summary sheet are null replace them with XXXX");
+            throw new RuntimeException(String.format("Summary Sheet Exception"));
         }
-        printHashMap(filteredRowsMap);
-        return filteredRowsMap;
+
+    }
+
+    private void setInvoiceDetailsCellValues(Sheet invoiceDetailSheet, List<InvoiceDetails> invoiceDetailsList,CellStyle style) {
+        int rowCount = 1;
+        try {
+            for (InvoiceDetails invoiceDetails : invoiceDetailsList) {
+                Row row = invoiceDetailSheet.createRow(rowCount);
+                int columnCount = 0;
+                Cell cell;
+
+                setCellValue(row, columnCount, invoiceDetails.getInvoiceDetailsId().getMawb());
+                setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getManifestDate());
+                setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getAccountNumber());
+                setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getAwb());
+                setCellValue(row, ++columnCount, invoiceDetails.getOrderNumber());
+                setCellValue(row, ++columnCount, invoiceDetails.getOrigin());
+                setCellValue(row, ++columnCount, invoiceDetails.getDestination());
+                setCellValue(row, ++columnCount, invoiceDetails.getShippersName());
+                setCellValue(row, ++columnCount, invoiceDetails.getConsigneeName());
+                setCellValue(row, ++columnCount, invoiceDetails.getWeight());
+                setCellValue(row, ++columnCount, invoiceDetails.getDeclaredValue());
+                setCellValue(row, ++columnCount, invoiceDetails.getValueCustom());
+                setCellValue(row, ++columnCount, invoiceDetails.getVatAmount());
+                setCellValue(row, ++columnCount, invoiceDetails.getCustomFormCharges());
+                setCellValue(row, ++columnCount, invoiceDetails.getOther());
+                setCellValue(row, ++columnCount, invoiceDetails.getTotalCharges());
+                setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationNumber());
+                setCellValue(row,++columnCount,invoiceDetails.getRef());
+                setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationDate());
+
+                rowCount++;
+            }
+        }catch (ExcelMakingException e){
+            throw new ExcelMakingException("There was an issue in invoice sheet");
+        }
+
     }
 
 
-    public void printHashMap(Map<String, Map<String, List<List<String>>>> filteredRowsMap){
-        for (Map.Entry<String, Map<String, List<List<String>>>> accountEntry : filteredRowsMap.entrySet()) {
-            String accountNumber = accountEntry.getKey();
-            Map<String, List<List<String>>> mawbFilteredRowsMap = accountEntry.getValue();
+    private CellStyle makeStyleForTheSheet(Workbook existingWorkbook){
 
-            System.out.println("Account Number: " + accountNumber);
+        CellStyle style = existingWorkbook.createCellStyle();
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setBorderBottom(BorderStyle.THICK);
+        style.setBorderLeft(BorderStyle.THICK);
+        style.setBorderRight(BorderStyle.THICK);
+        style.setBorderTop(BorderStyle.THICK);
+        style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        style.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        style.setRightBorderColor(IndexedColors.BLACK.getIndex());
 
-            for (Map.Entry<String, List<List<String>>> mawbEntry : mawbFilteredRowsMap.entrySet()) {
-                String mawbNumber = mawbEntry.getKey();
-                List<List<String>> rowsForMawb = mawbEntry.getValue();
+        return style;
+    }
 
-                System.out.println("MAWB Number: " + mawbNumber);
+    private void populateCalculatedValues(Sheet summarySheet,List<Map<String, Object>> calculatedValuesList) {
+        try {
+            int startingRow=6;
+            for (Map<String, Object> calculatedValuesMap : calculatedValuesList) {
+                Row row = summarySheet.createRow(startingRow);
 
-                for (List<String> row : rowsForMawb) {
-                    // Print each row
-                    for (String cellValue : row) {
-                        System.out.print(cellValue + "\t");
-                    }
-                    System.out.println(); // Newline after printing each row
-                }
-                System.out.println(); // Empty line between each group of rows with the same MAWB number
+                setCellValue(row.createCell(0), calculatedValuesMap.get("InvoiceNumber"));
+                setCellValue(row.createCell(1), calculatedValuesMap.get("CustomDeclarationNumber"));
+                setCellValue(row.createCell(2), calculatedValuesMap.get("CustomerAccountNumber"));
+                setCellValue(row.createCell(3), calculatedValuesMap.get("MawbNumber"));
+                setCellValue(row.createCell(4), calculatedValuesMap.get("TotalAwbCount"));
+                setCellValue(row.createCell(5), calculatedValuesMap.get("TotalValue"));
+                setCellValue(row.createCell(6), calculatedValuesMap.get("CustomerShipmentValue"));
+                setCellValue(row.createCell(7), calculatedValuesMap.get("VatAmountCustomDeclarationForm"));
+                setCellValue(row.createCell(8), calculatedValuesMap.get("CustomFormCharges"));
+                setCellValue(row.createCell(9), calculatedValuesMap.get("Others"));
+                setCellValue(row.createCell(10), calculatedValuesMap.get("TotalCharges"));
+
+                // Move to the next row
+                startingRow++;
             }
-            System.out.println(); // Empty line between each group of rows with the same account number
         }
+        catch (ExcelMakingException e) {
+            throw new RuntimeException("There was an issue in populating calculated values in summary file");
+        }
+
+
+
+    }
+
+    private void setCellValue(Cell cell, Object value) {
+        if (value == null) {
+            cell.setCellValue("");
+        } else if (value instanceof String) {
+            cell.setCellValue((String) value);
+        } else if (value instanceof Long) {
+            cell.setCellValue((Long) value);
+        } else if (value instanceof Double) {
+            cell.setCellValue((Double) value);
+        }
+    }
+
+    private void setCellValue(Row row, int columnCount, Object value) {
+        Cell cell = row.createCell(columnCount);
+        cell.setCellValue(value != null ? value.toString() : "");
     }
 }
 

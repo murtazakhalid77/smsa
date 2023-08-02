@@ -2,10 +2,10 @@ package com.smsa.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smsa.backend.dto.CustomDto;
-import com.smsa.backend.dto.CustomDto;
 import com.smsa.backend.model.Custom;
 import com.smsa.backend.model.InvoiceDetails;
-import com.smsa.backend.security.util.ExcelHelper;
+
+import com.smsa.backend.security.util.ExcelImportHelper;
 import com.smsa.backend.service.ExcelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,9 +24,11 @@ import java.util.*;
 @CrossOrigin("*")
 public class ExcelController {
     @Autowired
-    ExcelService fileService;
+    ExcelImportHelper excelImportHelper;
+    @Autowired
+    ExcelService excelService;
 
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/upload")
     public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("custom") String custom) {
         Map<String, Object> response = new HashMap<>();
@@ -41,11 +43,11 @@ public class ExcelController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        if (ExcelHelper.hasExcelFormat(file)) {
+        if (excelImportHelper.hasExcelFormat(file)) {
             try {
-                fileService.saveInvoicesToDatabase(file, customDto.getCustom());
+                excelService.saveInvoicesToDatabase(file, customDto.getCustom());
 
-                for (InvoiceDetails invoiceDetails : fileService.getInvoicesWithoutAccount()) {
+                for (InvoiceDetails invoiceDetails : excelService.getInvoicesWithoutAccount()) {
                     accountNumbers.add(invoiceDetails.getInvoiceDetailsId().getAccountNumber());
                 }
 
@@ -55,22 +57,12 @@ public class ExcelController {
 
                 return ResponseEntity.ok(response);
             } catch (Exception e) {
-                message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-                e.printStackTrace();
+                message = e.getMessage();
                 response.put("message", message);
-                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(response);
+                return ResponseEntity.ok(response);
             }
+
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
-
-    public static void printFilteredRows(List<List<String>> filteredRows) {
-        for (List<String> row : filteredRows) {
-            for (String cellValue : row) {
-                System.out.print(cellValue + "\t");
-            }
-            System.out.println(); // Move to the next line after printing each row
-        }
-    }
-
 }

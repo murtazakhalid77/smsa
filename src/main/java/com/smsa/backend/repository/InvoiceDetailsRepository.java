@@ -16,5 +16,10 @@ public interface InvoiceDetailsRepository extends JpaRepository<InvoiceDetails, 
     @Query("UPDATE InvoiceDetails i SET i.isSentInMail = true WHERE i.invoiceDetailsId.accountNumber = ?1 AND i.sheetUniqueId = ?2")
     void updateIsSentInMailByAccountNumberAndSheetUniqueId(String accountNumber, String sheetUniqueId);
 
+    @Transactional
+    @Modifying
+    @Query("UPDATE InvoiceDetails i SET i.isSentInMail = false WHERE i.invoiceDetailsId.accountNumber = ?1 AND i.sheetUniqueId = ?2")
+    void revertIsSentInMailByAccountNumberAndSheetUniqueId(String accountNumber, String sheetUniqueId);
+
     List<InvoiceDetails> findAllBySheetUniqueId(String sheetUniqueId);
 }

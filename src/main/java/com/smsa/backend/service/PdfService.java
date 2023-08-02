@@ -11,10 +11,15 @@ import com.smsa.backend.model.InvoiceDetails;
 import com.smsa.backend.model.SheetHistory;
 import com.smsa.backend.repository.SheetHistoryRepository;
 import com.smsa.backend.security.util.HashMapHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class PdfGenerator {
+public class PdfService {
     Map<String, List<InvoiceDetails>> filteredRowsMap;
     @Autowired
     HashMapHelper hashMapHelper;
@@ -31,23 +36,31 @@ public class PdfGenerator {
     @Autowired
     SheetHistoryRepository sheetHistoryRepository;
 
-    Font arabicFont = FontFactory.getFont("C:\\Users\\Bionic Computer\\IdeaProjects\\untitled5\\src\\main\\java\\org\\example\\NotoNaskhArabic-VariableFont_wght.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+    @Autowired
+    ResourceLoader resourceLoader;
 
+    @Value("${smsa.file.location}")
+    private String smsaFolderLocation;
 
     Font englishFont = new Font(Font.FontFamily.TIMES_ROMAN, 10);
     Font pdfFont = new Font(Font.FontFamily.TIMES_ROMAN, 8);
     Font englishBoldFont = new Font(Font.FontFamily.TIMES_ROMAN, 10,Font.BOLD);
     Font columnFontBold = new Font(Font.FontFamily.TIMES_ROMAN, 8,Font.BOLD);
     Custom custom;
+    Font arabicFont;
 
-    public void makePdf(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId){
+
+    private static final Logger logger = LoggerFactory.getLogger(PdfService.class);
+    public byte[] makePdf(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId){
         this.custom =getCustom(sheetUniqueId).getCustom();
-
+        Resource resource =resourceLoader.getResource("classpath:afont.ttf");
+       arabicFont  = FontFactory.getFont(resource.getFilename(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
     Document document = new Document(PageSize.A4, 10, 10, 30, 50);
         arabicFont.setSize(10);
-    try {
-        PdfWriter.getInstance(document, new FileOutputStream("C:\\Users\\Bionic Computer\\Desktop\\backend\\src\\main\\java\\com\\smsa\\backend\\assets\\testFile.pdf"));
-        document.open();
+
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            PdfWriter writer = PdfWriter.getInstance(document, outputStream);
+            document.open();
 
         PdfPTable headerTable = new PdfPTable(2);
         headerTable.setWidthPercentage(100);
@@ -58,8 +71,10 @@ public class PdfGenerator {
         PdfPCell pictureCell = new PdfPCell();
         pictureCell.setBorder(Rectangle.NO_BORDER);
 
+
+        Resource imgres =resourceLoader.getResource("classpath:img.png");
         // Replace "path/to/your/image.png" with the actual path to your image file
-        Image img = Image.getInstance("C:\\Users\\Bionic Computer\\IdeaProjects\\untitled5\\src\\img.png");
+        Image img = Image.getInstance("classpath:img.png");
         img.scaleToFit(100, 100); // Adjust the size of the image as needed
         pictureCell.addElement(new Chunk(img, 0, 0));
         headerTable.addCell(pictureCell);
@@ -68,7 +83,6 @@ public class PdfGenerator {
         PdfPCell arabicCell = new PdfPCell();
         arabicCell.setBorder(Rectangle.NO_BORDER);
         arabicCell.setRunDirection(PdfWriter.RUN_DIRECTION_RTL);
-
 
         String test = ": ﻟﺮﻗﻢ ﺍﻟﻀﺮﻳﺒﻲ:"+customer.getVatNumber();
         arabicCell.addElement(new Paragraph("ﺷﺮﻛﺔ ﺳﻤﺴﺎ ﻟﻠﻨﻘﻞ ﺍﻟﺴﺮﻳﻊ ﺍﻟﻤﺤﺪﻭﺩﺓ", arabicFont));
@@ -107,19 +121,19 @@ public class PdfGenerator {
         englishCell.setBorder(Rectangle.NO_BORDER);
 
         englishCell.addElement(new Paragraph("Invoice To.", englishBoldFont));
-        englishCell.addElement(new Paragraph("Customer Name:\t"+customer.getNameEnglish(), englishFont));
-        englishCell.addElement(new Paragraph("Customer VAT#\t\t+"+customer.getVatNumber(), englishFont));
-        englishCell.addElement(new Paragraph("\t\t\t"+customer.getAddress(), englishFont));
+        englishCell.addElement(new Paragraph("Customer Name:\t" + (customer.getNameEnglish() != null ? customer.getNameEnglish() : ""), englishFont));
+        englishCell.addElement(new Paragraph("Customer VAT#\t\t" + (customer.getVatNumber() != null ? customer.getVatNumber() : ""), englishFont));
+        englishCell.addElement(new Paragraph("\t\t\t" + (customer.getAddress() != null ? customer.getAddress() : ""), englishFont));
 
         // Right column: Arabic content
         PdfPCell arabicContentCell = new PdfPCell();
         arabicContentCell.setBorder(Rectangle.NO_BORDER);
         arabicContentCell.setRunDirection(PdfWriter.RUN_DIRECTION_RTL);
 
-        arabicContentCell.addElement(new Paragraph("الفاتورة  إلى.", arabicFont));
-        arabicContentCell.addElement(new Paragraph(	"اسم الشركة: "+customer.getNameArabic(), arabicFont));
-        arabicContentCell.addElement(new Paragraph("\tالرقم الضريبي #:"+customer.getVatNumber(), arabicFont));
-        arabicContentCell.addElement(new Paragraph("\t"+customer.getAddress(), arabicFont));
+        arabicContentCell.addElement(new Paragraph("الفاتورة إلى.", arabicFont));
+        arabicContentCell.addElement(new Paragraph("اسم الشركة: " + (customer.getNameArabic() != null ? customer.getNameArabic() : ""), arabicFont));
+        arabicContentCell.addElement(new Paragraph("\tالرقم الضريبي #: " + (customer.getVatNumber() != null ? customer.getVatNumber() : ""), arabicFont));
+        arabicContentCell.addElement(new Paragraph("\t" + (customer.getAddress() != null ? customer.getAddress() : ""), arabicFont));
 
         invoiceTable.addCell(englishCell);
         invoiceTable.addCell(arabicContentCell);
@@ -133,20 +147,20 @@ public class PdfGenerator {
         PdfPCell englishAdditionalCell = new PdfPCell();
         englishAdditionalCell.setBorder(Rectangle.NO_BORDER);
 
-        englishAdditionalCell.addElement(new Paragraph("Customer Account Number:"+customer.getAccountNumber(), englishFont));
-        englishAdditionalCell.addElement(new Paragraph("Invoice#", englishFont)); //TODO: invoice work
-        englishAdditionalCell.addElement(new Paragraph("Invocie Date:\t"+ LocalDate.now(), englishFont));
-        englishAdditionalCell.addElement(new Paragraph("Invoice Currency:"+customer.getInvoiceCurrency(), englishFont));
+        englishAdditionalCell.addElement(new Paragraph("Customer Account Number: " + (customer.getAccountNumber() != null ? customer.getAccountNumber() : ""), englishFont));
+        englishAdditionalCell.addElement(new Paragraph("Invoice#:"+"Inv-"+LocalDate.now()+"-"+customer.getAccountNumber(), englishFont)); // TODO: invoice work
+        englishAdditionalCell.addElement(new Paragraph("Invoice Date:\t" + LocalDate.now(), englishFont));
+        englishAdditionalCell.addElement(new Paragraph("Invoice Currency: " + (customer.getInvoiceCurrency() != null ? customer.getInvoiceCurrency() : ""), englishFont));
 
         // Right column: Arabic content
         PdfPCell arabicAdditionalCell = new PdfPCell();
         arabicAdditionalCell.setBorder(Rectangle.NO_BORDER);
         arabicAdditionalCell.setRunDirection(PdfWriter.RUN_DIRECTION_RTL);
 
-        arabicAdditionalCell.addElement(new Paragraph("رقم حساب العميل: "+customer.getAccountNumber(), arabicFont));
-        arabicAdditionalCell.addElement(new Paragraph("رقم  الفاتورة:" ,arabicFont)); //TODO:invoice work
-        arabicAdditionalCell.addElement(new Paragraph("تاريخ الفاتورة:\t"+LocalDate.now(), arabicFont));
-        arabicAdditionalCell.addElement(new Paragraph("عملة الفاتورة:"+customer.getInvoiceCurrency(), arabicFont));
+        arabicAdditionalCell.addElement(new Paragraph("رقم حساب العميل: " + (customer.getAccountNumber() != null ? customer.getAccountNumber() : ""), arabicFont));
+        arabicAdditionalCell.addElement(new Paragraph("رقم الفاتورة:" +"Inv-"+LocalDate.now()+"-"+customer.getAccountNumber(), arabicFont)); // TODO: invoice work
+        arabicAdditionalCell.addElement(new Paragraph("تاريخ الفاتورة: " + LocalDate.now(), arabicFont));
+        arabicAdditionalCell.addElement(new Paragraph("عملة الفاتورة: " + (customer.getInvoiceCurrency() != null ? customer.getInvoiceCurrency() : ""), arabicFont));
 
         additionalContentTable.addCell(englishAdditionalCell);
         additionalContentTable.addCell(arabicAdditionalCell);
@@ -189,7 +203,7 @@ public class PdfGenerator {
 
 
         // Create the table with specified columns and cell properties
-        PdfPTable dataTable = new PdfPTable(11 );
+        PdfPTable dataTable = new PdfPTable(11);
         dataTable.setWidthPercentage(100);
         dataTable.setSpacingBefore(20); // Add space before the table
 
@@ -297,10 +311,12 @@ public class PdfGenerator {
 
 
         document.close();
-        System.out.println("PDF Created successfully.");
-
+        writer.close();
+        logger.info("pdf created successfully");
+            return outputStream.toByteArray();
     } catch (DocumentException | IOException e) {
         e.printStackTrace();
+        throw new RuntimeException("There was an issue in making pdf");
     }
 }
     private List<String> getColumnNamesList() {

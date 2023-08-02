@@ -1,11 +1,7 @@
 package com.smsa.backend.security.util;
 
 
-import com.smsa.backend.dto.InvoiceDetailsDto;
-import com.smsa.backend.model.InvoiceDetails;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,12 +11,11 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
 @Service
-public class ExcelHelper {
+public class ExcelImportHelper {
     public static boolean hasExcelFormat(MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null) {

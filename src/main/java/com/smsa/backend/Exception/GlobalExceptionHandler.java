@@ -29,5 +29,18 @@ public class GlobalExceptionHandler {
                 .body(ex.getMessage()).localDateTime(LocalDateTime.now()).build();
         return new ResponseEntity(errorMessage, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(value = ParsingExcelException.class)
+    public ResponseEntity<ErrorMessage> parsingExcelException(ParsingExcelException ex){
+        ErrorMessage errorMessage = ErrorMessage.builder()
+                .body(ex.getMessage()).localDateTime(LocalDateTime.now()).build();
+        return new ResponseEntity(errorMessage, HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(value = ExcelMakingException.class)
+    public ResponseEntity<ErrorMessage> excelMakingException(ExcelMakingException ex){
+        ErrorMessage errorMessage = ErrorMessage.builder()
+                .body(ex.getMessage()).localDateTime(LocalDateTime.now()).build();
+        return new ResponseEntity(errorMessage, HttpStatus.NOT_FOUND);
+    }
+
 
 }

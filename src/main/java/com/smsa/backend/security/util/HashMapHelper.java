@@ -5,6 +5,7 @@ import com.smsa.backend.model.Customer;
 import com.smsa.backend.model.InvoiceDetails;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Component
@@ -42,7 +43,7 @@ public class HashMapHelper {
                 vatAmountCustomDeclartionForm += invoiceDetails.getVatAmount();
                 customFormChares += invoiceDetails.getCustomFormCharges();
                 others += invoiceDetails.getOther();
-                totalValue += invoiceDetails.getDeclaredValue() + invoiceDetails.getValueCustom() + invoiceDetails.getVatAmount() + invoiceDetails.getCustomFormCharges() + invoiceDetails.getOther();
+                totalValue += invoiceDetails.getTotalCharges()+ invoiceDetails.getValueCustom() + invoiceDetails.getVatAmount() + invoiceDetails.getCustomFormCharges() + invoiceDetails.getOther();
                 customDecarationNumberSet.add(invoiceDetails.getCustomDeclarationNumber());
             }
 
@@ -60,7 +61,7 @@ public class HashMapHelper {
             calculatedValuesMap.put("TotalValue", totalValue);   //for excel
             calculatedValuesMap.put("CustomDeclarationNumber", customDecarationNumberSet);
             calculatedValuesMap.put("CustomerAccountNumber", customer.getAccountNumber());
-            calculatedValuesMap.put("InvoiceNumber", "dummy");
+            calculatedValuesMap.put("InvoiceNumber", "Inv-"+ LocalDate.now()+"-"+customer.getAccountNumber());
             calculatedValuesMap.put("InvoiceType", "dummy");
             calculatedValuesMap.put("SMSAFeeCharges", customer.getSmsaServiceFromSAR());
             calculatedValuesMap.put("TotalAmount", calculateTotalAmount(calculatedValuesMap
@@ -77,8 +78,36 @@ public class HashMapHelper {
             resultList.add(calculatedValuesMap);
         }
 
+
         return resultList;
     }
+
+    public Map<String, Double> sumNumericColumns(List<Map<String, Object>> resultList) {
+        Map<String, Double> sumMap = new HashMap<>();
+
+
+        Double customerShipmentValueSum = 0.0;
+        Double vatAmountCustomDeclarationFormSum = 0.0;
+        Double customFormChargesSum = 0.0;
+        Double othersSum = 0.0;
+        Double totalChargesSum = 0.0;
+
+        for (Map<String, Object> calculatedValuesMap : resultList) {
+            customerShipmentValueSum += (Double) calculatedValuesMap.get("CustomerShipmentValue");
+            vatAmountCustomDeclarationFormSum += (Double) calculatedValuesMap.get("VatAmountCustomDeclarationForm");
+            customFormChargesSum += (Double) calculatedValuesMap.get("CustomFormCharges");
+            othersSum += (Double) calculatedValuesMap.get("Others");
+            totalChargesSum += (Double) calculatedValuesMap.get("TotalCharges");
+        }
+
+        sumMap.put("CustomerShipmentValueSum", customerShipmentValueSum);
+        sumMap.put("VatAmountCustomDeclarationFormSum", vatAmountCustomDeclarationFormSum);
+        sumMap.put("CustomFormChargesSum", customFormChargesSum);
+        sumMap.put("OthersSum", othersSum);
+        sumMap.put("TotalChargesSum", totalChargesSum);
+        return sumMap;
+    }
+
     public Double calculateVatOnSmsaFees(Double smsaFeesCharges,Double smsaFeeVat){
         return (smsaFeesCharges * smsaFeeVat) / 100;
     }

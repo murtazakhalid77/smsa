@@ -1,59 +1,59 @@
 package com.smsa.backend.scheduler;
 
-import com.smsa.backend.constants.Paths;
 import com.smsa.backend.model.Customer;
 import com.smsa.backend.model.InvoiceDetails;
 import com.smsa.backend.model.SheetHistory;
 import com.smsa.backend.repository.CustomerRepository;
 import com.smsa.backend.repository.InvoiceDetailsRepository;
 import com.smsa.backend.repository.SheetHistoryRepository;
-import com.smsa.backend.security.util.ExcelMaker;
 import com.smsa.backend.service.EmailService;
-import com.smsa.backend.service.ExcelSheetService;
-import com.smsa.backend.service.PdfGenerator;
+import com.smsa.backend.service.ExcelService;
+import com.smsa.backend.service.PdfService;
 import org.slf4j.Logger;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.*;
 
 @Component
 public class EmailSchedular {
     @Autowired
     SheetHistoryRepository sheetHistoryRepository;
-
     @Autowired
     InvoiceDetailsRepository invoiceDetailsRepository;
     @Autowired
     CustomerRepository customerRepository;
     @Autowired
-    ExcelSheetService excelSheetService;
+    ExcelService excelService;
     @Autowired
-    PdfGenerator pdfGenerator;
-    @Autowired
-    ExcelMaker excelMaker;
+    PdfService pdfService;
     @Autowired
     EmailService emailService;
+    @Autowired
+    ResourceLoader resourceLoader;
 
     private static final Logger logger = LoggerFactory.getLogger(EmailSchedular.class);
     private Map<String, List<InvoiceDetails>> invoiceDetailsMap;
 
-    @Scheduled(initialDelay = 5000, fixedDelay = 600000)
-    public void markSentAndProcessInvoices() {
+    @Scheduled(initialDelay = 5000, fixedDelay = 120000)
+    public void markSentAndProcessInvoices() throws Exception {
         List<SheetHistory> sheetsToBeSent = sheetHistoryRepository.findAllByIsEmailSentFalse();
+        if(!sheetsToBeSent.isEmpty()){
+            for (SheetHistory sheetHistory : sheetsToBeSent) {
+                String sheetUniqueId = sheetHistory.getUniqueUUid();
 
-        for (SheetHistory sheetHistory : sheetsToBeSent) {
-            String sheetUniqueId = sheetHistory.getUniqueUUid();
-
-            // Call a method to process invoices for this sheetUniqueId
-            processInvoicesForSheet(sheetUniqueId);
+                // Call a method to process invoices for this sheetUniqueId
+                processInvoicesForSheet(sheetUniqueId);
+                logger.info("work done sheet %S",sheetHistory.getName());
+            }
         }
+        logger.info("No work to do");
     }
-    public void processInvoicesForSheet(String sheetUniqueId) {
+    public void processInvoicesForSheet(String sheetUniqueId) throws Exception {
         boolean anyUnsentInvoice = false;
 
         List<InvoiceDetails> invoicesForSheet = invoiceDetailsRepository.findAllBySheetUniqueId(sheetUniqueId);
@@ -76,21 +76,19 @@ public class EmailSchedular {
                 if (customer.isPresent() && customer.get().getEmail() != null && customer.get().getStatus().equals(true)) {
                     logger.info("Making excel for Account Number: " + accountNumber);
                     try {
-                        //make a clean sheet
-                        ExcelMaker.cleanExcel(Paths.SRC_FILE_PATH.getPath());
 
-                        excelSheetService.updateExcelFile(invoiceDetailsList, customer.get(), sheetUniqueId);
+                        byte[] excelFileData = excelService.updateExcelFile(invoiceDetailsList, customer.get(), sheetUniqueId);
+                        byte[] pdfFileData = pdfService.makePdf(invoiceDetailsList, customer.get(), sheetUniqueId);
 
-                        pdfGenerator.makePdf(invoiceDetailsList, customer.get(), sheetUniqueId);
+                        if (emailService.sendMailWithAttachments(customer.get(), excelFileData, pdfFileData,sheetUniqueId)){
+                            logger.info("All the work done for account number %S with name %S",customer.get().getAccountNumber(),customer.get().getNameEnglish());
+                        }
 
-                        emailService.sendMailWithAttachment(customer.get());
-
-                        invoiceDetailsRepository.updateIsSentInMailByAccountNumberAndSheetUniqueId(accountNumber, sheetUniqueId);
-                    } catch (IOException e) {
-                        // Log the error and continue to the next iteration
+                    } catch (Exception e) {
                         logger.error("Error while creating Excel for Account Number: " + accountNumber, e);
                         anyUnsentInvoice = true;
-                        continue;
+                        throw new Exception(e);
+                        //continue
                     }
                 } else {
                     logger.warn("Kindly update customer's email and status: " + accountNumber);
@@ -99,7 +97,7 @@ public class EmailSchedular {
             }
         }
 
-        // Update sheet history status only if there were no exceptions during the process
+//         Update sheet history status only if there were no exceptions during the process
         if (!anyUnsentInvoice) {
             updateSheetHistoryStatus(sheetUniqueId, anyUnsentInvoice);
         }
