@@ -2,11 +2,13 @@ package com.smsa.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smsa.backend.dto.CustomDto;
+import com.smsa.backend.dto.ExcelImportDto;
 import com.smsa.backend.model.Custom;
 import com.smsa.backend.model.InvoiceDetails;
 
 import com.smsa.backend.security.util.ExcelImportHelper;
 import com.smsa.backend.service.ExcelService;
+import com.smsa.backend.service.HelperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.jws.Oneway;
 import java.io.IOException;
 import java.util.*;
 
@@ -27,25 +30,22 @@ public class ExcelController {
     ExcelImportHelper excelImportHelper;
     @Autowired
     ExcelService excelService;
+    @Autowired
+    HelperService helperService;
 
     //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/upload")
-    public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("custom") String custom) {
+    public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("excelImport") String excelImport) {
         Map<String, Object> response = new HashMap<>();
         Set<String> accountNumbers = new HashSet<>();
         String message = "";
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        CustomDto customDto;
-        try {
-            customDto = objectMapper.readValue(custom, CustomDto.class);
-        } catch (IOException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        ExcelImportDto excelImportDto1 = this.helperService.convertExcelImportIntoDto(excelImport);
+
 
         if (excelImportHelper.hasExcelFormat(file)) {
             try {
-                excelService.saveInvoicesToDatabase(file, customDto.getCustom());
+                excelService.saveInvoicesToDatabase(file, excelImportDto1.getCustom());
 
                 for (InvoiceDetails invoiceDetails : excelService.getInvoicesWithoutAccount()) {
                     accountNumbers.add(invoiceDetails.getInvoiceDetailsId().getAccountNumber());

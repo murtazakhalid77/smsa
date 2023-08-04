@@ -402,7 +402,7 @@ public class ExcelService {
             setCellValue(accountNumberCell, customer.getAccountNumber());
 
             Cell invoiceDateCell = summarySheet.getRow(3).getCell(9);
-            setCellValue(invoiceDateCell, getSheetHistory(sheetUniqueId).getInvoiceDate());
+            setCellValue(invoiceDateCell, getSheetHistory(sheetUniqueId).getStartDate());
         }catch (Exception e){
             logger.warn("The name,account,invoiceDate cell in the summary sheet are null replace them with XXXX");
             throw new RuntimeException(String.format("Summary Sheet Exception"));

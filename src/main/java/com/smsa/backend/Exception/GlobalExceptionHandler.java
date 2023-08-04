@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value =RecordAlreadyExistException.class)
     public ResponseEntity<ErrorMessage> resourceRecordalreadyExistException(RecordAlreadyExistException ex){
         ErrorMessage errorMessage = ErrorMessage.builder()
-                .body(ex.getMessage()).localDateTime(LocalDateTime.now()).build();
+                .body(ex.getMessage()).build();
         return new ResponseEntity(errorMessage, HttpStatus.NOT_FOUND);
     }
     @ExceptionHandler(value = SheetAlreadyExistException.class)

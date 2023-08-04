@@ -33,7 +33,7 @@ public class CustomerService {
 
         Optional<Customer> duplicateCustomer = customerRepository.findByAccountNumber(customerDTO.getAccountNumber());
         if(duplicateCustomer.isPresent()){
-            throw new RecordAlreadyExistException(String.format("Customer Record Already Exist =>%s",customerDTO));
+            throw new RecordAlreadyExistException("Cannot create customer with duplicate account number: ");
         }else{
             Customer customer = toDomain(customerDTO);
             System.out.println(customer);
