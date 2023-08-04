@@ -280,9 +280,8 @@ public class ExcelService {
         Map<String, List<InvoiceDetails>> filteredRowsMap;
         Custom custom = getSheetHistory(sheetUniqueId).getCustom();
 
-        Resource resource = resourceLoader.getResource("classpath:../../:sample.xlsx");
 
-        FileInputStream fileInputStream = new FileInputStream(resource.getFile());
+        FileInputStream fileInputStream = new FileInputStream(sampleFileLocation+"/sample.xlsx");
 
         Workbook newWorkBook = WorkbookFactory.create(fileInputStream);
 
