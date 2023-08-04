@@ -15,12 +15,13 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 import java.io.File;
 
-@Component
+@Service
 public class EmailService {
     private static final Logger logger = LoggerFactory.getLogger(EmailSchedular.class);
     @Autowired

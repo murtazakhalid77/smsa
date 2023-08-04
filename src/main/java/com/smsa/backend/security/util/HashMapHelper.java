@@ -2,17 +2,21 @@ package com.smsa.backend.security.util;
 
 import com.smsa.backend.model.Custom;
 import com.smsa.backend.model.Customer;
+import com.smsa.backend.model.Invoice;
 import com.smsa.backend.model.InvoiceDetails;
+import com.smsa.backend.repository.InvoiceRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class HashMapHelper {
 
 
-    public List<Map<String, Object>>    calculateValues(Map<String, List<InvoiceDetails>> filteredRowsMap, Customer customer, Custom custom) {
+    public List<Map<String, Object>>    calculateValues(Map<String, List<InvoiceDetails>> filteredRowsMap, Customer customer, Custom custom,Long invoiceNumber) {
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         Long totalAwbCount = 0L;
@@ -21,6 +25,8 @@ public class HashMapHelper {
         Double customFormChares = 0.0;
         Double others = 0.0;
         Double totalValue=0.0;
+
+
 
         for (Map.Entry<String, List<InvoiceDetails>> entry : filteredRowsMap.entrySet()) {
             String mawbNumber = entry.getKey();
@@ -46,7 +52,10 @@ public class HashMapHelper {
                 totalValue += invoiceDetails.getTotalCharges()+ invoiceDetails.getValueCustom() + invoiceDetails.getVatAmount() + invoiceDetails.getCustomFormCharges() + invoiceDetails.getOther();
                 customDecarationNumberSet.add(invoiceDetails.getCustomDeclarationNumber());
             }
-
+            String customDeclarationNumbers = customDecarationNumberSet.stream()
+                    .limit(3)  // Limit to the first three elements
+                    .map(String::valueOf)
+                    .collect(Collectors.joining("/"));
             // Put the MAWB number into the calculatedValuesMap for each iteration
             calculatedValuesMap.put("MawbNumber", mawbNumber);
             Double totalCharges = customFormChares + others;
@@ -59,10 +68,10 @@ public class HashMapHelper {
             calculatedValuesMap.put("Others", others);
             calculatedValuesMap.put("TotalCharges", totalCharges); //for excel
             calculatedValuesMap.put("TotalValue", totalValue);   //for excel
-            calculatedValuesMap.put("CustomDeclarationNumber", customDecarationNumberSet);
+            calculatedValuesMap.put("CustomDeclarationNumber", customDeclarationNumbers);
             calculatedValuesMap.put("CustomerAccountNumber", customer.getAccountNumber());
-            calculatedValuesMap.put("InvoiceNumber", "Inv-"+ LocalDate.now()+"-"+customer.getAccountNumber());
-            calculatedValuesMap.put("InvoiceType", "dummy");
+            calculatedValuesMap.put("InvoiceNumber", "Inv-"+invoiceNumber);
+            calculatedValuesMap.put("InvoiceType", "Bill-Shipper");
             calculatedValuesMap.put("SMSAFeeCharges", customer.getSmsaServiceFromSAR());
             calculatedValuesMap.put("TotalAmount", calculateTotalAmount(calculatedValuesMap
                     .get("VatAmountCustomDeclarationForm").toString(),
@@ -77,8 +86,6 @@ public class HashMapHelper {
 
             resultList.add(calculatedValuesMap);
         }
-
-
         return resultList;
     }
 
