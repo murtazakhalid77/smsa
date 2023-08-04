@@ -42,7 +42,7 @@ public class EmailSchedular {
 
     @Scheduled(initialDelay = 5000, fixedDelay = 120000)
     public void markSentAndProcessInvoices() throws Exception {
-        List<SheetHistory> sheetsToBeSent = sheetHistoryRepository.findAllByIsEmailSentFalse();
+        List<SheetHistory> sheetsToBeSent = sheetHistoryRepository.findAllByIsEmail(false);
         if(!sheetsToBeSent.isEmpty()){
             for (SheetHistory sheetHistory : sheetsToBeSent) {
                 String sheetUniqueId = sheetHistory.getUniqueUUid();

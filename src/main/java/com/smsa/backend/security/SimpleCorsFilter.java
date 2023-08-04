@@ -17,7 +17,7 @@ public class SimpleCorsFilter implements Filter {
         log.info("SimpleCORSFilter init");
     }
 
-    private final String[] allowedOrigins = {"http://localhost:4200"};
+    private final String[] allowedOrigins = {"*"};
 
 
 
