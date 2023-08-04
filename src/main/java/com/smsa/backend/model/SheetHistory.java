@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -23,7 +24,8 @@ public class SheetHistory {
     private Boolean isEmailSent;
     private LocalDate startDate;
     private LocalDate endDate;
-    @OneToOne
-    @JoinColumn(name = "custom_id", referencedColumnName = "id")
+    // Use @OneToMany with mappedBy to specify the relationship field in the Custom entity
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "custom_id")
     private Custom custom;
 }
