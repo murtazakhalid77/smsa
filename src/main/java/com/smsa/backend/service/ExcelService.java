@@ -49,6 +49,8 @@ public class ExcelService {
     private static final Logger logger = LoggerFactory.getLogger(ExcelService.class);
 
     public void saveInvoicesToDatabase(MultipartFile file, String customName) throws Exception {
+        invoicesWithAccount.clear();
+        invoicesWithoutAccount.clear();
         Map<String, List<InvoiceDetails>> filterd;
         try{
             filterd =filterRowsByAccountNumber(file ,customName);
