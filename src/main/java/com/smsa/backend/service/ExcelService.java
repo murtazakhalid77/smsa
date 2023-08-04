@@ -47,8 +47,9 @@ public class ExcelService {
     HashMapHelper hashMapHelper;
     @Autowired
     ResourceLoader resourceLoader;
-    @Value("{smsa.file.location}")
+    @Value("${smsa.file.location}")
     String sampleFileLocation;
+
     List<InvoiceDetails> invoicesWithAccount = new ArrayList<>();
     List<InvoiceDetails> invoicesWithoutAccount = new ArrayList<>();
     private static final Logger logger = LoggerFactory.getLogger(ExcelService.class);
