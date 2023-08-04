@@ -47,6 +47,8 @@ public class ExcelService {
     HashMapHelper hashMapHelper;
     @Autowired
     ResourceLoader resourceLoader;
+    @Value("{smsa.file.location}")
+    String sampleFileLocation;
     List<InvoiceDetails> invoicesWithAccount = new ArrayList<>();
     List<InvoiceDetails> invoicesWithoutAccount = new ArrayList<>();
     private static final Logger logger = LoggerFactory.getLogger(ExcelService.class);
@@ -278,7 +280,7 @@ public class ExcelService {
         Map<String, List<InvoiceDetails>> filteredRowsMap;
         Custom custom = getSheetHistory(sheetUniqueId).getCustom();
 
-        Resource resource = resourceLoader.getResource("classpath:sample.xlsx");
+        Resource resource = resourceLoader.getResource("classpath:../../:sample.xlsx");
 
         FileInputStream fileInputStream = new FileInputStream(resource.getFile());
 
