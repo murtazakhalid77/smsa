@@ -5,10 +5,8 @@ import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.smsa.backend.model.Custom;
-import com.smsa.backend.model.Customer;
-import com.smsa.backend.model.InvoiceDetails;
-import com.smsa.backend.model.SheetHistory;
+import com.smsa.backend.model.*;
+import com.smsa.backend.repository.InvoiceRepository;
 import com.smsa.backend.repository.SheetHistoryRepository;
 import com.smsa.backend.security.util.HashMapHelper;
 import org.slf4j.Logger;
@@ -29,7 +27,6 @@ import java.util.Map;
 
 @Service
 public class PdfService {
-    Map<String, List<InvoiceDetails>> filteredRowsMap;
     @Autowired
     HashMapHelper hashMapHelper;
 
@@ -38,24 +35,20 @@ public class PdfService {
 
     @Autowired
     ResourceLoader resourceLoader;
-
-    @Value("${smsa.file.location}")
-    private String smsaFolderLocation;
-
     Font englishFont = new Font(Font.FontFamily.TIMES_ROMAN, 10);
     Font pdfFont = new Font(Font.FontFamily.TIMES_ROMAN, 8);
     Font englishBoldFont = new Font(Font.FontFamily.TIMES_ROMAN, 10,Font.BOLD);
     Font columnFontBold = new Font(Font.FontFamily.TIMES_ROMAN, 8,Font.BOLD);
-    Custom custom;
     Font arabicFont;
-
-
+    public SheetHistory getSheetHistory(String sheetUniqueUUid){
+        return  sheetHistoryRepository.findByUniqueUUid(sheetUniqueUUid);
+    }
     private static final Logger logger = LoggerFactory.getLogger(PdfService.class);
-    public byte[] makePdf(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId){
-        this.custom =getCustom(sheetUniqueId).getCustom();
+    public byte[] makePdf(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId,Long invoiceNumber){
         Resource resource =resourceLoader.getResource("classpath:afont.ttf");
-       arabicFont  = FontFactory.getFont(resource.getFilename(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-    Document document = new Document(PageSize.A4, 10, 10, 30, 50);
+        arabicFont  = FontFactory.getFont(resource.getFilename(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+        Custom custom= getSheetHistory(sheetUniqueId).getCustom();
+        Document document = new Document(PageSize.A4, 10, 10, 30, 50);
         arabicFont.setSize(10);
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -71,11 +64,8 @@ public class PdfService {
         PdfPCell pictureCell = new PdfPCell();
         pictureCell.setBorder(Rectangle.NO_BORDER);
 
-
-        Resource imgres =resourceLoader.getResource("classpath:img.png");
-        // Replace "path/to/your/image.png" with the actual path to your image file
         Image img = Image.getInstance("classpath:img.png");
-        img.scaleToFit(100, 100); // Adjust the size of the image as needed
+        img.scaleToFit(100, 100);
         pictureCell.addElement(new Chunk(img, 0, 0));
         headerTable.addCell(pictureCell);
 
@@ -84,15 +74,12 @@ public class PdfService {
         arabicCell.setBorder(Rectangle.NO_BORDER);
         arabicCell.setRunDirection(PdfWriter.RUN_DIRECTION_RTL);
 
-        String test = ": ﻟﺮﻗﻢ ﺍﻟﻀﺮﻳﺒﻲ:"+customer.getVatNumber();
+        String test = ": ﺍﻟﺮﻗﻢ ﺍﻟﻀﺮﻳﺒﻲ"+customer.getVatNumber();
         arabicCell.addElement(new Paragraph("ﺷﺮﻛﺔ ﺳﻤﺴﺎ ﻟﻠﻨﻘﻞ ﺍﻟﺴﺮﻳﻊ ﺍﻟﻤﺤﺪﻭﺩﺓ", arabicFont));
         arabicCell.addElement(new Paragraph(test, arabicFont));
 
 
         headerTable.addCell(arabicCell);
-
-
-        // Set the height of the table to one inch (72 points)
 
         document.add(headerTable);
 
@@ -148,7 +135,7 @@ public class PdfService {
         englishAdditionalCell.setBorder(Rectangle.NO_BORDER);
 
         englishAdditionalCell.addElement(new Paragraph("Customer Account Number: " + (customer.getAccountNumber() != null ? customer.getAccountNumber() : ""), englishFont));
-        englishAdditionalCell.addElement(new Paragraph("Invoice#:"+"Inv-"+LocalDate.now()+"-"+customer.getAccountNumber(), englishFont)); // TODO: invoice work
+        englishAdditionalCell.addElement(new Paragraph("Invoice#:"+"Inv-"+invoiceNumber, englishFont)); // TODO: invoice work
         englishAdditionalCell.addElement(new Paragraph("Invoice Date:\t" + LocalDate.now(), englishFont));
         englishAdditionalCell.addElement(new Paragraph("Invoice Currency: " + (customer.getInvoiceCurrency() != null ? customer.getInvoiceCurrency() : ""), englishFont));
 
@@ -158,7 +145,7 @@ public class PdfService {
         arabicAdditionalCell.setRunDirection(PdfWriter.RUN_DIRECTION_RTL);
 
         arabicAdditionalCell.addElement(new Paragraph("رقم حساب العميل: " + (customer.getAccountNumber() != null ? customer.getAccountNumber() : ""), arabicFont));
-        arabicAdditionalCell.addElement(new Paragraph("رقم الفاتورة:" +"Inv-"+LocalDate.now()+"-"+customer.getAccountNumber(), arabicFont)); // TODO: invoice work
+        arabicAdditionalCell.addElement(new Paragraph("رقم الفاتورة:" +"Inv"+"-"+invoiceNumber)); // TODO: invoice work
         arabicAdditionalCell.addElement(new Paragraph("تاريخ الفاتورة: " + LocalDate.now(), arabicFont));
         arabicAdditionalCell.addElement(new Paragraph("عملة الفاتورة: " + (customer.getInvoiceCurrency() != null ? customer.getInvoiceCurrency() : ""), arabicFont));
 
@@ -211,33 +198,15 @@ public class PdfService {
         float columnHeight = 50;
 
         List<String> columnNames =getColumnNamesList();
-        // List to store column names
 
-        Map<String, String> columnMapping = new HashMap<>();
-
-        columnMapping.put("MAWB No.", "MawbNumber");
-        columnMapping.put("Total AWB Count", "TotalAwbCount");
-        columnMapping.put("Customer Shipment Value", "CustomerShipmentValue");
-        columnMapping.put("VAT Charges as per Custom Declaration Form", "VatAmountCustomDeclarationForm");
-        columnMapping.put("Custom Form Charges", "CustomFormCharges");
-        columnMapping.put("Other Charges", "Others");
-        columnMapping.put("Total Charges", "TotalCharges");
-        columnMapping.put("Total Value", "TotalValue");
-        columnMapping.put("Custom Declaration Number", "CustomDeclarationNumber");
-        columnMapping.put("Customer Account Number", "CustomerAccountNumber");
-        columnMapping.put("Invoice Number", "InvoiceNumber");
-        columnMapping.put("Invoice Type", "InvoiceType");
-        columnMapping.put("SMSA Fee Charges", "SMSAFeeCharges");
-        columnMapping.put("Total Amount", "TotalAmount");
-        columnMapping.put("Custom Port", "CustomPort");
-        columnMapping.put("VAT on SMSA Fee","VatOnSmsaFees");
+        Map<String, String> columnMapping = getColumnMapping();
 
 
         // Add the column names to the table
         for (String columnName : columnNames) {
             PdfPCell cell = new PdfPCell(new Paragraph(columnName, columnFontBold));
             cell.setMinimumHeight(columnHeight);
-            cell.setBackgroundColor(new BaseColor(42, 52, 189)); // Light blue color
+            cell.setBackgroundColor(new BaseColor(23, 54, 93)); // Light blue color
             cell.setVerticalAlignment(Element.ALIGN_MIDDLE); // Align content in the middle
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 
@@ -245,9 +214,10 @@ public class PdfService {
             dataTable.addCell(cell);
         }
 
+            Map<String, List<InvoiceDetails>> filteredRowsMap ;
         filteredRowsMap = hashMapHelper.filterRowsByMawbNumber(invoiceDetailsList);
 
-        List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap, customer,this.custom);
+        List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap, customer,custom,invoiceNumber);
 
         for (Map<String, Object> rowDataMap : calculatedValuesList) {
             for (String columnName : columnNames) {
@@ -319,6 +289,30 @@ public class PdfService {
         throw new RuntimeException("There was an issue in making pdf");
     }
 }
+
+    private Map<String, String> getColumnMapping() {
+       HashMap<String,String>  columnMapping = new HashMap<>();
+
+        columnMapping.put("MAWB No.", "MawbNumber");
+        columnMapping.put("Total AWB Count", "TotalAwbCount");
+        columnMapping.put("Customer Shipment Value", "CustomerShipmentValue");
+        columnMapping.put("VAT Charges as per Custom Declaration Form", "VatAmountCustomDeclarationForm");
+        columnMapping.put("Custom Form Charges", "CustomFormCharges");
+        columnMapping.put("Other Charges", "Others");
+        columnMapping.put("Total Charges", "TotalCharges");
+        columnMapping.put("Total Value", "TotalValue");
+        columnMapping.put("Custom Declaration No", "CustomDeclarationNumber");
+        columnMapping.put("Customer Account Number", "CustomerAccountNumber");
+        columnMapping.put("Invoice No", "InvoiceNumber");
+        columnMapping.put("Invoice Type", "InvoiceType");
+        columnMapping.put("SMSA Fee Charges", "SMSAFeeCharges");
+        columnMapping.put("Total Amount", "TotalAmount");
+        columnMapping.put("Custom Port", "CustomPort");
+        columnMapping.put("VAT on SMSA Fee","VatOnSmsaFees");
+
+        return columnMapping;
+    }
+
     private List<String> getColumnNamesList() {
         List<String> columnNames = new ArrayList<>();
         columnNames.add("Custom Port");
@@ -333,9 +327,6 @@ public class PdfService {
         columnNames.add("VAT on SMSA Fee");
         columnNames.add("Total Amount");
         return columnNames;
-    }
-    public SheetHistory getCustom(String sheetUniqueUUid){
-        return  sheetHistoryRepository.findByUniqueUUid(sheetUniqueUUid);
     }
 }
 

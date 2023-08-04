@@ -1,10 +1,12 @@
 package com.smsa.backend.scheduler;
 
 import com.smsa.backend.model.Customer;
+import com.smsa.backend.model.Invoice;
 import com.smsa.backend.model.InvoiceDetails;
 import com.smsa.backend.model.SheetHistory;
 import com.smsa.backend.repository.CustomerRepository;
 import com.smsa.backend.repository.InvoiceDetailsRepository;
+import com.smsa.backend.repository.InvoiceRepository;
 import com.smsa.backend.repository.SheetHistoryRepository;
 import com.smsa.backend.service.EmailService;
 import com.smsa.backend.service.ExcelService;
@@ -16,10 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-@Component
+@Service
 public class EmailSchedular {
     @Autowired
     SheetHistoryRepository sheetHistoryRepository;
@@ -34,10 +37,8 @@ public class EmailSchedular {
     @Autowired
     EmailService emailService;
     @Autowired
-    ResourceLoader resourceLoader;
-
+    InvoiceRepository invoiceRepository;
     private static final Logger logger = LoggerFactory.getLogger(EmailSchedular.class);
-    private Map<String, List<InvoiceDetails>> invoiceDetailsMap;
 
     @Scheduled(initialDelay = 5000, fixedDelay = 120000)
     public void markSentAndProcessInvoices() throws Exception {
@@ -48,17 +49,22 @@ public class EmailSchedular {
 
                 // Call a method to process invoices for this sheetUniqueId
                 processInvoicesForSheet(sheetUniqueId);
-                logger.info("work done sheet %S",sheetHistory.getName());
+                logger.info(String.format("work done sheet %S",sheetHistory.getName()));
             }
         }
         logger.info("No work to do");
     }
     public void processInvoicesForSheet(String sheetUniqueId) throws Exception {
+        Map<String, List<InvoiceDetails>> invoiceDetailsMap = new HashMap<>();
+
+        Invoice invoice =invoiceRepository.findById(1L).get();
+
+        Long invoiceNumber=invoice.getNumber();
         boolean anyUnsentInvoice = false;
 
         List<InvoiceDetails> invoicesForSheet = invoiceDetailsRepository.findAllBySheetUniqueId(sheetUniqueId);
-        invoiceDetailsMap = new HashMap<>();
-        invoiceDetailsMap = groupInvoicesByAccountNumber(invoicesForSheet);
+
+        invoiceDetailsMap = groupInvoicesByAccountNumber(invoicesForSheet,invoiceDetailsMap);
 
         for (String accountNumber : invoiceDetailsMap.keySet()) {
 
@@ -70,22 +76,25 @@ public class EmailSchedular {
                 continue; // Skip processing for this account number
             }
 
-            if (!checkIsSentInMail(accountNumber)) {
+            if (!checkIsSentInMail(accountNumber,invoiceDetailsMap)) {
                 Optional<Customer> customer = customerRepository.findByAccountNumber(accountNumber);
 
                 if (customer.isPresent() && customer.get().getEmail() != null && customer.get().getStatus().equals(true)) {
                     logger.info("Making excel for Account Number: " + accountNumber);
                     try {
-
-                        byte[] excelFileData = excelService.updateExcelFile(invoiceDetailsList, customer.get(), sheetUniqueId);
-                        byte[] pdfFileData = pdfService.makePdf(invoiceDetailsList, customer.get(), sheetUniqueId);
+                        Long invoiceNo=invoiceNumber++;
+                        byte[] excelFileData = excelService.updateExcelFile(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
+                        byte[] pdfFileData = pdfService.makePdf(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
 
                         if (emailService.sendMailWithAttachments(customer.get(), excelFileData, pdfFileData,sheetUniqueId)){
-                            logger.info("All the work done for account number %S with name %S",customer.get().getAccountNumber(),customer.get().getNameEnglish());
+                            logger.info(String.format("All the work done for account number %S with name %S",customer.get().getAccountNumber(),customer.get().getNameEnglish()));
                         }
 
+                        invoice.setNumber(invoiceNo);
+                        invoiceRepository.save(invoice);
+
                     } catch (Exception e) {
-                        logger.error("Error while creating Excel for Account Number: " + accountNumber, e);
+                        logger.error(String.format("Error while creating Excel for Account Number %S: " , accountNumber));
                         anyUnsentInvoice = true;
                         throw new Exception(e);
                         //continue
@@ -96,6 +105,7 @@ public class EmailSchedular {
                 }
             }
         }
+
 
 //         Update sheet history status only if there were no exceptions during the process
         if (!anyUnsentInvoice) {
@@ -111,7 +121,7 @@ public class EmailSchedular {
         }
     }
 
-    private Map<String, List<InvoiceDetails>> groupInvoicesByAccountNumber(List<InvoiceDetails> invoicesForSheet){
+    private Map<String, List<InvoiceDetails>> groupInvoicesByAccountNumber(List<InvoiceDetails> invoicesForSheet, Map<String, List<InvoiceDetails>> invoiceDetailsMap){
         for (InvoiceDetails invoiceDetails : invoicesForSheet) {
             String accountNumber = invoiceDetails.getInvoiceDetailsId().getAccountNumber();
             // If the account number is not already in the map, create a new list for it
@@ -122,7 +132,7 @@ public class EmailSchedular {
         return invoiceDetailsMap;
     }
 
-    private boolean checkIsSentInMail(String accountNumber) {
+    private boolean checkIsSentInMail(String accountNumber, Map<String, List<InvoiceDetails>> invoiceDetailsMap) {
         List<InvoiceDetails> invoiceDetailsList = invoiceDetailsMap.get(accountNumber);
         return invoiceDetailsList != null && !invoiceDetailsList.isEmpty()
                 && invoiceDetailsList.get(0).getIsSentInMail();
