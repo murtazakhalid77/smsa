@@ -29,10 +29,10 @@ import java.util.Map;
 public class PdfService {
     @Autowired
     HashMapHelper hashMapHelper;
-
     @Autowired
     SheetHistoryRepository sheetHistoryRepository;
-
+    @Autowired
+    HelperService helperService;
     @Autowired
     ResourceLoader resourceLoader;
     Font englishFont = new Font(Font.FontFamily.TIMES_ROMAN, 10);
@@ -46,8 +46,11 @@ public class PdfService {
     private static final Logger logger = LoggerFactory.getLogger(PdfService.class);
     public byte[] makePdf(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId,Long invoiceNumber){
         Resource resource =resourceLoader.getResource("classpath:afont.ttf");
+
         arabicFont  = FontFactory.getFont(resource.getFilename(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+
         Custom custom= getSheetHistory(sheetUniqueId).getCustom();
+
         Document document = new Document(PageSize.A4, 10, 10, 30, 50);
         arabicFont.setSize(10);
 
@@ -74,7 +77,7 @@ public class PdfService {
         arabicCell.setBorder(Rectangle.NO_BORDER);
         arabicCell.setRunDirection(PdfWriter.RUN_DIRECTION_RTL);
 
-        String test = ": ﺍﻟﺮﻗﻢ ﺍﻟﻀﺮﻳﺒﻲ"+customer.getVatNumber();
+        String test = ": ﺍﻟﺮﻗﻢ ﺍﻟﻀﺮﻳﺒﻲ"+custom.getSmsaFeeVat();
         arabicCell.addElement(new Paragraph("ﺷﺮﻛﺔ ﺳﻤﺴﺎ ﻟﻠﻨﻘﻞ ﺍﻟﺴﺮﻳﻊ ﺍﻟﻤﺤﺪﻭﺩﺓ", arabicFont));
         arabicCell.addElement(new Paragraph(test, arabicFont));
 
@@ -134,9 +137,11 @@ public class PdfService {
         PdfPCell englishAdditionalCell = new PdfPCell();
         englishAdditionalCell.setBorder(Rectangle.NO_BORDER);
 
+        String invoice=helperService.generateInvoiceDate(sheetUniqueId);
+
         englishAdditionalCell.addElement(new Paragraph("Customer Account Number: " + (customer.getAccountNumber() != null ? customer.getAccountNumber() : ""), englishFont));
-        englishAdditionalCell.addElement(new Paragraph("Invoice#:"+"Inv-"+invoiceNumber, englishFont)); // TODO: invoice work
-        englishAdditionalCell.addElement(new Paragraph("Invoice Date:\t" + LocalDate.now(), englishFont));
+        englishAdditionalCell.addElement(new Paragraph("Invoice#:"+"Inv-"+invoiceNumber, englishFont));
+        englishAdditionalCell.addElement(new Paragraph("Invoice Date:\t" + invoice,englishFont));
         englishAdditionalCell.addElement(new Paragraph("Invoice Currency: " + (customer.getInvoiceCurrency() != null ? customer.getInvoiceCurrency() : ""), englishFont));
 
         // Right column: Arabic content
@@ -145,8 +150,8 @@ public class PdfService {
         arabicAdditionalCell.setRunDirection(PdfWriter.RUN_DIRECTION_RTL);
 
         arabicAdditionalCell.addElement(new Paragraph("رقم حساب العميل: " + (customer.getAccountNumber() != null ? customer.getAccountNumber() : ""), arabicFont));
-        arabicAdditionalCell.addElement(new Paragraph("رقم الفاتورة:" +"Inv"+"-"+invoiceNumber)); // TODO: invoice work
-        arabicAdditionalCell.addElement(new Paragraph("تاريخ الفاتورة: " + LocalDate.now(), arabicFont));
+        arabicAdditionalCell.addElement(new Paragraph(+invoiceNumber+ "رقم الفاتورة:" +"Inv"+"-",arabicFont));
+        arabicAdditionalCell.addElement(new Paragraph(invoice +"تاريخ الفاتورة:",arabicFont));
         arabicAdditionalCell.addElement(new Paragraph("عملة الفاتورة: " + (customer.getInvoiceCurrency() != null ? customer.getInvoiceCurrency() : ""), arabicFont));
 
         additionalContentTable.addCell(englishAdditionalCell);
@@ -214,15 +219,17 @@ public class PdfService {
             dataTable.addCell(cell);
         }
 
-            Map<String, List<InvoiceDetails>> filteredRowsMap ;
+        Map<String, List<InvoiceDetails>> filteredRowsMap ;
         filteredRowsMap = hashMapHelper.filterRowsByMawbNumber(invoiceDetailsList);
 
         List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap, customer,custom,invoiceNumber);
 
         for (Map<String, Object> rowDataMap : calculatedValuesList) {
             for (String columnName : columnNames) {
+
                 String keyName = columnMapping.get(columnName);
                 Object value = rowDataMap.get(keyName);
+
 
                 // Get the data as strings and add them to the table cells
                 PdfPCell cell = new PdfPCell(new Paragraph(value != null ? value.toString() : "", pdfFont));
@@ -230,6 +237,7 @@ public class PdfService {
                 dataTable.addCell(cell);
             }
         }
+
         // Add the table to the document
         document.add(dataTable);
 

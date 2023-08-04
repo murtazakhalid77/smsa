@@ -45,7 +45,7 @@ public class ExcelController {
 
         if (excelImportHelper.hasExcelFormat(file)) {
             try {
-                excelService.saveInvoicesToDatabase(file, excelImportDto1.getCustom());
+                excelService.saveInvoicesToDatabase(file,excelImportDto1);
 
                 for (InvoiceDetails invoiceDetails : excelService.getInvoicesWithoutAccount()) {
                     accountNumbers.add(invoiceDetails.getInvoiceDetailsId().getAccountNumber());

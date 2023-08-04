@@ -36,7 +36,6 @@ public class CustomerService {
             throw new RecordAlreadyExistException("Cannot create customer with duplicate account number: ");
         }else{
             Customer customer = toDomain(customerDTO);
-            System.out.println(customer);
             return toDto(customerRepository.save(toDomain(customerDTO)));
         }
     }
