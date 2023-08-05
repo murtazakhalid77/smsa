@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -287,11 +288,13 @@ public class ExcelService {
 
         Sheet invoiceDetailSheet = newWorkBook.getSheetAt(1);
 
-        CellStyle style = makeStyleForTheSheet(newWorkBook);
+        invoiceDetailSheet.setDisplayGridlines(false);
 
-        setInvoiceDetailsCellValues(invoiceDetailSheet, invoiceDetailsList, style);
+        setInvoiceDetailsCellValues(invoiceDetailSheet, invoiceDetailsList);
 
         Sheet summarySheet = newWorkBook.getSheetAt(0);
+
+        summarySheet.setDisplayGridlines(false);
 
         setSummarySheetCellValues(summarySheet, customer, sheetUniqueId, invoiceNumber);
 
@@ -389,7 +392,7 @@ public class ExcelService {
 
     }
 
-    private void setInvoiceDetailsCellValues(Sheet invoiceDetailSheet, List<InvoiceDetails> invoiceDetailsList,CellStyle style) {
+    private void setInvoiceDetailsCellValues(Sheet invoiceDetailSheet, List<InvoiceDetails> invoiceDetailsList) {
         int rowCount = 1;
         try {
             for (InvoiceDetails invoiceDetails : invoiceDetailsList) {
@@ -442,9 +445,15 @@ public class ExcelService {
         return style;
     }
 
-    private void populateCalculatedValues(Sheet summarySheet,List<Map<String, Object>> calculatedValuesList) {
+    private String formatCurrency(Double value) {
+        NumberFormat formatter = NumberFormat.getNumberInstance();
+        formatter.setMinimumFractionDigits(2);
+        formatter.setMaximumFractionDigits(2);
+        return formatter.format(value);
+    }
+    private void populateCalculatedValues(Sheet summarySheet, List<Map<String, Object>> calculatedValuesList) {
         try {
-            int startingRow=6;
+            int startingRow = 6;
             for (Map<String, Object> calculatedValuesMap : calculatedValuesList) {
                 Row row = summarySheet.createRow(startingRow);
 
@@ -453,24 +462,32 @@ public class ExcelService {
                 setCellValue(row.createCell(2), calculatedValuesMap.get("CustomerAccountNumber"));
                 setCellValue(row.createCell(3), calculatedValuesMap.get("MawbNumber"));
                 setCellValue(row.createCell(4), calculatedValuesMap.get("TotalAwbCount"));
-                setCellValue(row.createCell(5), calculatedValuesMap.get("TotalValue"));
-                setCellValue(row.createCell(6), calculatedValuesMap.get("CustomerShipmentValue"));
-                setCellValue(row.createCell(7), calculatedValuesMap.get("VatAmountCustomDeclarationForm"));
-                setCellValue(row.createCell(8), calculatedValuesMap.get("CustomFormCharges"));
-                setCellValue(row.createCell(9), calculatedValuesMap.get("Others"));
-                setCellValue(row.createCell(10), calculatedValuesMap.get("TotalCharges"));
+
+                // Convert String to Double and pass to formatCurrency
+                setCellValue(row.createCell(5), formatCurrency(Double.valueOf(calculatedValuesMap.get("TotalValue").toString())));
+                setCellValue(row.createCell(6), formatCurrency(Double.valueOf(calculatedValuesMap.get("CustomerShipmentValue").toString())));
+                setCellValue(row.createCell(7), formatCurrency(Double.valueOf(calculatedValuesMap.get("VatAmountCustomDeclarationForm").toString())));
+                setCellValue(row.createCell(8), formatCurrency(Double.valueOf(calculatedValuesMap.get("CustomFormCharges").toString())));
+                setCellValue(row.createCell(9), formatCurrency(Double.valueOf(calculatedValuesMap.get("Others").toString())));
+                setCellValue(row.createCell(10), formatCurrency(Double.valueOf(calculatedValuesMap.get("TotalCharges").toString())));
+
+                CellStyle style = summarySheet.getWorkbook().createCellStyle();
+                style.setAlignment(HorizontalAlignment.RIGHT);
+                row.getCell(5).setCellStyle(style);
+                row.getCell(6).setCellStyle(style);
+                row.getCell(7).setCellStyle(style);
+                row.getCell(8).setCellStyle(style);
+                row.getCell(9).setCellStyle(style);
+                row.getCell(10).setCellStyle(style);
 
                 // Move to the next row
                 startingRow++;
             }
+        } catch (ExcelMakingException e) {
+            throw new RuntimeException("There was an issue in populating calculated values in the summary file");
         }
-        catch (ExcelMakingException e) {
-            throw new RuntimeException("There was an issue in populating calculated values in summary file");
-        }
-
-
-
     }
+
 
     private void setCellValue(Cell cell, Object value) {
         if (value == null) {

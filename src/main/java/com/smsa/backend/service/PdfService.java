@@ -19,11 +19,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class PdfService {
@@ -77,7 +76,7 @@ public class PdfService {
         arabicCell.setBorder(Rectangle.NO_BORDER);
         arabicCell.setRunDirection(PdfWriter.RUN_DIRECTION_RTL);
 
-        String test = ": ﺍﻟﺮﻗﻢ ﺍﻟﻀﺮﻳﺒﻲ"+custom.getSmsaFeeVat();
+        String test = " ﺍﻟﺮﻗﻢ ﺍﻟﻀﺮﻳﺒﻲ:"+custom.getSmsaFeeVat();
         arabicCell.addElement(new Paragraph("ﺷﺮﻛﺔ ﺳﻤﺴﺎ ﻟﻠﻨﻘﻞ ﺍﻟﺴﺮﻳﻊ ﺍﻟﻤﺤﺪﻭﺩﺓ", arabicFont));
         arabicCell.addElement(new Paragraph(test, arabicFont));
 
@@ -150,8 +149,8 @@ public class PdfService {
         arabicAdditionalCell.setRunDirection(PdfWriter.RUN_DIRECTION_RTL);
 
         arabicAdditionalCell.addElement(new Paragraph("رقم حساب العميل: " + (customer.getAccountNumber() != null ? customer.getAccountNumber() : ""), arabicFont));
-        arabicAdditionalCell.addElement(new Paragraph(+invoiceNumber+ "رقم الفاتورة:" +"Inv"+"-",arabicFont));
-        arabicAdditionalCell.addElement(new Paragraph(invoice +"تاريخ الفاتورة:",arabicFont));
+        arabicAdditionalCell.addElement(new Paragraph("رقم الفاتورة:" +"Inv"+"-"+invoiceNumber,arabicFont));
+        arabicAdditionalCell.addElement(new Paragraph("تاريخ الفاتورة:"+invoice,arabicFont));
         arabicAdditionalCell.addElement(new Paragraph("عملة الفاتورة: " + (customer.getInvoiceCurrency() != null ? customer.getInvoiceCurrency() : ""), arabicFont));
 
         additionalContentTable.addCell(englishAdditionalCell);
@@ -224,22 +223,48 @@ public class PdfService {
 
         List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap, customer,custom,invoiceNumber);
 
-        for (Map<String, Object> rowDataMap : calculatedValuesList) {
-            for (String columnName : columnNames) {
+            // Loop through the data and columns to populate the table
+            for (Map<String, Object> rowDataMap : calculatedValuesList) {
+                for (String columnName : columnNames) {
+                    String keyName = columnMapping.get(columnName);
+                    Object value = rowDataMap.get(keyName);
 
-                String keyName = columnMapping.get(columnName);
-                Object value = rowDataMap.get(keyName);
+                    PdfPCell cell = new PdfPCell();
+                    cell.setVerticalAlignment(Element.ALIGN_RIGHT); // Align content in the middle
 
+                    if (shouldApplyCurrencyFormat(columnName)) {
+                        String formattedValue = formatCurrency(Double.valueOf(value.toString()));
+                        cell.addElement(new Paragraph(formattedValue, pdfFont));
+                    } else {
+                        cell.addElement(new Paragraph(value != null ? value.toString() : "", pdfFont));
+                    }
 
-                // Get the data as strings and add them to the table cells
-                PdfPCell cell = new PdfPCell(new Paragraph(value != null ? value.toString() : "", pdfFont));
-                cell.setVerticalAlignment(Element.ALIGN_CENTER); // Align content in the middle
-                dataTable.addCell(cell);
+                    dataTable.addCell(cell);
+                }
             }
-        }
 
-        // Add the table to the document
+            double grandTotal = 0.0;
+            for (Map<String, Object> rowDataMap : calculatedValuesList) {
+                String totalAmountKey = columnMapping.get("Total Amount");
+                Object totalAmountValue = rowDataMap.get(totalAmountKey);
+
+                if (totalAmountValue instanceof Number) {
+                    grandTotal += ((Number) totalAmountValue).doubleValue();
+                }
+            }
+            // Add grand total cell
+            PdfPCell grandTotalCell = new PdfPCell(new Paragraph("Grand Total:"+formatCurrency(grandTotal), pdfFont));
+            grandTotalCell.setBorder(Rectangle.TOP);
+            grandTotalCell.setColspan(columnNames.size()); // Set the colspan to span across all columns
+            grandTotalCell.setHorizontalAlignment(Element.ALIGN_RIGHT); // Align content to the right
+            dataTable.addCell(grandTotalCell);
+
+
+
+            // Add the table to the document
         document.add(dataTable);
+
+
 
 
         // Create the single column table
@@ -321,6 +346,18 @@ public class PdfService {
         return columnMapping;
     }
 
+    private boolean shouldApplyCurrencyFormat(String columnName) {
+        List<String> currencyFormattedColumns = Arrays.asList(
+                "VAT Charges as per Custom Declaration Form",
+                "Custom Form Charges",
+                "Other Charges",
+                "SMSA Fee Charges",
+                "VAT on SMSA Fee",
+                "Total Amount"
+        );
+
+        return currencyFormattedColumns.contains(columnName);
+    }
     private List<String> getColumnNamesList() {
         List<String> columnNames = new ArrayList<>();
         columnNames.add("Custom Port");
@@ -335,6 +372,12 @@ public class PdfService {
         columnNames.add("VAT on SMSA Fee");
         columnNames.add("Total Amount");
         return columnNames;
+    }
+    private String formatCurrency(Double value) {
+        NumberFormat formatter = NumberFormat.getNumberInstance();
+        formatter.setMinimumFractionDigits(2);
+        formatter.setMaximumFractionDigits(2);
+        return formatter.format(value);
     }
 }
 
