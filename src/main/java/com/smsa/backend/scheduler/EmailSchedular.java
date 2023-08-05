@@ -59,7 +59,7 @@ public class EmailSchedular {
 
         Invoice invoice =invoiceRepository.findById(1L).get();
 
-        Long invoiceNumber=invoice.getNumber();
+        Long invoiceNumber = invoice.getNumber(); //5
         boolean anyUnsentInvoice = false;
 
         List<InvoiceDetails> invoicesForSheet = invoiceDetailsRepository.findAllBySheetUniqueId(sheetUniqueId);
@@ -82,7 +82,8 @@ public class EmailSchedular {
                 if (customer.isPresent() && customer.get().getEmail() != null && customer.get().getStatus().equals(true)) {
                     logger.info("Making excel for Account Number: " + accountNumber);
                     try {
-                        Long invoiceNo=invoiceNumber++;
+                        Long invoiceNo = invoiceNumber; // Use the current invoiceNumber
+                        invoiceNumber++; //
                         byte[] excelFileData = excelService.updateExcelFile(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
                         byte[] pdfFileData = pdfService.makePdf(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
 
@@ -90,8 +91,6 @@ public class EmailSchedular {
                             logger.info(String.format("All the work done for account number %S with name %S",customer.get().getAccountNumber(),customer.get().getNameEnglish()));
                         }
 
-                        invoice.setNumber(invoiceNo);
-                        invoiceRepository.save(invoice);
 
                     } catch (Exception e) {
                         logger.error(String.format("Error while creating Excel for Account Number %S: " , accountNumber));
@@ -106,7 +105,8 @@ public class EmailSchedular {
             }
         }
 
-
+        invoice.setNumber(invoiceNumber);
+        invoiceRepository.save(invoice);
 //         Update sheet history status only if there were no exceptions during the process
         if (!anyUnsentInvoice) {
             updateSheetHistoryStatus(sheetUniqueId, anyUnsentInvoice);

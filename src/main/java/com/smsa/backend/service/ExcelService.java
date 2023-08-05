@@ -47,6 +47,8 @@ public class ExcelService {
     HashMapHelper hashMapHelper;
     @Value("${smsa.file.location}")
     String sampleFileLocation;
+    @Value("${smsa.file.local.location}")
+    String sampleFileLocalLocation;
     List<InvoiceDetails> invoicesWithAccount = new ArrayList<>();
     List<InvoiceDetails> invoicesWithoutAccount = new ArrayList<>();
     private static final Logger logger = LoggerFactory.getLogger(ExcelService.class);
@@ -279,7 +281,7 @@ public class ExcelService {
         Custom custom = getSheetHistory(sheetUniqueId).getCustom();
 
 
-        FileInputStream fileInputStream = new FileInputStream(sampleFileLocation+"/sample.xlsx");
+        FileInputStream fileInputStream = new FileInputStream(sampleFileLocalLocation);
 
         Workbook newWorkBook = WorkbookFactory.create(fileInputStream);
 
@@ -315,10 +317,14 @@ public class ExcelService {
 
 
     }
-
-    private void populateSumValues(Sheet summarySheet, Map<String, Double> sumMap) {
+    public void populateSumValues(Sheet summarySheet, Map<String, Double> sumMap) {
         try {
-            int startingRow = summarySheet.getLastRowNum() + 1; // Start from the next row after the existing data
+            int lastRowIndex = summarySheet.getLastRowNum();
+            int startingRow = findStartingRow(summarySheet);
+
+            if (startingRow > lastRowIndex) {
+                startingRow = lastRowIndex + 1;
+            }
 
             Row row = summarySheet.createRow(startingRow);
             setCellValue(row.createCell(6), sumMap.get("CustomerShipmentValueSum"));
@@ -327,9 +333,33 @@ public class ExcelService {
             setCellValue(row.createCell(9), sumMap.get("OthersSum"));
             setCellValue(row.createCell(10), sumMap.get("TotalChargesSum"));
         } catch (ExcelMakingException e) {
-
             throw new RuntimeException("There was an issue in populating sum values in summary file");
         }
+    }
+
+    private int findStartingRow(Sheet sheet) {
+        DataFormatter dataFormatter = new DataFormatter();
+        int lastRowIndex = sheet.getLastRowNum();
+
+        for (int rowIndex = lastRowIndex; rowIndex >= 0; rowIndex--) {
+            Row row = sheet.getRow(rowIndex);
+            if (row != null) {
+                boolean isRowEmpty = true;
+                for (Cell cell : row) {
+                    String cellValue = dataFormatter.formatCellValue(cell);
+                    if (cellValue != null && !cellValue.trim().isEmpty()) {
+                        isRowEmpty = false;
+                        break;
+                    }
+                }
+
+                if (!isRowEmpty) {
+                    return rowIndex + 1;
+                }
+            }
+        }
+
+        return 0; // If no non-empty row is found, start from the first row
     }
 
 
