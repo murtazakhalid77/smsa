@@ -42,6 +42,4 @@ public class CustomController {
     ResponseEntity<CustomDto> updateCustom(@RequestBody CustomDto customDto, @PathVariable Long id){
         return ResponseEntity.ok(this.customService.updateCustom(customDto, id));
     }
-
-
 }

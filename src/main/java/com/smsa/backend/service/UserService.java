@@ -1,6 +1,7 @@
 package com.smsa.backend.service;
 
 
+import com.smsa.backend.Exception.RecordNotFoundException;
 import com.smsa.backend.model.Roles;
 import com.smsa.backend.model.User;
 import com.smsa.backend.repository.RolesRepository;
@@ -10,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -40,4 +43,25 @@ public class UserService {
         return rolesSet;
     }
 
+    public List<User> getAllUsers() {
+        return this.userRepository.findAll();
+    }
+
+    public User findUserById(Long id) {
+        Optional<User> user = this.userRepository.findById(id);
+        if(user.isPresent()){
+            return user.get();
+        }else{
+            throw new RecordNotFoundException("User Couldn't Found");
+        }
+    }
+
+    public User updateUser(User user) {
+        Optional<User> userExist = this.userRepository.findById(user.getId());
+        if(userExist.isPresent()){
+            return this.userRepository.save(user);
+        }else{
+            throw new RecordNotFoundException("User Couldn't Found");
+        }
+    }
 }
