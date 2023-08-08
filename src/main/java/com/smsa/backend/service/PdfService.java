@@ -139,7 +139,7 @@ public class PdfService {
         String invoice=helperService.generateInvoiceDate(sheetUniqueId);
 
         englishAdditionalCell.addElement(new Paragraph("Customer Account Number: " + (customer.getAccountNumber() != null ? customer.getAccountNumber() : ""), englishFont));
-        englishAdditionalCell.addElement(new Paragraph("Invoice#:"+"Inv-"+invoiceNumber, englishFont));
+        englishAdditionalCell.addElement(new Paragraph("Invoice#:"+"CDV-"+invoiceNumber, englishFont));
         englishAdditionalCell.addElement(new Paragraph("Invoice Date:\t" + invoice,englishFont));
         englishAdditionalCell.addElement(new Paragraph("Invoice Currency: " + (customer.getInvoiceCurrency() != null ? customer.getInvoiceCurrency() : ""), englishFont));
 
@@ -149,7 +149,7 @@ public class PdfService {
         arabicAdditionalCell.setRunDirection(PdfWriter.RUN_DIRECTION_RTL);
 
         arabicAdditionalCell.addElement(new Paragraph("رقم حساب العميل: " + (customer.getAccountNumber() != null ? customer.getAccountNumber() : ""), arabicFont));
-        arabicAdditionalCell.addElement(new Paragraph("رقم الفاتورة:" +"Inv"+"-"+invoiceNumber,arabicFont));
+        arabicAdditionalCell.addElement(new Paragraph("رقم الفاتورة:" +"CDV"+"-"+invoiceNumber,arabicFont));
         arabicAdditionalCell.addElement(new Paragraph("تاريخ الفاتورة:"+invoice,arabicFont));
         arabicAdditionalCell.addElement(new Paragraph("عملة الفاتورة: " + (customer.getInvoiceCurrency() != null ? customer.getInvoiceCurrency() : ""), arabicFont));
 
@@ -183,11 +183,12 @@ public class PdfService {
 
         document.add(subjectTable);
 
+
+
         // Add the content paragraph
-        Paragraph contentParagraph = new Paragraph("" +
-                "Dear Customer,\n\nThis is Duty & Taxes Invoice in connection with " +
-                "Inbound Shipments mentioned therein, The Charges as per Saudi Custom " +
-                "Declaration form are paid to Saudi Custom on behalf of Consignee.", englishFont);
+        Paragraph contentParagraph = new Paragraph(String.format("Dear Customer,\n\nThis is Duty & Taxes Invoice in connection with " +
+                "Inbound Shipments mentioned therein, The Charges as per %S Declaration " +
+                "form are paid to %S on behalf of Consignee",custom.getCustomPort(),custom.getCustomPort()), englishFont);
         contentParagraph.setAlignment(Element.ALIGN_LEFT);
         contentParagraph.setSpacingBefore(5); // Add some space before the content paragraph
         document.add(contentParagraph);

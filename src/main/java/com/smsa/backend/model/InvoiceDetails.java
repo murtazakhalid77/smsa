@@ -34,7 +34,7 @@ public class InvoiceDetails {
     private Double other;
     private Double totalCharges;
     private Long customDeclarationNumber;
-    private LocalDate customDeclarationDate;
+    private String customDeclarationDate;
     private String ref;
     private String sheetUniqueId;
     private LocalDate sheetTimesStamp;
@@ -384,7 +384,7 @@ public class InvoiceDetails {
         return result;
     }
 
-    public InvoiceDetails(final InvoiceDetailsId invoiceDetailsId, final String orderNumber, final String origin, final String destination, final String shippersName, final String consigneeName, final Double weight, final Double declaredValue, final Double valueCustom, final Double vatAmount, final Double customFormCharges, final Double other, final Double totalCharges, final Long customDeclarationNumber, final LocalDate customDeclarationDate, final String ref, final String sheetUniqueId, final LocalDate sheetTimesStamp, final String customerUniqueId, final LocalDate CustomerTimestamp, final Boolean isSentInMail, final Customer customer) {
+    public InvoiceDetails(final InvoiceDetailsId invoiceDetailsId, final String orderNumber, final String origin, final String destination, final String shippersName, final String consigneeName, final Double weight, final Double declaredValue, final Double valueCustom, final Double vatAmount, final Double customFormCharges, final Double other, final Double totalCharges, final Long customDeclarationNumber, final String customDeclarationDate, final String ref, final String sheetUniqueId, final LocalDate sheetTimesStamp, final String customerUniqueId, final LocalDate CustomerTimestamp, final Boolean isSentInMail, final Customer customer) {
         this.invoiceDetailsId = invoiceDetailsId;
         this.orderNumber = orderNumber;
         this.origin = origin;
@@ -468,7 +468,7 @@ public class InvoiceDetails {
         return this.customDeclarationNumber;
     }
 
-    public LocalDate getCustomDeclarationDate() {
+    public String getCustomDeclarationDate() {
         return this.customDeclarationDate;
     }
 
@@ -556,7 +556,7 @@ public class InvoiceDetails {
         this.customDeclarationNumber = customDeclarationNumber;
     }
 
-    public void setCustomDeclarationDate(final LocalDate customDeclarationDate) {
+    public void setCustomDeclarationDate(final String customDeclarationDate) {
         this.customDeclarationDate = customDeclarationDate;
     }
 
@@ -604,7 +604,7 @@ public class InvoiceDetails {
         private Double other;
         private Double totalCharges;
         private Long customDeclarationNumber;
-        private LocalDate customDeclarationDate;
+        private String customDeclarationDate;
         private String ref;
         private String sheetUniqueId;
         private LocalDate sheetTimesStamp;
@@ -686,7 +686,7 @@ public class InvoiceDetails {
             return this;
         }
 
-        public InvoiceDetailsBuilder customDeclarationDate(final LocalDate customDeclarationDate) {
+        public InvoiceDetailsBuilder customDeclarationDate(final String customDeclarationDate) {
             this.customDeclarationDate = customDeclarationDate;
             return this;
         }

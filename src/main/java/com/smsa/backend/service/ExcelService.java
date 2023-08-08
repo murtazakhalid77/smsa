@@ -1,6 +1,7 @@
 package com.smsa.backend.service;
 
 
+import com.smsa.backend.Exception.AwbDublicateException;
 import com.smsa.backend.Exception.ExcelMakingException;
 import com.smsa.backend.Exception.ParsingExcelException;
 import com.smsa.backend.Exception.SheetAlreadyExistException;
@@ -92,7 +93,13 @@ public class ExcelService {
             throw new ParsingExcelException(String.format("There was an issue in parsing the file %S", originalFilename));
         }
 
-        //TODO: UPDATE WORK OF SHEET
+        try {
+            findDuplicatesOfAwb(rowsToBeFiltered);
+        }catch (AwbDublicateException e){
+            logger.error("There is an awb duplication couldnt upload the file");
+            throw new AwbDublicateException("There was a duplication of AWB, couldn't upload the file");
+        }
+
 
         if (!rowsToBeFiltered.isEmpty()) {
             rowsToBeFiltered.remove(0);
@@ -136,6 +143,24 @@ public class ExcelService {
 
         return mappedRowsMap;
 
+    }
+    public static List<String> findDuplicatesOfAwb(List<List<String>> data) {
+        Set<String> seenValues = new HashSet<>();
+        List<String> duplicates = new ArrayList<>();
+
+        for (List<String> row : data) {
+            if (row.size() > 3) { // Make sure the row has at least 4 columns
+                String value = row.get(3);
+                if (!seenValues.add(value)) {
+                    duplicates.add(value);
+                }
+            }
+        }
+
+        if (!duplicates.isEmpty()){
+            throw new AwbDublicateException("There was a duplication of AWB, couldn't upload the file");
+        }
+        return duplicates;
     }
 
     private void validateSheetName(String sheetName) {
@@ -190,8 +215,8 @@ public class ExcelService {
                 .name(originalFilename)
                 .isEmailSent(false)
                 .custom(custom.get())
-                .startDate(excelImportDto.getStartDate() != null ? excelImportDto.getStartDate() : null)
-                .endDate(excelImportDto.getEndDate() != null ? excelImportDto.getEndDate() : null)
+                .startDate(excelImportDto.getFormattedStartDate() != null ? excelImportDto.getFormattedStartDate() : null)
+                .endDate(excelImportDto.getFormattedEndDate() != null ? excelImportDto.getFormattedEndDate() : null)
                 .build();
 
     }
@@ -213,10 +238,10 @@ public class ExcelService {
 
 
     private InvoiceDetails mapToDomain(List<String> row) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMM-yy", Locale.ENGLISH);
+
         InvoiceDetailsId invoiceDetailsId = InvoiceDetailsId.builder()
-                .mawb(parseLongOrDefault(row.get(0), 0L))
-                .manifestDate(parseLocalDateOrDefault(row.get(1), null, formatter))
+                .mawb(row.get(0))
+                .manifestDate(row.get(1))
                 .accountNumber(row.get(2))
                 .awb(parseLongOrDefault(row.get(3), 0L))
                 .build();
@@ -237,7 +262,7 @@ public class ExcelService {
                 .totalCharges(parseDoubleOrDefault(row.get(15), 0.0))
                 .customDeclarationNumber(parseLongOrDefault(row.get(16), 0L))
                 .ref(row.get(17))
-                .customDeclarationDate(parseLocalDateOrDefault(row.get(18), null, formatter))
+                .customDeclarationDate(row.get(18))
                 .build();
 
         return invoiceDetails;
@@ -330,11 +355,11 @@ public class ExcelService {
             }
 
             Row row = summarySheet.createRow(startingRow);
-            setCellValue(row.createCell(6), sumMap.get("CustomerShipmentValueSum"));
-            setCellValue(row.createCell(7), sumMap.get("VatAmountCustomDeclarationFormSum"));
-            setCellValue(row.createCell(8), sumMap.get("CustomFormChargesSum"));
-            setCellValue(row.createCell(9), sumMap.get("OthersSum"));
-            setCellValue(row.createCell(10), sumMap.get("TotalChargesSum"));
+            setCellValue(row.createCell(6), formatCurrency(sumMap.get("CustomerShipmentValueSum")));
+            setCellValue(row.createCell(7), formatCurrency(sumMap.get("VatAmountCustomDeclarationFormSum")));
+            setCellValue(row.createCell(8), formatCurrency(sumMap.get("CustomFormChargesSum")));
+            setCellValue(row.createCell(9), formatCurrency(sumMap.get("OthersSum")));
+            setCellValue(row.createCell(10), formatCurrency(sumMap.get("TotalChargesSum")))         ;
         } catch (ExcelMakingException e) {
             throw new RuntimeException("There was an issue in populating sum values in summary file");
         }
@@ -372,7 +397,7 @@ public class ExcelService {
     private void setSummarySheetCellValues(Sheet summarySheet, Customer customer, String sheetUniqueId,Long invoiceNumber) throws RuntimeException {
         try {
             Cell invoiceNumberCell = summarySheet.getRow(2).getCell(9);
-            setCellValue(invoiceNumberCell,"Inv-"+invoiceNumber);
+            setCellValue(invoiceNumberCell,"CDV-"+invoiceNumber);
 
             Cell nameCell = summarySheet.getRow(3).getCell(1);
             setCellValue(nameCell, customer.getNameEnglish());
@@ -410,12 +435,12 @@ public class ExcelService {
                 setCellValue(row, ++columnCount, invoiceDetails.getShippersName());
                 setCellValue(row, ++columnCount, invoiceDetails.getConsigneeName());
                 setCellValue(row, ++columnCount, invoiceDetails.getWeight());
-                setCellValue(row, ++columnCount, invoiceDetails.getDeclaredValue());
-                setCellValue(row, ++columnCount, invoiceDetails.getValueCustom());
-                setCellValue(row, ++columnCount, invoiceDetails.getVatAmount());
-                setCellValue(row, ++columnCount, invoiceDetails.getCustomFormCharges());
-                setCellValue(row, ++columnCount, invoiceDetails.getOther());
-                setCellValue(row, ++columnCount, invoiceDetails.getTotalCharges());
+                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getDeclaredValue()));
+                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getValueCustom()));
+                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getVatAmount()));
+                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getCustomFormCharges()));
+                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getOther()));
+                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getTotalCharges()));
                 setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationNumber());
                 setCellValue(row,++columnCount,invoiceDetails.getRef());
                 setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationDate());

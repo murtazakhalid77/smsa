@@ -37,7 +37,7 @@ public class CustomService {
             List<CustomDto> customDtos = this.customRepository.findByIsPresent();
             return customDtos;
         }catch(Exception ex){
-            System.out.println(ex);
+            ex.printStackTrace();
         }
         return null;
     }
