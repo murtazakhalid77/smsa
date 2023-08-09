@@ -29,7 +29,9 @@ public class UserService {
         try{
             userDto.setPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
             userDto.setRoles(assignRolesToUser(userDto));
-            return userRepository.save(userDto);
+            User user = userRepository.save(userDto);
+            user.setPassword("");
+            return user;
 
         }catch (Exception e){
             throw new RuntimeException("Some thing went wrong in adding new user "+e);
@@ -44,12 +46,18 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-        return this.userRepository.findAll();
+        List<User> users = this.userRepository.findAll();
+        for(User user: users){
+            user.setPassword("");
+        }
+
+        return users;
     }
 
     public User findUserById(Long id) {
         Optional<User> user = this.userRepository.findById(id);
         if(user.isPresent()){
+            user.get().setPassword("");
             return user.get();
         }else{
             throw new RecordNotFoundException("User Couldn't Found");
@@ -59,7 +67,14 @@ public class UserService {
     public User updateUser(User user) {
         Optional<User> userExist = this.userRepository.findById(user.getId());
         if(userExist.isPresent()){
-            return this.userRepository.save(user);
+            if(user.getPassword().length() == 0){
+                user.setPassword(userExist.get().getPassword());
+            }else{
+                user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            }
+            User user1 = this.userRepository.save(user);
+            user1.setPassword("");
+            return user1;
         }else{
             throw new RecordNotFoundException("User Couldn't Found");
         }

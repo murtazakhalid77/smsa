@@ -1,5 +1,7 @@
 package com.smsa.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
@@ -23,6 +25,7 @@ public class User {
     private Long id;
 
     private String name;
+//    @JsonIgnore
     private String password;
     private boolean status;
 
