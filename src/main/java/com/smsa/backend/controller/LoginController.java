@@ -25,8 +25,6 @@ public class LoginController {
     private JwtUtil jwtUtil;    
     @Autowired
     private MyUserDetailService myUserDetailService;
-    @Autowired
-    private UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody LoginCredentials loginCredentials) throws Exception {

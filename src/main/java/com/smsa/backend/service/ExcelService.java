@@ -47,8 +47,6 @@ public class ExcelService {
     HelperService helperService;
     @Autowired
     HashMapHelper hashMapHelper;
-    @Value("${smsa.file.location}")
-    String sampleFileLocation;
     @Value("${smsa.file.local.location}")
     String sampleFileLocalLocation;
     List<InvoiceDetails> invoicesWithAccount = new ArrayList<>();
@@ -96,7 +94,7 @@ public class ExcelService {
         try {
             findDuplicatesOfAwb(rowsToBeFiltered);
         }catch (AwbDublicateException e){
-            logger.error("There is an awb duplication couldnt upload the file");
+            logger.error("There is an awb duplication couldn't upload the file");
             throw new AwbDublicateException("There was a duplication of AWB, couldn't upload the file");
         }
 
@@ -277,7 +275,6 @@ public class ExcelService {
         }
     }
 
-    // Helper method to parse double values with default value on exception
     private Double parseDoubleOrDefault(String value, Double defaultValue) {
         try {
             return Double.parseDouble(value);
@@ -285,21 +282,9 @@ public class ExcelService {
             return defaultValue;
         }
     }
-
-    // Helper method to parse LocalDate values with default value on exception
-    private LocalDate parseLocalDateOrDefault(String value, LocalDate defaultValue, DateTimeFormatter formatter) {
-        try {
-            return LocalDate.parse(value, formatter);
-        } catch (DateTimeParseException e) {
-            return defaultValue;
-        }
-    }
-
     public SheetHistory getSheetHistory(String sheetUniqueUUid) {
         return sheetHistoryRepository.findByUniqueUUid(sheetUniqueUUid);
     }
-
-
     public byte[] updateExcelFile(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId, Long invoiceNumber) throws Exception {
         logger.info(String.format("Inside update excel method for account ", customer.getAccountNumber()));
 
@@ -423,7 +408,6 @@ public class ExcelService {
             for (InvoiceDetails invoiceDetails : invoiceDetailsList) {
                 Row row = invoiceDetailSheet.createRow(rowCount);
                 int columnCount = 0;
-                Cell cell;
 
                 setCellValue(row, columnCount, invoiceDetails.getInvoiceDetailsId().getMawb());
                 setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getManifestDate());
@@ -451,23 +435,6 @@ public class ExcelService {
             throw new ExcelMakingException("There was an issue in invoice sheet");
         }
 
-    }
-
-
-    private CellStyle makeStyleForTheSheet(Workbook existingWorkbook){
-
-        CellStyle style = existingWorkbook.createCellStyle();
-        style.setAlignment(HorizontalAlignment.CENTER);
-        style.setBorderBottom(BorderStyle.THICK);
-        style.setBorderLeft(BorderStyle.THICK);
-        style.setBorderRight(BorderStyle.THICK);
-        style.setBorderTop(BorderStyle.THICK);
-        style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
-        style.setTopBorderColor(IndexedColors.BLACK.getIndex());
-        style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
-        style.setRightBorderColor(IndexedColors.BLACK.getIndex());
-
-        return style;
     }
 
     private String formatCurrency(Double value) {
