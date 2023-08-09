@@ -206,7 +206,7 @@ public class ExcelService {
     }
 
     private SheetHistory createSheetHistory(String originalFilename, ExcelImportDto excelImportDto, String sheetId) {
-        Optional<Custom> custom = customRepository.findByCustom(excelImportDto.getCustom());
+        Optional<Custom> custom = customRepository.findById(excelImportDto.getId());
 
         return SheetHistory.builder()
                 .uniqueUUid(sheetId)
