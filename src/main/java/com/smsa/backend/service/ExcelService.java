@@ -47,7 +47,7 @@ public class ExcelService {
     HelperService helperService;
     @Autowired
     HashMapHelper hashMapHelper;
-    @Value("${smsa.file.local.location}")
+    @Value("${smsa.file.location}")
     String sampleFileLocalLocation;
     List<InvoiceDetails> invoicesWithAccount = new ArrayList<>();
     List<InvoiceDetails> invoicesWithoutAccount = new ArrayList<>();
