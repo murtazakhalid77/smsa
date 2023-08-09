@@ -10,8 +10,8 @@ import java.time.LocalDate;
 import javax.persistence.Column;
 
 public class InvoiceDetailsId implements Serializable {
-    private Long mawb;
-    private LocalDate manifestDate;
+    private String mawb;
+    private String manifestDate;
     @Column(
             name = "account_number_id"
     )
@@ -33,26 +33,26 @@ public class InvoiceDetailsId implements Serializable {
                 return false;
             } else {
                 label59: {
-                    Object this$mawb = this.getMawb();
-                    Object other$mawb = other.getMawb();
-                    if (this$mawb == null) {
-                        if (other$mawb == null) {
+                    Object this$awb = this.getAwb();
+                    Object other$awb = other.getAwb();
+                    if (this$awb == null) {
+                        if (other$awb == null) {
                             break label59;
                         }
-                    } else if (this$mawb.equals(other$mawb)) {
+                    } else if (this$awb.equals(other$awb)) {
                         break label59;
                     }
 
                     return false;
                 }
 
-                Object this$awb = this.getAwb();
-                Object other$awb = other.getAwb();
-                if (this$awb == null) {
-                    if (other$awb != null) {
+                Object this$mawb = this.getMawb();
+                Object other$mawb = other.getMawb();
+                if (this$mawb == null) {
+                    if (other$mawb != null) {
                         return false;
                     }
-                } else if (!this$awb.equals(other$awb)) {
+                } else if (!this$mawb.equals(other$mawb)) {
                     return false;
                 }
 
@@ -88,10 +88,10 @@ public class InvoiceDetailsId implements Serializable {
     public int hashCode() {
         boolean PRIME = true;
         int result = 1;
-        Object $mawb = this.getMawb();
-        result = result * 59 + ($mawb == null ? 43 : $mawb.hashCode());
         Object $awb = this.getAwb();
         result = result * 59 + ($awb == null ? 43 : $awb.hashCode());
+        Object $mawb = this.getMawb();
+        result = result * 59 + ($mawb == null ? 43 : $mawb.hashCode());
         Object $manifestDate = this.getManifestDate();
         result = result * 59 + ($manifestDate == null ? 43 : $manifestDate.hashCode());
         Object $accountNumber = this.getAccountNumber();
@@ -99,7 +99,7 @@ public class InvoiceDetailsId implements Serializable {
         return result;
     }
 
-    public InvoiceDetailsId(final Long mawb, final LocalDate manifestDate, final String accountNumber, final Long awb) {
+    public InvoiceDetailsId(final String mawb, final String manifestDate, final String accountNumber, final Long awb) {
         this.mawb = mawb;
         this.manifestDate = manifestDate;
         this.accountNumber = accountNumber;
@@ -109,11 +109,11 @@ public class InvoiceDetailsId implements Serializable {
     public InvoiceDetailsId() {
     }
 
-    public Long getMawb() {
+    public String getMawb() {
         return this.mawb;
     }
 
-    public LocalDate getManifestDate() {
+    public String getManifestDate() {
         return this.manifestDate;
     }
 
@@ -125,11 +125,11 @@ public class InvoiceDetailsId implements Serializable {
         return this.awb;
     }
 
-    public void setMawb(final Long mawb) {
+    public void setMawb(final String mawb) {
         this.mawb = mawb;
     }
 
-    public void setManifestDate(final LocalDate manifestDate) {
+    public void setManifestDate(final String manifestDate) {
         this.manifestDate = manifestDate;
     }
 
@@ -141,22 +141,21 @@ public class InvoiceDetailsId implements Serializable {
         this.awb = awb;
     }
 
-
     public static class InvoiceDetailsIdBuilder {
-        private Long mawb;
-        private LocalDate manifestDate;
+        private String mawb;
+        private String manifestDate;
         private String accountNumber;
         private Long awb;
 
         InvoiceDetailsIdBuilder() {
         }
 
-        public InvoiceDetailsIdBuilder mawb(final Long mawb) {
+        public InvoiceDetailsIdBuilder mawb(final String mawb) {
             this.mawb = mawb;
             return this;
         }
 
-        public InvoiceDetailsIdBuilder manifestDate(final LocalDate manifestDate) {
+        public InvoiceDetailsIdBuilder manifestDate(final String manifestDate) {
             this.manifestDate = manifestDate;
             return this;
         }

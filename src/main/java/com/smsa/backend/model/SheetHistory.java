@@ -22,8 +22,8 @@ public class SheetHistory {
     private String name;
     private String uniqueUUid;
     private Boolean isEmailSent;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private String startDate;
+    private String endDate;
     // Use @OneToMany with mappedBy to specify the relationship field in the Custom entity
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "custom_id")

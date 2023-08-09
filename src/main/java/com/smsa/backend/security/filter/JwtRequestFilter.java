@@ -54,6 +54,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     } catch (Exception e) {
+        e.printStackTrace();
 //        ExceptionResponseDto exception= new ExceptionResponseDto(HttpStatus.UNAUTHORIZED, LocalDateTime.now().toString(),"Jwt Token is Expired");
         response.setStatus(401);
         response.setHeader("Access-Control-Allow-Origin", "*");

@@ -70,7 +70,7 @@ public class HashMapHelper {
             calculatedValuesMap.put("TotalValue", totalValue);   //for excel
             calculatedValuesMap.put("CustomDeclarationNumber", customDeclarationNumbers);
             calculatedValuesMap.put("CustomerAccountNumber", customer.getAccountNumber());
-            calculatedValuesMap.put("InvoiceNumber", "Inv-"+invoiceNumber);
+            calculatedValuesMap.put("InvoiceNumber", "CDV-"+invoiceNumber);
             calculatedValuesMap.put("InvoiceType", "Bill-Shipper");
             calculatedValuesMap.put("SMSAFeeCharges", customer.getSmsaServiceFromSAR());
             calculatedValuesMap.put("TotalAmount", calculateTotalAmount(calculatedValuesMap
@@ -79,7 +79,7 @@ public class HashMapHelper {
                     calculatedValuesMap.get("Others").toString(),
                     calculatedValuesMap.get("SMSAFeeCharges").toString(),
                     custom.getSmsaFeeVat())); //for pdf
-            calculatedValuesMap.put("CustomPort",custom.getCustomPort());
+            calculatedValuesMap.put("CustomPort",custom.getCustom());
             calculatedValuesMap.put("VatOnSmsaFees",
                     calculateVatOnSmsaFees(Double.valueOf(calculatedValuesMap.
                             get("SMSAFeeCharges").toString()),custom.getSmsaFeeVat())); //for pdf

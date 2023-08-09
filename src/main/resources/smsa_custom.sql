@@ -38,7 +38,19 @@ CREATE TABLE `custom` (
 
 LOCK TABLES `custom` WRITE;
 /*!40000 ALTER TABLE `custom` DISABLE KEYS */;
-INSERT INTO `custom` VALUES (1,'Dubai, AE','United Arab Emirates Custom',_binary '',5),(2,'Abu Dhabi, AE','United Arab Emirates Custom',_binary '',5),(3,'Riyadh, Sa','Saudi Custom',_binary '',15),(4,'Dammam, Sa','Saudi Arabian Custom',_binary '',15),(5,'Jeddah, SA','Saudi Arabian Custom',_binary '',15),(6,'Hinakiya, SA','Saudi Arabian Custom',_binary '',15),(7,'Manama, BH','Bahrain Custom',_binary '',0),(8,'Amman, Jordan','Jordan Custom',_binary '',0),(9,'Kuwait, KW','Kuwait Custom',_binary '\0',15),(10,'Doha, QA','Qatar Custom',_binary '',0),(11,'Muscat, OM','Oman Custom',_binary '',0),(12,'Jafaza, AE','United Arab Emirates Custom (JAFZA)',_binary '',5);
+insert into custom(id, custom, custom_port, smsa_fee_vat, is_Present) values
+(1, 'United Arab Emirates Custom', 'Dubai, AE', 5, 1),
+(2, 'United Arab Emirates Custom', 'Abu Dhabi, AE', 5, 1),
+(3, 'Saudi Custom', 'Riyadh, Sa', 15, 1),
+(4, 'Saudi Arabian Custom', 'Dammam, Sa', 15, 1),
+(5, 'Saudi Arabian Custom', 'Jeddah, SA', 15, 1),
+(6, 'Saudi Arabian Custom', 'Hinakiya, SA', 15, 1),
+(7, 'Bahrain Custom', 'Manama, BH', 0, 1),
+(8, 'Jordan Custom', 'Amman, Jordan', 0, 1),
+(9, 'Kuwait Custom', 'Kuwait, KW', 15, 1),
+(10, 'Qatar Custom', 'Doha, QA', 0, 1),
+(11, 'Oman Custom', 'Muscat, OM', 0, 1),
+(12, 'United Arab Emirates Custom (JAFZA)', 'Jafaza, AE', 5, 1);
 /*!40000 ALTER TABLE `custom` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

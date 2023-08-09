@@ -30,23 +30,30 @@ public class ExcelImportHelper {
     }
 
 
-
-
     public static List<List<String>> parseExcelFile(MultipartFile file) {
         List<List<String>> rows = new ArrayList<>();
+        boolean foundLastWrittenRow = false;
 
         try (InputStream is = file.getInputStream()) {
             Workbook workbook = WorkbookFactory.create(is);
-
             Sheet sheet = workbook.getSheetAt(0); // Assuming you want to parse the first sheet
 
             for (Row row : sheet) {
+                if (foundLastWrittenRow) {
+                    break; // Stop parsing after the last written row
+                }
+
                 List<String> rowData = new ArrayList<>();
                 for (Cell cell : row) {
-                    String cellValue = getCellValueAsString(cell);
+                    String cellValue = getCellValueAsString(cell, workbook);
                     rowData.add(cellValue);
                 }
+
                 rows.add(rowData);
+
+                if (rowData.isEmpty() || rowData.stream().allMatch(String::isEmpty)) {
+                    foundLastWrittenRow = true; // Detecting empty row or row with all empty cells as last written row
+                }
             }
 
             workbook.close();
@@ -57,7 +64,10 @@ public class ExcelImportHelper {
         return rows;
     }
 
-    private static String getCellValueAsString(Cell cell) {
+
+    private static String getCellValueAsString(Cell cell, Workbook workbook) {
+        FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
         if (cell == null) {
             return "";
         } else if (cell.getCellType() == CellType.STRING) {
@@ -72,11 +82,19 @@ public class ExcelImportHelper {
         } else if (cell.getCellType() == CellType.BOOLEAN) {
             return String.valueOf(cell.getBooleanCellValue());
         } else if (cell.getCellType() == CellType.FORMULA) {
-            return cell.getCellFormula();
-        } else {
-            return "";
+            CellValue formulaResult = evaluator.evaluate(cell);
+            if (formulaResult.getCellType() == CellType.NUMERIC) {
+                return formatNumericCellValue(cell);
+            } else if (formulaResult.getCellType() == CellType.STRING) {
+                return formulaResult.getStringValue();
+            } else if (formulaResult.getCellType() == CellType.BOOLEAN) {
+                return String.valueOf(formulaResult.getBooleanValue());
+            }
+            // You can handle other cell types here if needed
         }
+        return "";
     }
+
 
     private static String formatDateCellValue(Cell cell) {
         LocalDate dateValue = cell.getLocalDateTimeCellValue().toLocalDate();

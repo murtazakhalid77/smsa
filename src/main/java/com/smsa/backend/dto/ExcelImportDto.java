@@ -19,6 +19,6 @@ public class ExcelImportDto {
     private boolean isPresent;
     private String date1;
     private String date2;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private String formattedStartDate;
+    private String formattedEndDate;
 }

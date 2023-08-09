@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 @Service
 public class HelperService {
@@ -18,23 +19,31 @@ public class HelperService {
     public ExcelImportDto convertExcelImportIntoDto(String excelImport) {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
-        ExcelImportDto excelImportDto1;
+
         try {
-            excelImportDto1 = objectMapper.readValue(excelImport, ExcelImportDto.class);
-            excelImportDto1.setStartDate(excelImportDto1.getDate1() != null ? convertInToLocalDate(excelImportDto1.getDate1()) : null);
-            excelImportDto1.setEndDate(excelImportDto1.getDate2() != null ? convertInToLocalDate(excelImportDto1.getDate2()) : null);
-            return excelImportDto1;
-        }catch (Exception e){
+            ExcelImportDto excelImportDto = objectMapper.readValue(excelImport, ExcelImportDto.class);
+
+            if (excelImportDto.getDate1() != null) {
+                excelImportDto.setFormattedStartDate(convertInToLocalDate(excelImportDto.getDate1()));
+            }
+
+            if (excelImportDto.getDate2() != null) {
+                excelImportDto.setFormattedEndDate(convertInToLocalDate(excelImportDto.getDate2()));
+            }
+
+            return excelImportDto;
+        } catch (Exception e) {
             throw new RuntimeException("There was an issue when parsing date");
         }
     }
 
-    private LocalDate convertInToLocalDate(String date){
+    private String convertInToLocalDate(String date){
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        LocalDate localDate = LocalDate.parse(date, inputFormatter);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-        LocalDate localDate = LocalDate.parse(date, formatter);
-        System.out.println("LocalDate: " + localDate);
-        return localDate;
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
+        return localDate.format(outputFormatter);
+
     }
     public String generateInvoiceDate(String sheetUniqueId) {
         SheetHistory history = getSheetHistory(sheetUniqueId);
