@@ -1,0 +1,114 @@
+<app-sidebar></app-sidebar>
+<div class="body-position">
+    <app-dashboard-head></app-dashboard-head>
+    <div class="main-container">
+        <div>
+            <h4>Customers</h4>
+            <p class="page-intro">Whole data about your business here</p>
+        </div>
+        <div class="mt-2" *ngIf="accountNumbers">
+            <h4>Account Numbers: </h4>
+            <p>Please complete the below account numbers that are created by system</p>
+            <p class="page-intro">{{accountNumbers}}</p>
+        </div>
+        <div class="order-body">
+            <div class="order-search-panel">
+                <input type="text" placeholder="Search Account number" class="order-search form-control"
+                (input)="searchCustomer($event.target)">
+
+                <!-- <ng-container *ngIf="accountNumbers"> -->
+                    <!-- <div *ngIf="accountNumbers" style="background-color: #400099;
+                                border-radius: 10px">
+                        {{accountNumbers}}</div> -->
+                <!-- </ng-container> -->
+         
+         
+                <div>
+                    <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg" type="submit"  (click)="addCustomer()">
+                        <i class="fa-solid fa-pen"></i>&nbsp;Add customer
+                    </button>
+                </div>
+            </div>
+            <div class="order-table table-container">
+                <table class="table table-striped">
+                    <thead style="
+                    background: #ffffff;
+                    position: sticky;">
+                    <tr class="header-fixed">
+                        <th class="nowrap col-md-2 col-lg-1">
+                            <span class="font">Account Number</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1">
+                            <span class="font">Invoice Currency</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1">
+                            <span class="font">Currency Rate (from SAR)</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1">
+                            <span class="font">SMSA Service Fees (SAR)</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1">
+                            <span class="font">Status</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1">
+                            <span class="font">Customer Name (Arabic)</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1">
+                            <span class="font">Customer Name (English)</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1">
+                            <span class="font">Email</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1">
+                            <span class="font">Customer VAT</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1">
+                            <span class="font">Customer Address</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1">
+                            <span class="font">PO Box</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1">
+                            <span class="font">Country</span>
+                        </th>
+        
+                        <th class="nowrap col-md-2 col-lg-1">
+                            <span class="font">Actions</span>
+                        </th>
+                    </tr>
+                </thead>
+
+                    <tbody>
+                        <tr *ngFor="let customer of customers" class="order-table-row-hover">
+                            <th scope="row" class="tracking-id text-center">{{customer?.accountNumber}}</th>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.invoiceCurrency}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">${{customer?.currencyRateFromSAR}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.smsaServiceFromSAR}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.status}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.nameArabic}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.nameEnglish}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.email}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.vatNumber}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.address}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.poBox}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.country}}</td>
+                            <td class="order-table-btns-container text-center w-auto col-md-2 col-lg-1">
+                                <!-- <div class="btn-group mr-2" role="group" aria-label="Second group">
+                                    <button type="button" class="btn order-table-btn"
+                                        routerLink="/editOrder/{{customer.id}}">
+                                        <i class="fa-solid fa-pen"></i>&nbsp;Edit
+                                    </button>
+                                    <button type="button" class="btn order-table-btn" (click)="deleteOrder(customer.id)">
+                                        <i class="fa-solid fa-trash"></i>&nbsp;Delete
+                                    </button>
+                                </div> -->
+                                <i [style.color]="customer?.status ? 'black' : 'red'" style="cursor: pointer !important;" class="fa-solid fa-pen" (click)="updateCustomer(customer?.accountNumber)"></i>&nbsp;
+
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

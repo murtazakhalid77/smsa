@@ -1,0 +1,157 @@
+<app-sidebar></app-sidebar>
+<div class="body-position">
+    <app-dashboard-head></app-dashboard-head>
+    <div class="main-container">
+        <div>
+            <h4>Add Cstomer</h4>
+        </div>
+
+        <div class="order-body">
+            <form [formGroup]="customerForm" (ngSubmit)="submit(customerForm)">
+                <div class="order-form">
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Account Number</label>
+                        <input type="text" formControlName="account" placeholder="Enter your account"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customerForm.get('account')?.invalid && (customerForm.get('account')?.dirty || customerForm.get('account')?.touched)">
+                            Please provide account.
+                        </span>
+                    </div>
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Invoice Currency</label>
+                        <select class="order-search form-control order-form-input" aria-label="Default select example" formControlName="invoice">
+                            <option value="" disabled selected>Select Currency</option>
+                            <option *ngFor="let country of countries" [value]="country.code">{{ country.code }}</option>
+                          </select>
+                          
+                          
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customerForm.get('invoice')?.invalid && (customerForm.get('invoice')?.dirty || customerForm.get('invoice')?.touched)">
+                            Please provide invoice.
+                        </span>
+                    </div>
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Currency Rate (from SAR)</label>
+                        <input type="text" placeholder="Enter currencyRate" formControlName="currencyRate"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customerForm.get('currencyRate')?.invalid && (customerForm.get('currencyRate')?.dirty || customerForm.get('currencyRate')?.touched)">
+                            Please provide currencyRate.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                      <label class="add-order-label">Status</label>
+                      <select class="order-search form-control order-form-input" formControlName="status">
+                        <option value="true">True</option>
+                        <option value="false">False</option>
+                      </select>
+                      <span class="inputValidators" style="color: red; margin-left: 2%;"
+                        *ngIf="customerForm.get('status')?.invalid && (customerForm.get('status')?.dirty || customerForm.get('status')?.touched)">
+                        Please provide status.
+                      </span>
+                    </div>
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">SMSA Service Fees (SAR)</label>
+                        <input type="text" formControlName="smsaServiceFee" placeholder="Enter Smsa Service Fees"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customerForm.get('smsaServiceFee')?.invalid && (customerForm.get('smsaServiceFee')?.dirty || customerForm.get('smsaServiceFee')?.touched)">
+                            Please provide Smsa Service Fees.
+                        </span>
+                    </div>
+
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Customer Name (Arabic)</label>
+                        <input type="text" formControlName="nameArabic" placeholder="Enter customer name(Arabic)"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customerForm.get('nameArabic')?.invalid && (customerForm.get('nameArabic')?.dirty || customerForm.get('nameArabic')?.touched)">
+                            Please provide customer name(Arabic).
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Customer Name (English)</label>
+                        <input type="text" formControlName="nameEnglish" placeholder="Enter customer name(English)"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customerForm.get('nameEnglish')?.invalid && (customerForm.get('nameEnglish')?.dirty || customerForm.get('nameEnglish')?.touched)">
+                            Please provide customer name(English).
+                        </span>
+                    </div>
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Country</label>
+                        <select class="order-search form-control order-form-input" aria-label="Default select example" formControlName="country">
+                            <option value="" disabled selected>Select Country</option>
+                            <option *ngFor="let country of countries" [value]="country.name">{{ country.name }}</option>
+                          </select>
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customerForm.get('country')?.invalid && (customerForm.get('country')?.dirty || customerForm.get('country')?.touched)">
+                            Please provide country.
+                        </span>
+                    </div>
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Customer VAT</label>
+                        <input type="text" formControlName="customerVAT" placeholder="Enter customerVAT"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customerForm.get('customerVAT')?.invalid && (customerForm.get('customerVAT')?.dirty || customerForm.get('customerVAT')?.touched)">
+                            Please provide customerVAT.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Customer Address</label>
+                        <input type="text" formControlName="address" placeholder="Enter your address"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customerForm.get('address')?.invalid && (customerForm.get('address')?.dirty || customerForm.get('address')?.touched)">
+                            Please provide address.
+                        </span>
+                    </div>
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">P.O.Box</label>
+                        <input type="text" formControlName="poBox" placeholder="Enter your P.O.Box"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customerForm.get('poBox')?.invalid && (customerForm.get('poBox')?.dirty || customerForm.get('poBox')?.touched)">
+                            Please provide poBox.
+                        </span>
+                    </div>
+
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Email</label>
+                        <input type="text" formControlName="email" placeholder="Enter your email"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customerForm.get('email')?.invalid && (customerForm.get('email')?.dirty || customerForm.get('email')?.touched)">
+                            Please provide email.
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-12 form-group d-flex justify-content-end" style="padding: 0 10px;">
+                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" [disabled]="customerForm.invalid">
+                            <span>Submit</span>
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="order-form">
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

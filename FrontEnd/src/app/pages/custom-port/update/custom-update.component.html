@@ -1,0 +1,66 @@
+<app-sidebar></app-sidebar>
+<div class="body-position">
+    <app-dashboard-head></app-dashboard-head>
+    <div class="main-container">
+        <div>
+            <h4>Add Cstom</h4>
+        </div>
+
+        <div class="order-body">
+            <form [formGroup]="customForm" (ngSubmit)="submit(customForm)">
+                <div class="order-form">
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Custom Port</label>
+                        <input type="text" formControlName="customPort" placeholder="Enter Custom Port"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('customPort')?.invalid && (customForm.get('customPort')?.dirty || customForm.get('customPort')?.touched)">
+                            Please provide custom port.
+                        </span>
+                    </div>
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Custom</label>
+                        <input type="text" formControlName="custom" placeholder="Enter Custom"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('custom')?.invalid && (customForm.get('custom')?.dirty || customForm.get('custom')?.touched)">
+                            Please provide custom.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">SMSA Fee Vat</label>
+                        <input type="text" formControlName="smsaFeeVat" placeholder="Enter SMSA Fee"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('smsaFeeVat')?.invalid && (customForm.get('smsaFeeVat')?.dirty || customForm.get('smsaFeeVat')?.touched)">
+                            Please provide smsa fee.
+                        </span>
+                    </div>
+
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Is-Active</label>
+                        <select class="order-search form-control order-form-input" formControlName="isActive">
+                          <option value="true">True</option>
+                          <option value="false">False</option>
+                        </select>
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                          *ngIf="customForm.get('isActive')?.invalid && (customForm.get('isActive')?.dirty || customForm.get('isActive')?.touched)">
+                          Please provide isActive.
+                        </span>
+                      </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-12 form-group d-flex justify-content-end" style="padding: 0 10px;">
+                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" [disabled]="customForm.invalid">
+                          <span>Submit</span>
+                        </button>
+                      </div>         
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

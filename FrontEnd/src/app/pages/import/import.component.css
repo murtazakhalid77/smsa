@@ -1,0 +1,100 @@
+.custom-outline-primary {
+    border-color: #400099; /* Replace "your-custom-color" with the color of your choice */
+    color: #400099; /* Replace "your-custom-color" with the color of your choice */
+}
+
+.custom-outline-primary:hover {
+    background-color: #400099;
+    color: white; /* Replace "your-hover-color" with the background color of your choice on hover */
+}
+.custom-vat-span {
+    margin-top: 10px; /* Adjust the value to set the desired top margin */
+  }
+  
+  /* Add space between customVat and % */
+  .custom-vat-percentage {
+    margin-left: 5px; /* Adjust the value to set the desired left margin */
+  }
+
+  /* your-component.component.css */
+/* your-component.component.css */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+  }
+  
+  .modal.open {
+    display: flex;
+  }
+  
+  .modal-dialog {
+    width: 500px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .modal-content {
+    padding: 20px;
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .modal-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+  }
+  
+  .modal-body {
+    padding-bottom: 20px;
+    color: #333;
+  }
+  
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 15px;
+  }
+  
+  .modal-footer button {
+    margin-left: 10px;
+  }
+  
+  /* Close button in modal header */
+  .modal-header .close {
+    cursor: pointer;
+    font-size: 24px;
+  }
+  
+  /* Hover effect on buttons */
+  .btn {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .btn:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Optional: Center the modal on small screens */
+  @media (max-width: 576px) {
+    .modal-dialog {
+      width: 90%;
+    }
+  }
+  
+  

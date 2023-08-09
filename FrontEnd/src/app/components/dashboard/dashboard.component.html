@@ -1,0 +1,25 @@
+<app-sidebar></app-sidebar>
+<div class="body-position">
+    <app-dashboard-head></app-dashboard-head>
+
+    <div class="main-container">
+        <div class="row">
+            <div class="col-sm-3" *ngFor="let card of cardsArray">
+                <div class="card card-props">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-3 card-icon-container">
+                                <i class="{{card.icon}} card-icon"></i>
+                            </div>
+                            <div class="card-body col-9">
+                                <h5 class="card-title">{{card.title}}</h5>
+                                <h6 class="icon-color">{{card.price}}</h6>
+                                <p class="card-text">{{card.text}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

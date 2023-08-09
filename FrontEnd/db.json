@@ -1,0 +1,51 @@
+{
+  "dashboard-cards": [
+    {
+      "id": 1,
+      "icon": "fa-solid fa-dollar-sign",
+      "title": "Revenue",
+      "price": "$13,456.5",
+      "text": "Shipping fees are not included"
+    },
+    {
+      "id": 2,
+      "icon": "fa-solid fa-cart-shopping",
+      "title": "Orders",
+      "price": "$13,456.5",
+      "text": "Shipping fees are not included"
+    },
+    {
+      "id": 3,
+      "icon": "fa-solid fa-bag-shopping",
+      "title": "Products",
+      "price": "$13,456.5",
+      "text": "Shipping fees are not included"
+    },
+    {
+      "id": 4,
+      "icon": "fa-solid fa-coins",
+      "title": "Earning",
+      "price": "$13,456.5",
+      "text": "Shipping fees are not included"
+    }
+  ],
+  "customers": [
+    {
+      "account": "as",
+      "invoice": "as",
+      "currencyRate": "as",
+      "isActive": "False",
+      "smsaServiceFee": "as",
+      "nameArabic": "as",
+      "nameEnglish": "as",
+      "customerVAT": "as",
+      "number": "as",
+      "address": "as",
+      "poBox": "as",
+      "country": "as",
+      "id": 1
+    }
+  ],
+  "users": [],
+  "currentUser": []
+}

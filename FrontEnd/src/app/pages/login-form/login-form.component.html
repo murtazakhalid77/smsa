@@ -1,0 +1,46 @@
+
+<!-- <div class="toast" [class.show]="isToastVisible" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
+    <div class="toast-header">
+      Toast Header
+      <button type="button" class="ml-2 mb-1 close" (click)="hideToast()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="toast-body">
+      Some text inside the toast body
+    </div>
+  </div> -->
+
+<div class="image-container" [ngStyle]="{ 'background-image': 'url(' + currentImageUrl + ')' }">
+    <form [formGroup]="myForm" class="reactive-form" (ngSubmit)="submit()">
+        <img src="../../../assets/smca-logo.png" alt="" class="login-img">
+        <div class="form-container">
+            <h4 class="form-head">LOGIN</h4>
+            <div>
+                <input type="text" formControlName="email" placeholder="Email" class="input-login">
+                <span class="inputValidators" style="color: red;"
+                    *ngIf="myForm.get('email')?.invalid && (myForm.get('email')?.dirty || myForm.get('email')?.touched)">
+                    Please provide email.
+                </span>
+            </div>
+            <div>
+                <input type="{{togglePassword ? 'text':'password'}}" formControlName="password" placeholder="Password"
+                    class="input-login">
+                <span class="inputValidators"
+                    *ngIf="myForm.get('password')?.invalid && (myForm.get('password')?.dirty || myForm.get('password')?.touched)">
+                    Password must be greater than seven characters.
+                </span>
+            </div>
+            <div class="form-settings">
+                <span class="password-forget" (click)="showPassword()">Show password</span>
+                <!-- <span class="password-forget">Forgot password?</span> -->
+            </div>
+            <button type="submit" class="form-submit-btn" [disabled]="myForm.invalid">Submit</button>
+            <!-- <div class="more-login">Or log-in with</div>
+            <div class="more-login">
+                <img src="../../../assets/google-icon.png" alt="" class="form-img">
+                <img src="../../../assets/facebook-icon.png" alt="" class="form-img">
+            </div> -->
+        </div>
+    </form>
+</div>

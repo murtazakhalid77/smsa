@@ -1,0 +1,152 @@
+<app-sidebar></app-sidebar>
+<div class="body-position">
+    <app-dashboard-head></app-dashboard-head>
+    <div class="main-container">
+        <div>
+            <h4>Edit Customer</h4>
+        </div>
+
+        <div class="order-body">
+            <form [formGroup]="editOrderForm" (ngSubmit)="submit(editOrderForm)">
+                <div class="order-form">
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Account Number</label>
+                        <input type="text" formControlName="account" placeholder="Enter your account"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="editOrderForm
+                            .get('account')?.invalid && (editOrderForm.get('account')?.dirty || editOrderForm.get('account')?.touched)">
+                            Please provide account.
+                        </span>
+                    </div>
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Invoice Currency</label>
+                        <input type="text" formControlName="invoice" placeholder="Enter your invoice"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="editOrderForm.get('invoice')?.invalid && (editOrderForm.get('invoice')?.dirty || editOrderForm.get('invoice')?.touched)">
+                            Please provide invoice.
+                        </span>
+                    </div>
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Currency Rate (from SAR)</label>
+                        <input type="text" placeholder="Enter currencyRate" formControlName="currencyRate"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="editOrderForm.get('currencyRate')?.invalid && (editOrderForm.get('currencyRate')?.dirty || editOrderForm.get('currencyRate')?.touched)">
+                            Please provide currencyRate.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Is-Active</label>
+                        <select class="order-search form-control order-form-input" formControlName="isActive">
+                            <option selected>True</option>
+                            <option>False</option>
+                        </select>
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="editOrderForm.get('isActive')?.invalid && (editOrderForm.get('isActive')?.dirty || editOrderForm.get('isActive')?.touched)">
+                            Please provide isActive.
+                        </span>
+                    </div>
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">SMSA Service Fees (SAR)</label>
+                        <input type="text" formControlName="smsaServiceFee" placeholder="Enter Smsa Service Fees"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="editOrderForm.get('smsaServiceFee')?.invalid && (editOrderForm.get('smsaServiceFee')?.dirty || editOrderForm.get('smsaServiceFee')?.touched)">
+                            Please provide Smsa Service Fees.
+                        </span>
+                    </div>
+
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Customer Name (Arabic)</label>
+                        <input type="text" formControlName="nameArabic" placeholder="Enter customer name(Arabic)"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="editOrderForm.get('nameArabic')?.invalid && (editOrderForm.get('nameArabic')?.dirty || editOrderForm.get('nameArabic')?.touched)">
+                            Please provide customer name(Arabic).
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Customer Name (English)</label>
+                        <input type="text" formControlName="nameEnglish" placeholder="Enter customer name(English)"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="editOrderForm.get('nameEnglish')?.invalid && (editOrderForm.get('nameEnglish')?.dirty || editOrderForm.get('nameEnglish')?.touched)">
+                            Please provide customer name(English).
+                        </span>
+                    </div>
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Customer VAT</label>
+                        <input type="text" formControlName="customerVAT" placeholder="Enter customerVAT"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="editOrderForm.get('customerVAT')?.invalid && (editOrderForm.get('customerVAT')?.dirty || editOrderForm.get('customerVAT')?.touched)">
+                            Please provide customerVAT.
+                        </span>
+                    </div>
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Number</label>
+                        <input type="text" formControlName="number" placeholder="Enter your number"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="editOrderForm.get('number')?.invalid && (editOrderForm.get('number')?.dirty || editOrderForm.get('number')?.touched)">
+                            Please provide number.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Customer Address</label>
+                        <input type="text" formControlName="address" placeholder="Enter your address"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="editOrderForm.get('address')?.invalid && (editOrderForm.get('address')?.dirty || editOrderForm.get('address')?.touched)">
+                            Please provide address.
+                        </span>
+                    </div>
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">P.O.Box</label>
+                        <input type="text" formControlName="poBox" placeholder="Enter your P.O.Box"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="editOrderForm.get('poBox')?.invalid && (editOrderForm.get('poBox')?.dirty || editOrderForm.get('poBox')?.touched)">
+                            Please provide poBox.
+                        </span>
+                    </div>
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Country</label>
+                        <input type="text" formControlName="country" placeholder="Enter your country"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="editOrderForm.get('country')?.invalid && (editOrderForm.get('country')?.dirty || editOrderForm.get('country')?.touched)">
+                            Please provide country.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-12 form-group" style="padding: 0 10px;">
+                        <button type="submit"
+                            class="order-table-btn order-form-input order-search form-control order-form-input"
+                            style="margin-top: 6px;" [disabled]="editOrderForm.invalid">Add
+                            customer
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="order-form">
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

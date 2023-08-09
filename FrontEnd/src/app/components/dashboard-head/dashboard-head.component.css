@@ -1,0 +1,16 @@
+.custom-outline-primary {
+    background-color: #400099; /* Replace "your-custom-color" with the color of your choice */
+    color: white; 
+    border-color: white;/* Replace "your-custom-color" with the color of your choice */
+}
+
+/* .custom-outline-primary:hover {
+    background-color: #400099;
+    color: white; 
+} */
+/* Add this CSS in your style file or <style> block */
+.hover-effect:hover {
+    cursor: pointer !important;
+    /* Apply other styles for the hover effect if needed */
+}
+  

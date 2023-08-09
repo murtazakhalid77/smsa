@@ -1,0 +1,76 @@
+<app-sidebar></app-sidebar>
+<div class="body-position">
+    <app-dashboard-head></app-dashboard-head>
+    <div class="main-container">
+        <div>
+            <h4>Add User</h4>
+        </div>
+
+        <div class="order-body">
+            <form [formGroup]="userForm" (ngSubmit)="submit(userForm)">
+                <div class="order-form">
+                    <div *ngIf="id" class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Id</label>
+                        <input type="text" formControlName="id" placeholder="Enter Id"
+                            class="order-search form-control order-form-input">
+                        <!-- <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="userForm.get('id')?.invalid && (userForm.get('id')?.dirty || userForm.get('customPort')?.touched)">
+                            Please provide Id.
+                        </span> -->
+                    </div>
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">User Name</label>
+                        <input type="text" formControlName="name" placeholder="Enter User Name @gmail.com"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="userForm.get('name')?.invalid && (userForm.get('name')?.dirty || userForm.get('name')?.touched)">
+                            Please provide user name.
+                        </span>
+                    </div>
+
+                    <div *ngIf="!id" class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Password</label>
+                        <input type="text" formControlName="password" placeholder="Enter Password"
+                            class="order-search form-control order-form-input">
+                        <!-- <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="userForm.get('password')?.invalid && (userForm.get('password')?.dirty || userForm.get('password')?.touched)">
+                            Please provide password.
+                        </span> -->
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div *ngIf="id" class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Password</label>
+                        <input type="text" formControlName="password" placeholder="Enter Password"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="userForm.get('password')?.invalid && (userForm.get('password')?.dirty || userForm.get('password')?.touched)">
+                            Please provide password.
+                        </span>
+                    </div>
+
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Is-Active</label>
+                        <select class="order-search form-control order-form-input" formControlName="status">
+                          <option value="true">True</option>
+                          <option value="false">False</option>
+                        </select>
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                          *ngIf="userForm.get('status')?.invalid && (userForm.get('status')?.dirty || userForm.get('status')?.touched)">
+                          Please provide isActive.
+                        </span>
+                      </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-12 form-group d-flex justify-content-end" style="padding: 0 10px;">
+                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" [disabled]="userForm.invalid">
+                          <span>Submit</span>
+                        </button>
+                      </div>         
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

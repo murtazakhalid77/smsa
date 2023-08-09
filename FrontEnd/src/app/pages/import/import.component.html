@@ -1,0 +1,136 @@
+<app-sidebar></app-sidebar>
+<div class="body-position">
+    
+    <app-dashboard-head></app-dashboard-head>
+
+    <!-- Button trigger modal -->
+<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+    Launch demo modal
+  </button> -->
+  
+  <!-- Modal -->
+  <div class="modal" [class.open]="isModalOpen">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Customers</h5>
+        </div>
+        <div class="modal-body">
+          <p>
+            Account Numbers: {{accountNumbers}}
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+          <button type="button" class="btn btn-primary" (click)="navigateToCustomer()">Customers</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+
+    <div class="main-container">
+        <div>
+            <h4>Import</h4>
+            <p class="page-intro">Whole data about your business here</p>
+        </div>
+        <div class="order-body">
+            <br>
+            <!-- <button type="button" class="btn order-table-btn btn-search-panel" style="float: right;"
+            (click)="UploadExcelContent()">
+            <i class="fa-solid fa-rotate-right"></i>&nbsp;Upload
+        </button> -->
+        <div class="row">
+
+            <div class="col-lg-3">
+                <select class="form-select" aria-label="Default select example" [(ngModel)]="selectedCustomPort" (change)="onCustomPortSelected()">
+                  <option hidden disabled selected value="">Select Custom Port</option>
+                  <option *ngFor="let custom of customs" [value]="custom.customPort">{{custom.customPort}}</option>
+                </select>
+                <!-- Add top margin to the span element -->
+                <span *ngIf="customVat !== null && customVat !== undefined" class="mt-2">
+                  Custom Vat: {{ customVat }}%
+                </span>                
+              </div>
+              
+              
+              
+
+            <!-- <div class="col-lg-7 d-flex">
+                    <div class="d-inline-block">
+                        <label for="startDate">Start Date</label>
+                        <input type="date">
+                    </div>
+              
+                    <div class="d-inline-block">
+                        <label for="endDate" class="ml-2">End Date</label>
+                        <input type="date">
+                    </div>
+              </div> -->
+
+
+              <div class="col-lg-7">
+                <div class="row">
+                  <div class="col-md-2 mt-1">
+                    <label for="startDate">Start Date</label>
+                  </div>
+                  <div class="col-md-3">
+                    <input type="date" class="form-control" [(ngModel)]="startDate" (input)="onDateChange()">
+                  </div>
+              
+                  <div class="col-md-2 mt-1">
+                    <label for="endDate">End Date</label>
+                  </div>
+                  <div class="col-md-3">
+                    <input type="date" class="form-control" [(ngModel)]="endDate" (input)="onDateChange()">
+                  </div>
+                </div>
+              </div>
+              
+              
+              
+              
+              
+
+            <!-- <div class="col-lg-2">
+
+                <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg" (click)="reloadPage()">
+                    <i class="fa-solid fa-rotate-right"></i>&nbsp;Refresh
+                </button>
+            </div> -->
+
+        </div>
+            <br>
+            <div class="import-body" *ngIf="!flag">
+                <input type="file" placeholder="Enter your name" class="order-search form-control import-file"
+                    (change)="onFileChange($event)" accept=".xlsx">
+                &nbsp;&nbsp;
+                <button type="button"
+                class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg"
+                (click)="importExcel()"
+                style="width: 120px; height: 40px;">
+          Import
+        </button>
+        
+            </div>
+            <div class="order-table" *ngIf="flag" style="width: 99%;
+            overflow: auto;">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col" *ngFor="let head of tableHeader[0]" style="border:1px solid #c9c9c9;">{{head}}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="order-table-row-hover" *ngFor="let data of arr; let i=index">
+                        <tr *ngFor="let row of arr.slice(1)">
+                            <td *ngFor="let cell of row" style="border:1px solid #c9c9c9;">{{ cell }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
