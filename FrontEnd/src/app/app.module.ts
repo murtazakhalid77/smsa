@@ -23,6 +23,8 @@ import { LoaderComponent } from './pages/loader/loader.component';
 import { LoaderInterceptor } from './services/interceptors/loader.interceptor';
 import { UserComponent } from './pages/user/list/user.component';
 import { UserUpdateComponent } from './pages/user/update/user-update.component';
+import { CurrencyListComponent } from './pages/currency/list/currency-list.component';
+import { CurrencyUpdateComponent } from './pages/currency/update/currency-update.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -38,7 +40,9 @@ import { UserUpdateComponent } from './pages/user/update/user-update.component';
     CustomUpdateComponent,
     LoaderComponent,
     UserUpdateComponent,
-    UserComponent
+    UserComponent,
+    CurrencyListComponent,
+    CurrencyUpdateComponent
   ],
   imports: [
     BrowserModule,

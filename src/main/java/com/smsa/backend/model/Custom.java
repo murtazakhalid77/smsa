@@ -30,8 +30,10 @@ public class Custom {
         private String customPort;
         private String custom;
         private Double smsaFeeVat;
+        private String currency;
         private boolean isPresent;
-        // Use @ManyToOne with the @JoinColumn annotation to specify the foreign key column name in the database
+
+
         @OneToMany(mappedBy = "custom", cascade = CascadeType.ALL, orphanRemoval = true)
         private List<SheetHistory> sheetHistories;
 }

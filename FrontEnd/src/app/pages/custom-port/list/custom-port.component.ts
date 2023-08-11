@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { LoginService } from 'src/app/services/login.service';
 import { CustomService, EntityAllCustomsResponseType } from '../service/custom-port.service';
 import { ICustom } from '../custom.model';
-
+import {DashboardHeadComponent} from 'src/app/components/dashboard-head/dashboard-head.component'
 @Component({
   selector: 'app-custom-port',
   templateUrl: './custom-port.component.html',

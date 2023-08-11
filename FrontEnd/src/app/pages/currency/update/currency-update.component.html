@@ -1,0 +1,57 @@
+<app-sidebar></app-sidebar>
+<div class="body-position">
+    <app-dashboard-head></app-dashboard-head>
+    <div class="main-container">
+        <div>
+            <h4>Add Currency</h4>
+        </div>
+
+        <div class="order-body">
+            <form [formGroup]="currencyForm" (ngSubmit)="submit(currencyForm)">
+                <div class="order-form">
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Currency from</label>
+                        <input type="text" formControlName="currencyFrom" placeholder="Enter Currency Form"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="currencyForm.get('currencyFrom')?.invalid && (currencyForm.get('currencyFrom')?.dirty || currencyForm.get('currencyFrom')?.touched)">
+                            Please Provide Currency From
+                        </span>
+                    </div>
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">CurrencyTo</label>
+                        <input type="text" formControlName="currencyTo" placeholder="Enter Currency To"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="currencyForm.get('currencyTo')?.invalid && (currencyForm.get('currencyTo')?.dirty || currencyForm.get('currencyTo')?.touched)">
+                            Please provide Currency to
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                   
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Is-Active</label>
+                        <select class="order-search form-control order-form-input" formControlName="isActive">
+                          <option value="true">True</option>
+                          <option value="false">False</option>
+                        </select>
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                          *ngIf="currencyForm.get('isActive')?.invalid && (currencyForm.get('isActive')?.dirty || currencyForm.get('isActive')?.touched)">
+                          Please provide isActive.
+                        </span>
+                      </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-12 form-group d-flex justify-content-end" style="padding: 0 10px;">
+                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" [disabled]="currencyForm.invalid">
+                          <span>Submit</span>
+                        </button>
+                      </div>         
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

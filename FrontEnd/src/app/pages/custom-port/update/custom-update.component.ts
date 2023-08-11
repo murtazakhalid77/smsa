@@ -6,7 +6,6 @@ import { Custom, ICustom } from '../custom.model';
 import { Observable, map } from 'rxjs';
 
 
-
 @Component({
   selector: 'app-custom-update',
   templateUrl: './custom-update.component.html',

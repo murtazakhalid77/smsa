@@ -7,6 +7,7 @@ import com.smsa.backend.Exception.ParsingExcelException;
 import com.smsa.backend.Exception.SheetAlreadyExistException;
 import com.smsa.backend.dto.ExcelImportDto;
 import com.smsa.backend.model.*;
+import com.smsa.backend.model.Currency;
 import com.smsa.backend.repository.*;
 import com.smsa.backend.security.util.ExcelImportHelper;
 import com.smsa.backend.security.util.HashMapHelper;
@@ -47,6 +48,8 @@ public class ExcelService {
     HelperService helperService;
     @Autowired
     HashMapHelper hashMapHelper;
+    @Autowired
+    CurrencyService currencyService;
     @Value("${smsa.file.location}")
     String sampleFileLocalLocation;
     List<InvoiceDetails> invoicesWithAccount = new ArrayList<>();
@@ -285,6 +288,7 @@ public class ExcelService {
     public SheetHistory getSheetHistory(String sheetUniqueUUid) {
         return sheetHistoryRepository.findByUniqueUUid(sheetUniqueUUid);
     }
+
     public byte[] updateExcelFile(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId, Long invoiceNumber) throws Exception {
         logger.info(String.format("Inside update excel method for account ", customer.getAccountNumber()));
 
@@ -300,7 +304,7 @@ public class ExcelService {
 
         invoiceDetailSheet.setDisplayGridlines(false);
 
-        setInvoiceDetailsCellValues(invoiceDetailSheet, invoiceDetailsList);
+        setInvoiceDetailsCellValues(invoiceDetailSheet, invoiceDetailsList,custom,customer);
 
         Sheet summarySheet = newWorkBook.getSheetAt(0);
 
@@ -382,7 +386,7 @@ public class ExcelService {
     private void setSummarySheetCellValues(Sheet summarySheet, Customer customer, String sheetUniqueId,Long invoiceNumber) throws RuntimeException {
         try {
             Cell invoiceNumberCell = summarySheet.getRow(2).getCell(9);
-            setCellValue(invoiceNumberCell,"CDV-"+invoiceNumber);
+            setCellValue(invoiceNumberCell,"ECDV-"+invoiceNumber);
 
             Cell nameCell = summarySheet.getRow(3).getCell(1);
             setCellValue(nameCell, customer.getNameEnglish());
@@ -402,12 +406,21 @@ public class ExcelService {
 
     }
 
-    private void setInvoiceDetailsCellValues(Sheet invoiceDetailSheet, List<InvoiceDetails> invoiceDetailsList) {
+    private void setInvoiceDetailsCellValues(Sheet invoiceDetailSheet, List<InvoiceDetails> invoiceDetailsList,Custom custom,Customer customer) {
         int rowCount = 1;
         try {
+            Currency currency = currencyService.findByCurrencyFromAndCurrencyTo(custom,customer);
+            Double conversionRate = Double.parseDouble(currency.getConversionRate());
+
             for (InvoiceDetails invoiceDetails : invoiceDetailsList) {
                 Row row = invoiceDetailSheet.createRow(rowCount);
                 int columnCount = 0;
+
+                Double vatAmount = invoiceDetails.getVatAmount() * conversionRate;
+                Double customFormCharges = invoiceDetails.getCustomFormCharges() * conversionRate;
+                Double other = invoiceDetails.getOther() * conversionRate;
+                Double totalCharges = invoiceDetails.getTotalCharges() * conversionRate;
+
 
                 setCellValue(row, columnCount, invoiceDetails.getInvoiceDetailsId().getMawb());
                 setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getManifestDate());
@@ -425,6 +438,11 @@ public class ExcelService {
                 setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getCustomFormCharges()));
                 setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getOther()));
                 setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getTotalCharges()));
+                setCellValue(row, ++columnCount,custom.getCustom());
+                setCellValue(row, ++columnCount, formatCurrency(vatAmount));
+                setCellValue(row, ++columnCount, formatCurrency(customFormCharges));
+                setCellValue(row, ++columnCount, formatCurrency(other));
+                setCellValue(row, ++columnCount, formatCurrency(totalCharges));
                 setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationNumber());
                 setCellValue(row,++columnCount,invoiceDetails.getRef());
                 setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationDate());

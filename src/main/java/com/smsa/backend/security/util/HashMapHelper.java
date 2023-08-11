@@ -2,19 +2,14 @@ package com.smsa.backend.security.util;
 
 import com.smsa.backend.model.Custom;
 import com.smsa.backend.model.Customer;
-import com.smsa.backend.model.Invoice;
 import com.smsa.backend.model.InvoiceDetails;
-import com.smsa.backend.repository.InvoiceRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class HashMapHelper {
-
 
     public List<Map<String, Object>>    calculateValues(Map<String, List<InvoiceDetails>> filteredRowsMap, Customer customer, Custom custom,Long invoiceNumber) {
         List<Map<String, Object>> resultList = new ArrayList<>();
@@ -118,6 +113,7 @@ public class HashMapHelper {
     public Double calculateVatOnSmsaFees(Double smsaFeesCharges,Double smsaFeeVat){
         return (smsaFeesCharges * smsaFeeVat) / 100;
     }
+
     private Double calculateTotalAmount(String vatChargesAsPerCustomDeclarationForm, String customFormCharges, String otherCharges, String smsaFeesCharges, Double vatOnSmsaFees) {
         Double vatCharges = Double.valueOf(vatChargesAsPerCustomDeclarationForm);
         Double customFormChargesValue = Double.valueOf(customFormCharges);
