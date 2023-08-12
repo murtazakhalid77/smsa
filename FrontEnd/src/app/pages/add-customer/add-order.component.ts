@@ -8,6 +8,8 @@ import { Observable, finalize, map } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { StmtModifier } from '@angular/compiler';
+import { Currency } from '../model/Currency.model';
+import { CurrencyService } from '../currency/service/currency.service';
 
 @Component({
   selector: 'app-add-order',
@@ -22,9 +24,7 @@ export class AddOrderComponent implements OnInit {
   status?: boolean;
   selectedCurrencyCode: string | null = null;
   countryCodes?: any;
-
-   // All countries
-// length 252
+  currencies?: any = ['AED', 'SAR', 'BHD', 'JOD', 'KWD', 'QAR', 'OMR'];
   countries = [
   {name: "Afghanistan",code: "AF"},
   {name: "Åland Islands",code: "AX"},
@@ -285,7 +285,8 @@ export class AddOrderComponent implements OnInit {
       private customerService: CustomerService, 
       private router: Router,
       private route: ActivatedRoute,
-      private toastr: ToastrService
+      private toastr: ToastrService,
+      private currencyService: CurrencyService
       ) { }
 
   ngOnInit(): void {
@@ -314,6 +315,14 @@ export class AddOrderComponent implements OnInit {
       poBox: ['', [Validators.required]],
       country: ['', [Validators.required]],
       email: ['', [Validators.required]]
+    })
+  }
+
+  getDistinctCurrencies(){
+    this.currencyService.getDistinctCurrencies().subscribe(res =>{
+      if(res){
+        this.currencies = res.body;
+      }
     })
   }
 

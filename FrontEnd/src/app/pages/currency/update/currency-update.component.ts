@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Currency, ICurrencyDto } from '../../model/currency.model';
+import { Currency, ICurrencyDto } from '../../model/Currency.model';
 import { CurrencyService, EntityCurrencyResponseType } from '../service/currency.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, map } from 'rxjs';

@@ -35,4 +35,9 @@ public class CurrencyController {
     ResponseEntity<CurrencyDto> updateCurrency(@RequestBody CurrencyDto currencyDto, @PathVariable Long id){
         return ResponseEntity.ok(this.currencyService.updateCurrency(currencyDto, id));
     }
+
+    @GetMapping("/currency-distinct")
+    ResponseEntity<List<String>> getDistinctCurrencies(){
+        return ResponseEntity.ok(this.currencyService.getDistinctCurrencies());
+    }
 }

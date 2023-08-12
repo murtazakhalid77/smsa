@@ -3,7 +3,7 @@
     <app-dashboard-head></app-dashboard-head>
     <div class="main-container">
         <div>
-            <h4>Add Cstomer</h4>
+            <h4>Add Customer</h4>
         </div>
 
         <div class="order-body">
@@ -22,13 +22,13 @@
                         <label class="add-order-label">Invoice Currency</label>
                         <select class="order-search form-control order-form-input" aria-label="Default select example" formControlName="invoice">
                             <option value="" disabled selected>Select Currency</option>
-                            <option *ngFor="let country of countries" [value]="country.code">{{ country.code }}</option>
+                            <option *ngFor="let currency of currencies" [value]="currency">{{ currency }}</option>
                           </select>
                           
-                          
+                            
                         <span class="inputValidators" style="color: red; margin-left: 2%;"
                             *ngIf="customerForm.get('invoice')?.invalid && (customerForm.get('invoice')?.dirty || customerForm.get('invoice')?.touched)">
-                            Please provide invoice.
+                            Please provide invoice currency.
                         </span>
                     </div>
                     <div class="col-md-4 form-group" style="padding: 0 10px;">

@@ -34,7 +34,9 @@
                         <th class="text-center nowrap">
                             <span class="font">SMSA Fee (VAT)</span>
                         </th>
-        
+                        <th class="text-center nowrap">
+                            <span class="font">Currency</span>
+                        </th>
                         <th class="text-center nowrap">
                             <span class="font">Actions</span>
                         </th>
@@ -47,6 +49,7 @@
                             <td class="text-center w-auto">{{custom?.custom}}</td>
                             <td class="text-center w-auto">{{custom?.customPort}}</td>
                             <td class="text-center w-auto">{{custom?.smsaFeeVat}}</td>
+                            <td class="text-center w-auto">{{custom?.currency}}</td>
                             <td class="order-table-btns-container text-center w-auto">
                                 <i [style.color]="custom?.present ? 'black' : 'red'" style="cursor: pointer !important;" class="fa-solid fa-pen"(click)="updateCustom(custom?.id)"></i>&nbsp;
                             </td>

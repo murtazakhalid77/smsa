@@ -13,5 +13,6 @@ public class CustomDto {
     private String customPort;
     private String custom;
     private Double smsaFeeVat;
+    private String currency;
     private boolean isPresent;
 }

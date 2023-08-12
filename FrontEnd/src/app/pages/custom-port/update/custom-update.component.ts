@@ -4,6 +4,7 @@ import { CustomService, EntityCustomResponseType } from '../service/custom-port.
 import { Router, ActivatedRoute } from '@angular/router';
 import { Custom, ICustom } from '../custom.model';
 import { Observable, map } from 'rxjs';
+import { CurrencyService } from '../../currency/service/currency.service';
 
 
 @Component({
@@ -16,21 +17,27 @@ export class CustomUpdateComponent implements OnInit{
   customForm!: FormGroup
   custom?: ICustom;
   id: any;
+  vats = [0, 5, 15];
+  currencies?: any;
 
   constructor(
     private formbuilder: FormBuilder, 
     private customService: CustomService, 
     private router: Router,
     private route: ActivatedRoute,
+    private currencyService: CurrencyService
     ) { }
 
   ngOnInit(): void {
+
+    this.getDistinctCurrencies();
 
     this.customForm = this.formbuilder.group({
       customPort: ['', [Validators.required]],
       custom: ['', [Validators.required]],
       smsaFeeVat: ['', [Validators.required]],
       isActive: ['', [Validators.required]],
+      currency: ['', [Validators.required]]
     })
 
     this.route.queryParams.subscribe( params => {
@@ -64,15 +71,25 @@ export class CustomUpdateComponent implements OnInit{
     );
   }
 
-  submit(customForm: FormGroup){
+  getDistinctCurrencies(){
+    this.currencyService.getDistinctCurrencies().subscribe(res =>{
+      if(res){
+        this.currencies = res.body;
+      }
+    })
+  }
 
+  submit(customForm: FormGroup){
     let custom = {
       id: this.id,
       customPort: customForm.value.customPort,
       custom: customForm.value.custom,
       smsaFeeVat: customForm.value.smsaFeeVat,
+      currency: customForm.value.currency,
       present: customForm.value.isActive
     }
+
+    console.log(custom)
 
     if(this.id!=null ){
       this.updateCustom(custom);

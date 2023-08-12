@@ -3,7 +3,7 @@ import { environment } from 'src/Environments/environment';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Custom } from '../../custom-port/custom.model';
-import { ICurrencyDto, Currency } from '../../model/currency.model';
+import { ICurrencyDto, Currency } from '../../model/Currency.model';
 
 export type EntityAllCurrencyResponseType = HttpResponse<ICurrencyDto[]>;
 export type EntityCurrencyResponseType = HttpResponse<ICurrencyDto>;
@@ -47,4 +47,10 @@ export class CurrencyService {
     return this.http.get<Currency[]>(`${url}`, { observe: 'response' });
     // .pipe(map((res: EntityUserResponse) => res));
   }
+
+  getDistinctCurrencies(): Observable<any> {
+    let url = `${this._url}/currency-distinct`;
+    return this.http.get<any>(`${url}`, { observe: 'response' });
+  }
+
 }

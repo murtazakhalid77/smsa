@@ -13,6 +13,13 @@ import java.util.Optional;
 @Repository
 public interface CustomRepository extends JpaRepository<Custom, Long> {
     Optional<Custom> findByCustom(String customName);
-    @Query(value = "select new com.smsa.backend.dto.CustomDto(c.id, c.customPort, c.custom, c.smsaFeeVat, c.isPresent) from Custom c where c.isPresent = true")
+    @Query(value = "select new com.smsa.backend.dto.CustomDto(c.id, c.customPort, c.custom, c.smsaFeeVat, c.currency, c.isPresent) from Custom c where c.isPresent = true")
     List<CustomDto> findByIsPresent();
+
+    @Query(value = "SELECT Distinct c.currency " +
+            "FROM Custom c " +
+            "WHERE c.currency IS NOT NULL " +
+            "ORDER BY c.currency")
+    List<String> getDistinctCurrencies();
+
 }

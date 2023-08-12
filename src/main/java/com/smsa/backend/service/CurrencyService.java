@@ -17,6 +17,8 @@ import java.util.Optional;
 public class CurrencyService {
     @Autowired
     CurrencyRepository currencyRepository;
+    @Autowired
+    CustomService customService;
     public CurrencyDto addCurrency(CurrencyDto currencyDto) {
         return toDto(this.currencyRepository.save(toDomain(currencyDto)));
     }
@@ -75,6 +77,9 @@ public class CurrencyService {
         return null;
     }
 
+    public List<String> getDistinctCurrencies() {
+        return this.customService.getDistinctCurrencies();
+    }
 
     private CurrencyDto toDto(Currency currency){
         return new CurrencyDto().builder()

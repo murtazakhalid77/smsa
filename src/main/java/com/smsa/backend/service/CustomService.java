@@ -42,6 +42,14 @@ public class CustomService {
         return null;
     }
 
+    public List<String> getDistinctCurrencies(){
+        try {
+            return this.customRepository.getDistinctCurrencies();
+        }catch (Exception e){
+            throw new RecordNotFoundException(String.format("Currency Not Found"));
+        }
+    }
+
     public CustomDto getCustomById(Long id) {
         Optional<Custom> custom = this.customRepository.findById(id);
         if(custom.isPresent()){
@@ -60,6 +68,7 @@ public class CustomService {
             custom.get().setCustomPort(customDto.getCustomPort());
             custom.get().setCustom(customDto.getCustom());
             custom.get().setSmsaFeeVat(customDto.getSmsaFeeVat());
+            custom.get().setCurrency(customDto.getCurrency());
             custom.get().setPresent(customDto.isPresent());
 
             return toDto(this.customRepository.save(custom.get()));
@@ -74,6 +83,7 @@ public class CustomService {
                 .custom(custom.getCustom())
                 .customPort(custom.getCustomPort())
                 .smsaFeeVat(custom.getSmsaFeeVat())
+                .currency(custom.getCurrency())
                 .isPresent(custom.isPresent())
                 .build();
     }
@@ -83,6 +93,7 @@ public class CustomService {
                 .custom(customDto.getCustom())
                 .customPort(customDto.getCustomPort())
                 .smsaFeeVat(customDto.getSmsaFeeVat())
+                .currency(customDto.getCurrency())
                 .isPresent(customDto.isPresent())
                 .build();
     }

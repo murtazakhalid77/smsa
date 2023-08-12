@@ -3,6 +3,7 @@ export interface ICustom {
     customPort?: string,
     custom?: string,
     smsaFeeVat?: number,
+    currency?: string,
     present?: boolean
   }
 
@@ -12,6 +13,7 @@ export interface ICustom {
         public customPort?: string,
         public custom?: string,
         public smsaFeeVat?: number,
+        public currency?: string,
         public present?: boolean
     ) {}
   }
