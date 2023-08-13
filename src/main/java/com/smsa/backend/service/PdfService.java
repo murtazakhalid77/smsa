@@ -195,12 +195,12 @@ public class PdfService {
 
 
         // Create the table with specified columns and cell properties
-        PdfPTable dataTable = new PdfPTable(11);
+        PdfPTable dataTable = new PdfPTable(9);
         dataTable.setWidthPercentage(100);
         dataTable.setSpacingBefore(20); // Add space before the table
 
         // Set column height to 50 points
-        float columnHeight = 50;
+        float columnHeight = 30;
 
         List<String> columnNames =getColumnNamesList();
 
@@ -211,6 +211,7 @@ public class PdfService {
         for (String columnName : columnNames) {
             PdfPCell cell = new PdfPCell(new Paragraph(columnName, columnFontBold));
             cell.setMinimumHeight(columnHeight);
+            cell.setPadding(0);;
             cell.setBackgroundColor(new BaseColor(23, 54, 93)); // Light blue color
             cell.setVerticalAlignment(Element.ALIGN_MIDDLE); // Align content in the middle
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -222,7 +223,7 @@ public class PdfService {
         Map<String, List<InvoiceDetails>> filteredRowsMap ;
         filteredRowsMap = hashMapHelper.filterRowsByMawbNumber(invoiceDetailsList);
 
-        List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap, customer,custom,invoiceNumber);
+        List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap, customer,custom,invoiceNumber,sheetUniqueId);
 
             // Loop through the data and columns to populate the table
             for (Map<String, Object> rowDataMap : calculatedValuesList) {
@@ -325,33 +326,25 @@ public class PdfService {
 }
 
     private Map<String, String> getColumnMapping() {
-       HashMap<String,String>  columnMapping = new HashMap<>();
+        Map<String, String> columnMapping = new HashMap<>();
 
-        columnMapping.put("MAWB No.", "MawbNumber");
-        columnMapping.put("Total AWB Count", "TotalAwbCount");
-        columnMapping.put("Customer Shipment Value", "CustomerShipmentValue");
-        columnMapping.put("VAT Charges as per Custom Declaration Form", "VatAmountCustomDeclarationForm");
-        columnMapping.put("Custom Form Charges", "CustomFormCharges");
-        columnMapping.put("Other Charges", "Others");
-        columnMapping.put("Total Charges", "TotalCharges");
-        columnMapping.put("Total Value", "TotalValue");
-        columnMapping.put("Custom Declaration No", "CustomDeclarationNumber");
-        columnMapping.put("Customer Account Number", "CustomerAccountNumber");
-        columnMapping.put("Invoice No", "InvoiceNumber");
         columnMapping.put("Invoice Type", "InvoiceType");
-        columnMapping.put("SMSA Fee Charges", "SMSAFeeCharges");
-        columnMapping.put("Total Amount", "TotalAmount");
         columnMapping.put("Custom Port", "CustomPort");
-        columnMapping.put("VAT on SMSA Fee","VatOnSmsaFees");
+        columnMapping.put("Invoice No", "InvoiceNumber");
+        columnMapping.put("MAWB No.", "MawbNumber");
+        columnMapping.put("Custom Declaration No", "CustomDeclarationNumber");
+        columnMapping.put("Total Charges as per Custom Declaration Form", "VatAmountCustomDeclarationForm");
+        columnMapping.put("SMSA Fee Charges", "SMSAFeeCharges");
+        columnMapping.put("VAT on SMSA Fee", "VatOnSmsaFees");
+        columnMapping.put("Total Amount", "TotalAmount");
 
         return columnMapping;
     }
 
+
     private boolean shouldApplyCurrencyFormat(String columnName) {
         List<String> currencyFormattedColumns = Arrays.asList(
-                "VAT Charges as per Custom Declaration Form",
-                "Custom Form Charges",
-                "Other Charges",
+                "Total Charges as per Custom Declaration Form",
                 "SMSA Fee Charges",
                 "VAT on SMSA Fee",
                 "Total Amount"
@@ -361,14 +354,12 @@ public class PdfService {
     }
     private List<String> getColumnNamesList() {
         List<String> columnNames = new ArrayList<>();
-        columnNames.add("Custom Port");
         columnNames.add("Invoice Type");
+        columnNames.add("Custom Port");
         columnNames.add("Invoice No");
         columnNames.add("MAWB No.");
         columnNames.add("Custom Declaration No");
-        columnNames.add("VAT Charges as per Custom Declaration Form");
-        columnNames.add("Custom Form Charges");
-        columnNames.add("Other Charges");
+        columnNames.add("Total Charges as per Custom Declaration Form");
         columnNames.add("SMSA Fee Charges");
         columnNames.add("VAT on SMSA Fee");
         columnNames.add("Total Amount");
