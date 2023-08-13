@@ -300,25 +300,21 @@ public class ExcelService {
 
         Workbook newWorkBook = WorkbookFactory.create(fileInputStream);
 
-        Sheet invoiceDetailSheet = newWorkBook.getSheetAt(1);
+        setHeaderValuesToBothSheet(newWorkBook,customer, sheetUniqueId, invoiceNumber);
 
-        invoiceDetailSheet.setDisplayGridlines(false);
+        Sheet invoiceDetailSheet = newWorkBook.getSheetAt(1);
 
         setInvoiceDetailsCellValues(invoiceDetailSheet, invoiceDetailsList,custom,customer);
 
         Sheet summarySheet = newWorkBook.getSheetAt(0);
 
-        summarySheet.setDisplayGridlines(false);
-
-        setSummarySheetCellValues(summarySheet, customer, sheetUniqueId, invoiceNumber);
-
         filteredRowsMap = hashMapHelper.filterRowsByMawbNumber(invoiceDetailsList);
 
-        List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap, customer, custom, invoiceNumber);
+        List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap, customer, custom, invoiceNumber,sheetUniqueId);
 
         Map<String, Double> sumMap = hashMapHelper.sumNumericColumns(calculatedValuesList);
 
-        populateCalculatedValues(summarySheet, calculatedValuesList);
+        populateCalculatedValues(summarySheet, calculatedValuesList,sheetUniqueId);
 
         populateSumValues(summarySheet, sumMap);
 
@@ -334,6 +330,47 @@ public class ExcelService {
 
 
     }
+
+    private void setHeaderValuesToBothSheet(Workbook newWorkBook, Customer customer, String sheetUniqueId, Long invoiceNumber) {
+        try {
+
+                Sheet sheet = newWorkBook.getSheetAt(0);
+                sheet.setDisplayGridlines(Boolean.FALSE);
+
+                Cell customerNameCell = sheet.getRow(4).getCell(1);
+                setCellValue(customerNameCell, customer.getNameEnglish());
+
+                Cell accountNumberCell = sheet.getRow(5).getCell(1);
+                setCellValue(accountNumberCell, customer.getAccountNumber());
+
+                Cell invoiceDateCell = sheet.getRow(6).getCell(1);
+                setCellValue(invoiceDateCell, helperService.generateInvoiceDate(sheetUniqueId));
+
+                Cell currencyCell = sheet.getRow(7).getCell(1);
+                setCellValue(currencyCell, customer.getInvoiceCurrency());
+
+
+            Sheet sheet1 = newWorkBook.getSheetAt(1);
+            sheet1.setDisplayGridlines(Boolean.FALSE);
+
+            Cell customerNameCell1 = sheet1.getRow(4).getCell(1);
+            setCellValue(customerNameCell1, customer.getNameEnglish());
+
+            Cell accountNumberCell1 = sheet1.getRow(5).getCell(1);
+            setCellValue(accountNumberCell1, customer.getAccountNumber());
+
+            Cell invoiceDateCell1 = sheet1.getRow(6).getCell(1);
+            setCellValue(invoiceDateCell1, helperService.generateInvoiceDate(sheetUniqueId));
+
+            Cell currencyCell1 = sheet1.getRow(7).getCell(1);
+            setCellValue(currencyCell1, customer.getInvoiceCurrency());
+
+
+        } catch (Exception e){
+            logger.warn("The name,account,invoiceDate cell in the summary sheet are null replace them with XXXX");
+            throw new RuntimeException(String.format("Summary Sheet Exception"));
+        }
+    }
     public void populateSumValues(Sheet summarySheet, Map<String, Double> sumMap) {
         try {
             int lastRowIndex = summarySheet.getLastRowNum();
@@ -344,15 +381,52 @@ public class ExcelService {
             }
 
             Row row = summarySheet.createRow(startingRow);
-            setCellValue(row.createCell(6), formatCurrency(sumMap.get("CustomerShipmentValueSum")));
-            setCellValue(row.createCell(7), formatCurrency(sumMap.get("VatAmountCustomDeclarationFormSum")));
-            setCellValue(row.createCell(8), formatCurrency(sumMap.get("CustomFormChargesSum")));
-            setCellValue(row.createCell(9), formatCurrency(sumMap.get("OthersSum")));
-            setCellValue(row.createCell(10), formatCurrency(sumMap.get("TotalChargesSum")))         ;
+
+            List<String> sumColumns = getSumColumnsList();
+
+            int columnIndex = 8; // Starting column index
+
+            for (String sumColumn : sumColumns) {
+
+                if (columnIndex == 13) {
+                    columnIndex++; // Move to the next column without setting the value
+                    continue; // Skip this iteration and move to the next one
+                }
+
+                Double sumValue = sumMap.get(sumColumn);
+
+                if (sumValue != null) {
+                    Cell cell = row.createCell(columnIndex);
+                    setCellValue(cell, formatCurrency(sumValue));
+
+                    // Apply the same cell style here
+                    CellStyle style = summarySheet.getWorkbook().createCellStyle();
+                    style.setAlignment(HorizontalAlignment.RIGHT); // Example of setting alignment
+                    cell.setCellStyle(style);
+
+                    columnIndex++; // Move to the next column
+                }
+            }
         } catch (ExcelMakingException e) {
-            throw new RuntimeException("There was an issue in populating sum values in summary file");
+            throw new RuntimeException("There was an issue in populating sum values in the summary file");
         }
     }
+
+    private List<String> getSumColumnsList() {
+        return Arrays.asList(
+                "CustomerShipmentValueSum",
+                "VatAmountCustomDeclarationFormSum",
+                "CustomFormChargesSum",
+                "OthersSum",
+                "TotalChargesSum",
+                "CustomDeclartionCurrency", //ignore
+                "VatAmountCustomerCurrencySum",
+                "CustomFormChargesCustomerCurrencySum",
+                "OtherCustomerCurrencySum",
+                "TotalChargesCustomerCurrencySum"
+        );
+    }
+
 
     private int findStartingRow(Sheet sheet) {
         DataFormatter dataFormatter = new DataFormatter();
@@ -407,7 +481,7 @@ public class ExcelService {
     }
 
     private void setInvoiceDetailsCellValues(Sheet invoiceDetailSheet, List<InvoiceDetails> invoiceDetailsList,Custom custom,Customer customer) {
-        int rowCount = 1;
+        int rowCount = 10;
         try {
             Currency currency = currencyService.findByCurrencyFromAndCurrencyTo(custom,customer);
             Double conversionRate = Double.parseDouble(currency.getConversionRate());
@@ -461,37 +535,37 @@ public class ExcelService {
         formatter.setMaximumFractionDigits(2);
         return formatter.format(value);
     }
-    private void populateCalculatedValues(Sheet summarySheet, List<Map<String, Object>> calculatedValuesList) {
+    private void populateCalculatedValues(Sheet summarySheet, List<Map<String, Object>> calculatedValuesList, String sheetUniqueId) {
         try {
-            int startingRow = 6;
+            int startingRow = 10;
+            List<String> columnNames = getColumnNamesList();
+            Map<String, String> columnMapping = getColumnMapping();
+
             for (Map<String, Object> calculatedValuesMap : calculatedValuesList) {
                 Row row = summarySheet.createRow(startingRow);
 
-                setCellValue(row.createCell(0), calculatedValuesMap.get("InvoiceNumber"));
-                setCellValue(row.createCell(1), calculatedValuesMap.get("CustomDeclarationNumber"));
-                setCellValue(row.createCell(2), calculatedValuesMap.get("CustomerAccountNumber"));
-                setCellValue(row.createCell(3), calculatedValuesMap.get("MawbNumber"));
-                setCellValue(row.createCell(4), calculatedValuesMap.get("TotalAwbCount"));
+                for (int columnIndex = 0; columnIndex < columnNames.size(); columnIndex++) {
+                    String columnName = columnNames.get(columnIndex);
+                    String mapKey = columnMapping.get(columnName);
 
-                // Convert String to Double and pass to formatCurrency
-                setCellValue(row.createCell(5), formatCurrency(Double.valueOf(calculatedValuesMap.get("TotalValue").toString())));
-                setCellValue(row.createCell(6), formatCurrency(Double.valueOf(calculatedValuesMap.get("CustomerShipmentValue").toString())));
-                setCellValue(row.createCell(7), formatCurrency(Double.valueOf(calculatedValuesMap.get("VatAmountCustomDeclarationForm").toString())));
-                setCellValue(row.createCell(8), formatCurrency(Double.valueOf(calculatedValuesMap.get("CustomFormCharges").toString())));
-                setCellValue(row.createCell(9), formatCurrency(Double.valueOf(calculatedValuesMap.get("Others").toString())));
-                setCellValue(row.createCell(10), formatCurrency(Double.valueOf(calculatedValuesMap.get("TotalCharges").toString())));
+                    if (mapKey != null && calculatedValuesMap.containsKey(mapKey)) {
+                        Object value = calculatedValuesMap.get(mapKey);
+                        Cell cell = row.createCell(columnIndex);
 
-                CellStyle style = summarySheet.getWorkbook().createCellStyle();
-                style.setAlignment(HorizontalAlignment.RIGHT);
-                row.getCell(5).setCellStyle(style);
-                row.getCell(6).setCellStyle(style);
-                row.getCell(7).setCellStyle(style);
-                row.getCell(8).setCellStyle(style);
-                row.getCell(9).setCellStyle(style);
-                row.getCell(10).setCellStyle(style);
+                        if (value instanceof Double) {
+                            setCellValue(cell, formatCurrency((Double) value));
+                        } else {
+                            setCellValue(cell, value != null ? value.toString() : "");
+                        }
 
-                // Move to the next row
-                startingRow++;
+                        // Apply cell style here
+                        CellStyle style = summarySheet.getWorkbook().createCellStyle();
+                        style.setAlignment(HorizontalAlignment.RIGHT); // Example of setting alignment
+                        cell.setCellStyle(style);
+                    }
+                }
+
+                startingRow++; // Move to the next row
             }
         } catch (ExcelMakingException e) {
             throw new RuntimeException("There was an issue in populating calculated values in the summary file");
@@ -515,6 +589,56 @@ public class ExcelService {
         Cell cell = row.createCell(columnCount);
         cell.setCellValue(value != null ? value.toString() : "");
     }
+    private Map<String, String> getColumnMapping() {
+        Map<String, String> columnMapping = new LinkedHashMap<>();
+        // Column names list
+        List<String> columnNames = getColumnNamesList();
+        // Add mappings for columns with potentially duplicate keys
+        columnMapping.put("Invoice Type", "InvoiceType");
+        columnMapping.put("Custom Port", "CustomPort");
+        columnMapping.put("Custom Declartion Date", "CustomDeclarationDate");
+        columnMapping.put("Invoice#", "InvoiceNumber");
+        columnMapping.put("MAWB Number", "MawbNumber");
+        columnMapping.put("Custom Declartion Currency", "CustomDeclarationCurrency");
+        columnMapping.put("Custom Declartion#", "CustomDeclarationNumber");
+        columnMapping.put("Total AWB Count", "TotalAwbCount");
+        columnMapping.put("Total Value", "TotalValue");
+        columnMapping.put("Value (Custom)", "CustomerShipmentValue");
+        columnMapping.put("VAT Amount", "VatAmountCustomDeclarationForm");
+        columnMapping.put("Custom Form Charges","CustomFormCharges");
+        columnMapping.put("Other", "Others"); // Duplicate key
+        columnMapping.put("Total Charges", "TotalCharges");
+
+        columnMapping.put("VAT Amount-","VatAmountCustomerCurrency" );
+        columnMapping.put("Custom Form Charges-","CustomFormChargesCustomerCurrency");
+        columnMapping.put("Other-", "OtherCustomerCurrency");
+        columnMapping.put("Total Charges-", "TotalChargesCustomerCurrency");
+        return columnMapping;
+    }
+    private List<String> getColumnNamesList() {
+        List<String> columnNames = new ArrayList<>();
+        columnNames.add("Invoice Type");
+        columnNames.add("Custom Port");
+        columnNames.add("Custom Declartion Date");
+        columnNames.add("Invoice#");
+        columnNames.add("MAWB Number");
+        columnNames.add("Custom Declartion#");
+        columnNames.add("Total AWB Count");
+        columnNames.add("Total Value");
+        columnNames.add("Value (Custom)");
+        columnNames.add("VAT Amount");
+        columnNames.add("Custom Form Charges");
+        columnNames.add("Other");
+        columnNames.add("Total Charges");
+        columnNames.add("Custom Declartion Currency");
+        columnNames.add("VAT Amount-");
+        columnNames.add("Custom Form Charges-");
+        columnNames.add("Other-");
+        columnNames.add("Total Charges-");
+        return columnNames;
+    }
+
+
 }
 
 
