@@ -18,7 +18,7 @@ export class CustomUpdateComponent implements OnInit{
   custom?: ICustom;
   id: any;
   vats = [0, 5, 15];
-  currencies?: any;
+  currencies?: any = ['USD', 'SAR', 'BHD', 'JOD', 'KWD', 'QAR', 'OMR', 'AED'];
 
   constructor(
     private formbuilder: FormBuilder, 
@@ -30,7 +30,7 @@ export class CustomUpdateComponent implements OnInit{
 
   ngOnInit(): void {
 
-    this.getDistinctCurrencies();
+    // this.getDistinctCurrencies();
 
     this.customForm = this.formbuilder.group({
       customPort: ['', [Validators.required]],

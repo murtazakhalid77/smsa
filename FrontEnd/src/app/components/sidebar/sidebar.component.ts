@@ -29,6 +29,6 @@ export class SidebarComponent {
     this.router.navigateByUrl('/user/view');
   }
   currency(){
-    this.router.navigateByUrl('/currency');
+    this.router.navigateByUrl('/currency/view');
   }
 }

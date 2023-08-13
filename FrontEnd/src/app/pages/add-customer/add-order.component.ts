@@ -24,7 +24,7 @@ export class AddOrderComponent implements OnInit {
   status?: boolean;
   selectedCurrencyCode: string | null = null;
   countryCodes?: any;
-  currencies?: any = ['AED', 'SAR', 'BHD', 'JOD', 'KWD', 'QAR', 'OMR'];
+  currencies?: any = ['USD', 'SAR', 'BHD', 'JOD', 'KWD', 'QAR', 'OMR', 'AED'];
   countries = [
   {name: "Afghanistan",code: "AF"},
   {name: "Åland Islands",code: "AX"},
@@ -318,13 +318,13 @@ export class AddOrderComponent implements OnInit {
     })
   }
 
-  getDistinctCurrencies(){
-    this.currencyService.getDistinctCurrencies().subscribe(res =>{
-      if(res){
-        this.currencies = res.body;
-      }
-    })
-  }
+  // getDistinctCurrencies(){
+  //   this.currencyService.getDistinctCurrencies().subscribe(res =>{
+  //     if(res){
+  //       this.currencies = res.body;
+  //     }
+  //   })
+  // }
 
   updateForm(accountNumber?: number){
 

@@ -30,6 +30,16 @@
                 </div>
 
                 <div class="order-form">
+
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Conversion Rate</label>
+                        <input type="text" formControlName="conversionRate" placeholder="Enter Conversion Rate"
+                        class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                          *ngIf="currencyForm.get('conversionRate')?.invalid && (currencyForm.get('conversionRate')?.dirty || currencyForm.get('conversionRate')?.touched)">
+                          Please provide conversion rate.
+                        </span>
+                      </div>
                    
                     <div class="col-md-6 form-group" style="padding: 0 10px;">
                         <label class="add-order-label">Is-Active</label>

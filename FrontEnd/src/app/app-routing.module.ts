@@ -12,6 +12,7 @@ import { CustomUpdateComponent } from './pages/custom-port/update/custom-update.
 import { UserComponent } from './pages/user/list/user.component';
 import { UserUpdateComponent } from './pages/user/update/user-update.component';
 import { CurrencyUpdateComponent } from './pages/currency/update/currency-update.component';
+import { CurrencyListComponent } from './pages/currency/list/currency-list.component';
 
 const routes: Routes = [
   {
@@ -71,6 +72,11 @@ const routes: Routes = [
   {
     path: 'currency',
     component: CurrencyUpdateComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'currency/view',
+    component: CurrencyListComponent,
     canActivate: [AuthGuard],
   }
 ];

@@ -62,6 +62,8 @@ public class CurrencyService {
             currency.get().setId(id);
             currency.get().setCurrencyFrom(currencyDto.getCurrencyFrom());
             currency.get().setCurrencyTo(currencyDto.getCurrencyTo());
+            currency.get().setConversionRate(currencyDto.getConversionRate());
+            currency.get().setIsPresent(currencyDto.getIsPresent());
             return toDto(this.currencyRepository.save(currency.get()));
         }
         throw new RecordNotFoundException(String.format("Currency Not Found On this Id => %d",id));
@@ -86,6 +88,8 @@ public class CurrencyService {
                 .id(currency.getId())
                 .currencyFrom(currency.getCurrencyFrom())
                 .currencyTo(currency.getCurrencyTo())
+                .conversionRate(currency.getConversionRate())
+                .isPresent(currency.getIsPresent())
                 .build();
     }
     private Currency toDomain(CurrencyDto currencyDto){
@@ -93,6 +97,8 @@ public class CurrencyService {
                 .id(currencyDto.getId())
                 .currencyFrom(currencyDto.getCurrencyFrom())
                 .currencyTo(currencyDto.getCurrencyTo())
+                .conversionRate(currencyDto.getConversionRate())
+                .isPresent(currencyDto.getIsPresent())
                 .build();
     }
 

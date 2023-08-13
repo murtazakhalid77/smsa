@@ -27,6 +27,7 @@ export class CurrencyUpdateComponent {
       this.currencyForm = this.formbuilder.group({
         currencyFrom: ['', [Validators.required]],
         currencyTo: ['', [Validators.required]],
+        conversionRate: ['', Validators.required],
         isActive: ['', [Validators.required]],
       })
 
@@ -65,12 +66,14 @@ export class CurrencyUpdateComponent {
   
     
   submit(currencyForm: FormGroup){
+    debugger;
 
     let currency = {
       id: this.id,
       currencyFrom: currencyForm.value.currencyFrom,
       currencyTo: currencyForm.value.currencyTo,
-      isActive: currencyForm.value.isActive
+      conversionRate: currencyForm.value.conversionRate,
+      isPresent: currencyForm.value.isActive
     }
 
     if(this.id!=null ){

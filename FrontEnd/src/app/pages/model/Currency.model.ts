@@ -2,6 +2,7 @@ export interface ICurrencyDto {
     id?: number;
     currencyFrom?: string,
     currencyTo?: string,
+    conversionRate?: string,
     isPresent?: boolean,
   }
 
@@ -11,6 +12,7 @@ export interface ICurrencyDto {
       public  id?: number,
       public currencyFrom?: string,
       public  currencyTo?: string,
+      public conversionRate?: string,
       public isPresent?: boolean,
     ) {}
     
