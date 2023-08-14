@@ -76,7 +76,7 @@ public class PdfService {
         arabicCell.setBorder(Rectangle.NO_BORDER);
         arabicCell.setRunDirection(PdfWriter.RUN_DIRECTION_RTL);
 
-        String test = " ﺍﻟﺮﻗﻢ ﺍﻟﻀﺮﻳﺒﻲ:"+custom.getSmsaFeeVat();
+        String test = " ﺍﻟﺮﻗﻢ ﺍﻟﻀﺮﻳﺒﻲ:"+"300057426900003";
         arabicCell.addElement(new Paragraph("ﺷﺮﻛﺔ ﺳﻤﺴﺎ ﻟﻠﻨﻘﻞ ﺍﻟﺴﺮﻳﻊ ﺍﻟﻤﺤﺪﻭﺩﺓ", arabicFont));
         arabicCell.addElement(new Paragraph(test, arabicFont));
 
@@ -188,7 +188,7 @@ public class PdfService {
         // Add the content paragraph
         Paragraph contentParagraph = new Paragraph(String.format("Dear Customer,\n\nThis is Duty & Taxes Invoice in connection with " +
                 "Inbound Shipments mentioned therein, The Charges as per %S Declaration " +
-                "form are paid to %S on behalf of Consignee",custom.getCustom(),custom.getCustom()), englishFont);
+                "form are paid to %S on behalf of Consignee and as requested by Shipper",custom.getCustom(),custom.getCustom()), englishFont);
         contentParagraph.setAlignment(Element.ALIGN_LEFT);
         contentParagraph.setSpacingBefore(5); // Add some space before the content paragraph
         document.add(contentParagraph);
@@ -208,17 +208,27 @@ public class PdfService {
 
 
         // Add the column names to the table
-        for (String columnName : columnNames) {
-            PdfPCell cell = new PdfPCell(new Paragraph(columnName, columnFontBold));
-            cell.setMinimumHeight(columnHeight);
-            cell.setPadding(0);;
-            cell.setBackgroundColor(new BaseColor(23, 54, 93)); // Light blue color
-            cell.setVerticalAlignment(Element.ALIGN_MIDDLE); // Align content in the middle
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            for (String columnName : columnNames) {
+                PdfPCell cell;
 
-            columnFontBold.setColor(BaseColor.WHITE);
-            dataTable.addCell(cell);
-        }
+                if (columnName.equals("VAT on SMSA Fee")) {
+                    cell = new PdfPCell(new Paragraph(custom.getSmsaFeeVat() + "%" + columnName, columnFontBold));
+                } else {
+                    cell = new PdfPCell(new Paragraph(columnName, columnFontBold));
+                }
+
+                cell.setMinimumHeight(columnHeight);
+                cell.setPadding(0);
+                cell.setBackgroundColor(new BaseColor(23, 54, 93)); // Light blue color
+
+                // Align content in the middle
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                cell.setVerticalAlignment(Element.ALIGN_CENTER);
+
+                columnFontBold.setColor(BaseColor.WHITE);
+
+                dataTable.addCell(cell);
+            }
 
         Map<String, List<InvoiceDetails>> filteredRowsMap ;
         filteredRowsMap = hashMapHelper.filterRowsByMawbNumber(invoiceDetailsList);
@@ -232,15 +242,19 @@ public class PdfService {
                     Object value = rowDataMap.get(keyName);
 
                     PdfPCell cell = new PdfPCell();
-                    cell.setVerticalAlignment(Element.ALIGN_RIGHT); // Align content in the middle
+                    cell.setPadding(5);
+
+                    Paragraph paragraphCell;
 
                     if (shouldApplyCurrencyFormat(columnName)) {
                         String formattedValue = formatCurrency(Double.valueOf(value.toString()));
-                        cell.addElement(new Paragraph(formattedValue, pdfFont));
+                        paragraphCell = new Paragraph(formattedValue, pdfFont);
+                        paragraphCell.setAlignment(Element.ALIGN_RIGHT);
                     } else {
-                        cell.addElement(new Paragraph(value != null ? value.toString() : "", pdfFont));
+                        paragraphCell = new Paragraph(value != null ? value.toString() : "", pdfFont);
+                        paragraphCell.setAlignment(Element.ALIGN_CENTER);
                     }
-
+                    cell.addElement(paragraphCell);
                     dataTable.addCell(cell);
                 }
             }
@@ -255,12 +269,17 @@ public class PdfService {
                 }
             }
             // Add grand total cell
-            PdfPCell grandTotalCell = new PdfPCell(new Paragraph("Grand Total:"+formatCurrency(grandTotal), pdfFont));
-            grandTotalCell.setBorder(Rectangle.TOP);
-            grandTotalCell.setColspan(columnNames.size()); // Set the colspan to span across all columns
-            grandTotalCell.setHorizontalAlignment(Element.ALIGN_RIGHT); // Align content to the right
-            dataTable.addCell(grandTotalCell);
+            PdfPCell grandTotalLabelCell = new PdfPCell(new Paragraph("Grand Total:", pdfFont));
+            grandTotalLabelCell.setColspan(columnNames.size() - 1);
+            grandTotalLabelCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            grandTotalLabelCell.setBackgroundColor(new BaseColor(192, 192, 192));
+            dataTable.addCell(grandTotalLabelCell);
 
+            PdfPCell grandTotalValueCell = new PdfPCell(new Paragraph(formatCurrency(grandTotal), pdfFont));
+            grandTotalValueCell.setColspan(1);
+            grandTotalValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            grandTotalValueCell.setBackgroundColor(new BaseColor(192, 192, 192));
+            dataTable.addCell(grandTotalValueCell);
 
 
             // Add the table to the document

@@ -59,7 +59,7 @@ public class EmailSchedular {
 
         Invoice invoice =invoiceRepository.findById(1L).get();
 
-        Long invoiceNumber = invoice.getNumber(); //5
+        Long invoiceNumber = invoice.getNumber();
         boolean anyUnsentInvoice = false;
 
         List<InvoiceDetails> invoicesForSheet = invoiceDetailsRepository.findAllBySheetUniqueId(sheetUniqueId);

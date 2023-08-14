@@ -39,7 +39,7 @@ public class EmailService {
 
             helper.setFrom(sender);
             helper.setTo(customer.getEmail());
-            helper.setSubject("Invoice Generated");
+            helper.setSubject("SMSA Express Invoice for Custom Duty & Taxes for Inbound Shipments");
 
             // Attach the Excel file
             helper.addAttachment("invoice.xlsx", new ByteArrayDataSource(excelFileData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
@@ -47,13 +47,26 @@ public class EmailService {
             // Attach the PDF file
             helper.addAttachment("invoice.pdf", new ByteArrayDataSource(pdfFileData, "application/pdf"));
 
-            helper.setText("hello");
+            helper.setText("<html><body>"
+                            + "<p>Dear Customer,</p>"
+                            + "<p>"
+                            + "Please find attached the Invoice for Custom Duty & Taxes for Inbound Shipments, Details are available under the attached file."
+                            + "</p>"
+                            + "<p>If you have any questions regarding this invoice, please contact us by email at <a href='mailto:cdvbill@smsaexpress.com'>cdvbill@smsaexpress.com</a>.</p>"
+                            + "<p dir='rtl'>عزيزي العميل,</p>"
+                            + "<p>"
+                            + "يرجى الاطلاع على الفاتورة المرفقة للرسوم والضرائب المخصصة للشحنات الواردة ، التفاصيل متاحة تحت الملف المرفق."
+                            + "</p>"
+                            + "<p>"
+                            + "إذا كان لديك أي أسئلة بخصوص هذه الفاتورة ، يرجى الاتصال بنا عبر البريد الإلكتروني على <a href='mailto:cdvbill@smsaexpress.com'>cdvbill@smsaexpress.com</a>."
+                            + "</p>"
+                            + "</body></html>", true);
             logger.info("Email Sent to: " + customer.getNameEnglish() + " " + customer.getAccountNumber());
             javaMailSender.send(message);
             invoiceDetailsRepository.updateIsSentInMailByAccountNumberAndSheetUniqueId(customer.getAccountNumber(), sheetUniqueId);
             return true;
         } catch (Exception e) {
-            //reverting it back
+            e.printStackTrace();
             invoiceDetailsRepository.revertIsSentInMailByAccountNumberAndSheetUniqueId(customer.getAccountNumber(),sheetUniqueId);
             throw new RuntimeException("Error while sending mail with attachments.");
 

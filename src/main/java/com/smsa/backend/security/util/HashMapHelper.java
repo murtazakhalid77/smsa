@@ -82,6 +82,7 @@ public class HashMapHelper {
                 customDecarationDateSet.add(invoiceDetails.getCustomDeclarationDate());
 
             }
+            String dateSetString = customDecarationDateSet.toString();
             String customDeclarationNumbers = customDecarationNumberSet.stream()
                     .limit(3)  // Limit to the first three elements
                     .map(String::valueOf)
@@ -108,7 +109,7 @@ public class HashMapHelper {
             calculatedValuesMap.put("CustomerAccountNumber", customer.getAccountNumber());
             calculatedValuesMap.put("InvoiceNumber", "ECDV-"+invoiceNumber);
             calculatedValuesMap.put("InvoiceType", "Bill-Shipper");
-            calculatedValuesMap.put("CustomDeclarationDate",customDecarationDateSet);
+            calculatedValuesMap.put("CustomDeclarationDate",dateSetString.substring(1, dateSetString.length() - 1));
             calculatedValuesMap.put("SMSAFeeCharges", customer.getSmsaServiceFromSAR());
             calculatedValuesMap.put("TotalAmount", calculateTotalAmount(calculatedValuesMap
                     .get("VatAmountCustomDeclarationForm").toString(),

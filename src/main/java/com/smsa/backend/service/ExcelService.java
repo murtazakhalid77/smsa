@@ -300,21 +300,54 @@ public class ExcelService {
 
         Workbook newWorkBook = WorkbookFactory.create(fileInputStream);
 
-        setHeaderValuesToBothSheet(newWorkBook,customer, sheetUniqueId, invoiceNumber);
+
+        Sheet sheet = newWorkBook.getSheetAt(0);
+        sheet.setDisplayGridlines(Boolean.FALSE);
+
+        Cell customerNameCell = sheet.getRow(4).getCell(1);
+        setCellValue(customerNameCell, customer.getNameEnglish());
+
+        Cell accountNumberCell = sheet.getRow(5).getCell(1);
+        setCellValue(accountNumberCell, customer.getAccountNumber());
+
+        Cell invoiceDateCell = sheet.getRow(6).getCell(1);
+        setCellValue(invoiceDateCell, helperService.generateInvoiceDate(sheetUniqueId));
+
+        Cell currencyCell = sheet.getRow(7).getCell(1);
+        setCellValue(currencyCell, customer.getInvoiceCurrency());
+
+        Sheet sheet1 = newWorkBook.getSheetAt(1);
+        sheet1.setDisplayGridlines(Boolean.FALSE);
+
+        Cell customerNameCell1 = sheet1.getRow(4).getCell(1);
+        setCellValue(customerNameCell1, customer.getNameEnglish());
+
+        Cell accountNumberCell1 = sheet1.getRow(5).getCell(1);
+        setCellValue(accountNumberCell1, customer.getAccountNumber());
+
+        Cell invoiceDateCell1 = sheet1.getRow(6).getCell(1);
+        setCellValue(invoiceDateCell1, helperService.generateInvoiceDate(sheetUniqueId));
+
+        Cell currencyCell1 = sheet1.getRow(7).getCell(1);
+        setCellValue(currencyCell1, customer.getInvoiceCurrency());
 
         Sheet invoiceDetailSheet = newWorkBook.getSheetAt(1);
 
-        setInvoiceDetailsCellValues(invoiceDetailSheet, invoiceDetailsList,custom,customer);
+        setInvoiceDetailsCellValues(invoiceDetailSheet, invoiceDetailsList, custom, customer);
 
         Sheet summarySheet = newWorkBook.getSheetAt(0);
 
         filteredRowsMap = hashMapHelper.filterRowsByMawbNumber(invoiceDetailsList);
 
-        List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap, customer, custom, invoiceNumber,sheetUniqueId);
+        List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap,
+                customer,
+                custom,
+                invoiceNumber,
+                sheetUniqueId);
 
         Map<String, Double> sumMap = hashMapHelper.sumNumericColumns(calculatedValuesList);
 
-        populateCalculatedValues(summarySheet, calculatedValuesList,sheetUniqueId);
+        populateCalculatedValues(summarySheet, calculatedValuesList, sheetUniqueId);
 
         populateSumValues(summarySheet, sumMap);
 
@@ -329,47 +362,6 @@ public class ExcelService {
         }
 
 
-    }
-
-    private void setHeaderValuesToBothSheet(Workbook newWorkBook, Customer customer, String sheetUniqueId, Long invoiceNumber) {
-        try {
-
-                Sheet sheet = newWorkBook.getSheetAt(0);
-                sheet.setDisplayGridlines(Boolean.FALSE);
-
-                Cell customerNameCell = sheet.getRow(4).getCell(1);
-                setCellValue(customerNameCell, customer.getNameEnglish());
-
-                Cell accountNumberCell = sheet.getRow(5).getCell(1);
-                setCellValue(accountNumberCell, customer.getAccountNumber());
-
-                Cell invoiceDateCell = sheet.getRow(6).getCell(1);
-                setCellValue(invoiceDateCell, helperService.generateInvoiceDate(sheetUniqueId));
-
-                Cell currencyCell = sheet.getRow(7).getCell(1);
-                setCellValue(currencyCell, customer.getInvoiceCurrency());
-
-
-            Sheet sheet1 = newWorkBook.getSheetAt(1);
-            sheet1.setDisplayGridlines(Boolean.FALSE);
-
-            Cell customerNameCell1 = sheet1.getRow(4).getCell(1);
-            setCellValue(customerNameCell1, customer.getNameEnglish());
-
-            Cell accountNumberCell1 = sheet1.getRow(5).getCell(1);
-            setCellValue(accountNumberCell1, customer.getAccountNumber());
-
-            Cell invoiceDateCell1 = sheet1.getRow(6).getCell(1);
-            setCellValue(invoiceDateCell1, helperService.generateInvoiceDate(sheetUniqueId));
-
-            Cell currencyCell1 = sheet1.getRow(7).getCell(1);
-            setCellValue(currencyCell1, customer.getInvoiceCurrency());
-
-
-        } catch (Exception e){
-            logger.warn("The name,account,invoiceDate cell in the summary sheet are null replace them with XXXX");
-            throw new RuntimeException(String.format("Summary Sheet Exception"));
-        }
     }
     public void populateSumValues(Sheet summarySheet, Map<String, Double> sumMap) {
         try {
@@ -481,10 +473,17 @@ public class ExcelService {
     }
 
     private void setInvoiceDetailsCellValues(Sheet invoiceDetailSheet, List<InvoiceDetails> invoiceDetailsList,Custom custom,Customer customer) {
-        int rowCount = 10;
+        int rowCount = 2;
         try {
             Currency currency = currencyService.findByCurrencyFromAndCurrencyTo(custom,customer);
             Double conversionRate = Double.parseDouble(currency.getConversionRate());
+
+            CellStyle rightAlignedStyle = invoiceDetailSheet.getWorkbook().createCellStyle();
+            rightAlignedStyle.setAlignment(HorizontalAlignment.RIGHT);
+
+            CellStyle centeredStyle = invoiceDetailSheet.getWorkbook().createCellStyle();
+            centeredStyle.setAlignment(HorizontalAlignment.CENTER);
+
 
             for (InvoiceDetails invoiceDetails : invoiceDetailsList) {
                 Row row = invoiceDetailSheet.createRow(rowCount);
@@ -496,30 +495,30 @@ public class ExcelService {
                 Double totalCharges = invoiceDetails.getTotalCharges() * conversionRate;
 
 
-                setCellValue(row, columnCount, invoiceDetails.getInvoiceDetailsId().getMawb());
-                setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getManifestDate());
-                setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getAccountNumber());
-                setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getAwb());
-                setCellValue(row, ++columnCount, invoiceDetails.getOrderNumber());
-                setCellValue(row, ++columnCount, invoiceDetails.getOrigin());
-                setCellValue(row, ++columnCount, invoiceDetails.getDestination());
-                setCellValue(row, ++columnCount, invoiceDetails.getShippersName());
-                setCellValue(row, ++columnCount, invoiceDetails.getConsigneeName());
-                setCellValue(row, ++columnCount, invoiceDetails.getWeight());
-                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getDeclaredValue()));
-                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getValueCustom()));
-                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getVatAmount()));
-                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getCustomFormCharges()));
-                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getOther()));
-                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getTotalCharges()));
-                setCellValue(row, ++columnCount,custom.getCustom());
-                setCellValue(row, ++columnCount, formatCurrency(vatAmount));
-                setCellValue(row, ++columnCount, formatCurrency(customFormCharges));
-                setCellValue(row, ++columnCount, formatCurrency(other));
-                setCellValue(row, ++columnCount, formatCurrency(totalCharges));
-                setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationNumber());
-                setCellValue(row,++columnCount,invoiceDetails.getRef());
-                setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationDate());
+                setCellValue(row, columnCount, invoiceDetails.getInvoiceDetailsId().getMawb(),centeredStyle);
+                setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getManifestDate(),centeredStyle);
+                setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getAccountNumber(),centeredStyle);
+                setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getAwb(),centeredStyle);
+                setCellValue(row, ++columnCount, invoiceDetails.getOrderNumber(),centeredStyle);
+                setCellValue(row, ++columnCount, invoiceDetails.getOrigin(),centeredStyle);
+                setCellValue(row, ++columnCount, invoiceDetails.getDestination(),centeredStyle);
+                setCellValue(row, ++columnCount, invoiceDetails.getShippersName(),centeredStyle);
+                setCellValue(row, ++columnCount, invoiceDetails.getConsigneeName(),centeredStyle);
+                setCellValue(row, ++columnCount, invoiceDetails.getWeight(),centeredStyle);
+                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getDeclaredValue()),rightAlignedStyle);
+                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getValueCustom()),rightAlignedStyle);
+                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getVatAmount()),rightAlignedStyle);
+                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getCustomFormCharges()),rightAlignedStyle);
+                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getOther()),rightAlignedStyle);
+                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getTotalCharges()),rightAlignedStyle);
+                setCellValue(row, ++columnCount,custom.getCurrency(),centeredStyle);
+                setCellValue(row, ++columnCount, formatCurrency(vatAmount),rightAlignedStyle);
+                setCellValue(row, ++columnCount, formatCurrency(customFormCharges),rightAlignedStyle);
+                setCellValue(row, ++columnCount, formatCurrency(other),rightAlignedStyle);
+                setCellValue(row, ++columnCount, formatCurrency(totalCharges),rightAlignedStyle);
+                setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationNumber(),centeredStyle);
+                setCellValue(row,++columnCount,invoiceDetails.getRef(),centeredStyle);
+                setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationDate(),centeredStyle);
 
                 rowCount++;
             }
@@ -537,6 +536,8 @@ public class ExcelService {
     }
     private void populateCalculatedValues(Sheet summarySheet, List<Map<String, Object>> calculatedValuesList, String sheetUniqueId) {
         try {
+
+
             int startingRow = 10;
             List<String> columnNames = getColumnNamesList();
             Map<String, String> columnMapping = getColumnMapping();
@@ -554,14 +555,17 @@ public class ExcelService {
 
                         if (value instanceof Double) {
                             setCellValue(cell, formatCurrency((Double) value));
+
+                            // Apply cell style for currency values
+                            CellStyle currencyStyle = summarySheet.getWorkbook().createCellStyle();
+                            currencyStyle.setAlignment(HorizontalAlignment.RIGHT);
+                            cell.setCellStyle(currencyStyle);
                         } else {
                             setCellValue(cell, value != null ? value.toString() : "");
+                            CellStyle centerStyle = summarySheet.getWorkbook().createCellStyle();
+                            centerStyle.setAlignment(HorizontalAlignment.CENTER);
+                            cell.setCellStyle(centerStyle);
                         }
-
-                        // Apply cell style here
-                        CellStyle style = summarySheet.getWorkbook().createCellStyle();
-                        style.setAlignment(HorizontalAlignment.RIGHT); // Example of setting alignment
-                        cell.setCellStyle(style);
                     }
                 }
 
@@ -585,10 +589,12 @@ public class ExcelService {
         }
     }
 
-    private void setCellValue(Row row, int columnCount, Object value) {
+    private void setCellValue(Row row, int columnCount, Object value, CellStyle cellStyle) {
         Cell cell = row.createCell(columnCount);
         cell.setCellValue(value != null ? value.toString() : "");
+        cell.setCellStyle(cellStyle);
     }
+
     private Map<String, String> getColumnMapping() {
         Map<String, String> columnMapping = new LinkedHashMap<>();
         // Column names list
