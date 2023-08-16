@@ -32,12 +32,14 @@
                         </span>
                     </div>
                     <div class="col-md-4 form-group" style="padding: 0 10px;">
-                        <label class="add-order-label">Currency Rate (from SAR)</label>
-                        <input type="text" placeholder="Enter currencyRate" formControlName="currencyRate"
-                            class="order-search form-control order-form-input">
+                        <label class="add-order-label">Region</label>   
+                            <select class="order-search form-control order-form-input" aria-label="Default select example" formControlName="region">
+                                <option value="" disabled selected>Select Region</option>
+                                <option *ngFor="let region of regions" [value]="region.customerRegion">{{ region.customerRegion }}</option>
+                              </select>
                         <span class="inputValidators" style="color: red; margin-left: 2%;"
                             *ngIf="customerForm.get('currencyRate')?.invalid && (customerForm.get('currencyRate')?.dirty || customerForm.get('currencyRate')?.touched)">
-                            Please provide currencyRate.
+                            Please select region.
                         </span>
                     </div>
                 </div>

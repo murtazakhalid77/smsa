@@ -1,1 +1,71 @@
-<p>region-list works!</p>
+<app-sidebar></app-sidebar>
+<div class="body-position">
+    <app-dashboard-head></app-dashboard-head>
+    <div class="main-container">
+        <div>
+            <h4>Regions</h4>
+            <p class="page-intro">Whole data about your business here</p>
+        </div>
+        <div class="order-body">
+            <div class="order-search-panel">
+                <input type="text" placeholder="Search Regions" class="order-search form-control"
+                (input)="searchRegion($event.target)">
+         
+                <div>
+                    <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg" type="submit"  (click)="addRegion()">
+                        <i class="fa-solid fa-pen"></i>&nbsp;Add Region
+                    </button>
+                </div>
+            </div>
+            <div class="order-table table-container">
+                <table class="table table-striped">
+                    <thead style="
+                    background: #ffffff;
+                    position: sticky;">
+                    <tr class="header-fixed">
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Id</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Region</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Header Name</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Vat</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Vat Number</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Description</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Status</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Actions</span>
+                        </th>
+                    </tr>
+                </thead>
+
+                    <tbody>
+                        <tr *ngFor="let region of regions" class="order-table-row-hover">
+                            <th scope="row" class="tracking-id text-center">{{region?.id}}</th>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{region?.customerRegion}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{region?.headerName}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{region?.vat}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{region?.vatNumber}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{region?.description}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{region?.status}}</td>
+                            <td class="order-table-btns-container text-center w-auto col-md-2 col-lg-1">
+                                <i [style.color]="region?.status ? 'black' : 'red'" style="cursor: pointer !important;" class="fa-solid fa-pen" (click)="updateRegion(region?.id)"></i>&nbsp;
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

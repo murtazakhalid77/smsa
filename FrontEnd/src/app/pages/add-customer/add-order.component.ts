@@ -10,6 +10,8 @@ import { ToastrService } from 'ngx-toastr';
 import { StmtModifier } from '@angular/compiler';
 import { Currency } from '../model/Currency.model';
 import { CurrencyService } from '../currency/service/currency.service';
+import { IRegion } from '../model/region.model';
+import { RegionService } from '../region/service/region.service';
 
 @Component({
   selector: 'app-add-order',
@@ -280,17 +282,20 @@ export class AddOrderComponent implements OnInit {
   {name: "Zimbabwe",code: "ZW"}
 ];
 
+ regions?: IRegion[];
+
   constructor(
       private formbuilder: FormBuilder, 
       private customerService: CustomerService, 
       private router: Router,
       private route: ActivatedRoute,
       private toastr: ToastrService,
-      private currencyService: CurrencyService
+      private currencyService: CurrencyService,
+      private regionService: RegionService
       ) { }
 
   ngOnInit(): void {
-
+    this.getAllRegions();
     this.countryCodes = this.countries.map(country => country.code);
 
 
@@ -315,6 +320,14 @@ export class AddOrderComponent implements OnInit {
       poBox: ['', [Validators.required]],
       country: ['', [Validators.required]],
       email: ['', [Validators.required]]
+    })
+  }
+
+  getAllRegions(){
+    this.regionService.getRegions().subscribe(res =>{
+      if(res && res.body){
+        this.regions = res.body;
+      }
     })
   }
 

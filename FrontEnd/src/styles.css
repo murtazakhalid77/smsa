@@ -14665,3 +14665,12 @@ nav.main-menu li.active>a,
     background: #400099;
     color: white;
 }
+.custom-outline-primary {
+    border-color: #400099; /* Replace "your-custom-color" with the color of your choice */
+    color: #400099; /* Replace "your-custom-color" with the color of your choice */
+}
+
+.custom-outline-primary:hover {
+    background-color: #400099;
+    color: white; /* Replace "your-hover-color" with the background color of your choice on hover */
+}

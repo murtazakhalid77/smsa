@@ -43,4 +43,5 @@ public class RegionController {
     ResponseEntity<List<RegionDto>> getAllRegionsByStatus(@PathVariable boolean status){
         return ResponseEntity.ok(this.regionService.getAllRegionsByStatus(status));
     }
+
 }

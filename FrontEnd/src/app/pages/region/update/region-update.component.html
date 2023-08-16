@@ -1,1 +1,91 @@
-<p>region-update works!</p>
+<app-sidebar></app-sidebar>
+<div class="body-position">
+    <app-dashboard-head></app-dashboard-head>
+    <div class="main-container">
+        <div>
+            <h4>Add Region</h4>
+        </div>
+
+        <div class="order-body">
+            <form [formGroup]="regionForm" (ngSubmit)="submit(regionForm)">
+                <div class="order-form">
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Customer Region</label>
+                        <input type="text" formControlName="customerRegion" placeholder="Enter customer region"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="regionForm.get('customerRegion')?.invalid && (regionForm.get('customerRegion')?.dirty || regionForm.get('customerRegion')?.touched)">
+                            Please provide customer region.
+                        </span>
+                    </div>
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Header Name</label>
+                        <input type="text" formControlName="headerName" placeholder="Enter header name"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="regionForm.get('headerName')?.invalid && (regionForm.get('headerName')?.dirty || regionForm.get('headerName')?.touched)">
+                            Please provide header name.
+                        </span>
+                    </div>
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Vat</label>
+                        <input type="text" formControlName="vat" placeholder="Enter vat"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="regionForm.get('vat')?.invalid && (regionForm.get('vat')?.dirty || regionForm.get('vat')?.touched)">
+                            Please provide vat.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Vat Number</label>
+                        <input type="text" formControlName="vatNumber" placeholder="Enter vat"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="regionForm.get('vatNumber')?.invalid && (regionForm.get('vatNumber')?.dirty || regionForm.get('vatNumber')?.touched)">
+                            Please provide vat.
+                        </span>
+                    </div>
+
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Description</label>
+                        <input type="text" formControlName="description" placeholder="Enter description"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="regionForm.get('description')?.invalid && (regionForm.get('description')?.dirty || regionForm.get('description')?.touched)">
+                            Please provide description.
+                        </span>
+                    </div>
+
+                    <div class="col-md-4 form-group" style="padding: 0 10px;">
+                      <label class="add-order-label">Status</label>
+                      <select class="order-search form-control order-form-input" formControlName="status">
+                        <option value="true">True</option>
+                        <option value="false">False</option>
+                      </select>
+                      <span class="inputValidators" style="color: red; margin-left: 2%;"
+                        *ngIf="regionForm.get('status')?.invalid && (regionForm.get('status')?.dirty || regionForm.get('status')?.touched)">
+                        Please provide status.
+                      </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-12 form-group d-flex justify-content-end" style="padding: 0 10px;">
+                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" [disabled]="regionForm.invalid">
+                            <span>Submit</span>
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="order-form">
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
