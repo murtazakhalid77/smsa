@@ -23,7 +23,4 @@ public class Region {
     private String vatNumber;
     private String description;
     private boolean status;
-
-    @OneToOne(mappedBy = "region", cascade = CascadeType.ALL)
-    private Customer customer;
 }

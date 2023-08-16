@@ -38,7 +38,7 @@
                                 <option *ngFor="let region of regions" [value]="region.customerRegion">{{ region.customerRegion }}</option>
                               </select>
                         <span class="inputValidators" style="color: red; margin-left: 2%;"
-                            *ngIf="customerForm.get('currencyRate')?.invalid && (customerForm.get('currencyRate')?.dirty || customerForm.get('currencyRate')?.touched)">
+                            *ngIf="customerForm.get('region')?.invalid && (customerForm.get('region')?.dirty || customerForm.get('region')?.touched)">
                             Please select region.
                         </span>
                     </div>

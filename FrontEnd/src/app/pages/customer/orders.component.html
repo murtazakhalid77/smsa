@@ -42,7 +42,7 @@
                             <span class="font">Invoice Currency</span>
                         </th>
                         <th class="nowrap col-md-2 col-lg-1">
-                            <span class="font">Currency Rate (from SAR)</span>
+                            <span class="font">Region</span>
                         </th>
                         <th class="nowrap col-md-2 col-lg-1">
                             <span class="font">SMSA Service Fees (SAR)</span>
@@ -82,7 +82,7 @@
                         <tr *ngFor="let customer of customers" class="order-table-row-hover">
                             <th scope="row" class="tracking-id text-center">{{customer?.accountNumber}}</th>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.invoiceCurrency}}</td>
-                            <td class="text-center w-auto col-md-2 col-lg-1">${{customer?.currencyRateFromSAR}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.region?.customerRegion}}</td>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.smsaServiceFromSAR}}</td>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.status}}</td>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.nameArabic}}</td>

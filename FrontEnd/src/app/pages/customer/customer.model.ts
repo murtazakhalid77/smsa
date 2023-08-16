@@ -1,8 +1,10 @@
+import { Region } from "../model/region.model";
+
 export interface ICustomer {
     id?: number;
     accountNumber?: string;
     invoiceCurrency?: string;
-    currencyRateFromSAR?: string;
+    region?: Region;
     smsaServiceFromSAR?: string;
     email?: string;
     nameArabic?: string;
@@ -20,7 +22,7 @@ export interface ICustomer {
         public id?: number,
         public accountNumber?: string,
         public invoiceCurrency?: string,
-        public currencyRateFromSAR?: string,
+        public region?: Region,
         public smsaServiceFromSAR?: string,
         public email?: string,
         public customerNameArabic?: string,
