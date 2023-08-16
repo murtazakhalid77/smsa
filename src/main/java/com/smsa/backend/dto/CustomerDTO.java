@@ -1,6 +1,7 @@
 package com.smsa.backend.dto;
 
 
+import com.smsa.backend.model.Region;
 import lombok.*;
 
 import javax.validation.constraints.Email;
@@ -26,9 +27,8 @@ public class CustomerDTO {
     @NotBlank(message = "Invoice currency is required")
     private String invoiceCurrency;
 
-    @NotNull(message = "Currency rate from SAR is required")
-    @Min(value = 0, message = "Currency rate from SAR must be greater than or equal to 0")
-    private Double currencyRateFromSAR;
+
+    private Region region;
 
     @NotNull(message = "SMSA service from SAR is required")
     @Min(value = 0, message = "SMSA service from SAR must be greater than or equal to 0")

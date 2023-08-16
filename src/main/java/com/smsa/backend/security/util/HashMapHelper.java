@@ -116,7 +116,14 @@ public class HashMapHelper {
                     calculatedValuesMap.get("CustomFormCharges").toString(),
                     calculatedValuesMap.get("Others").toString(),
                     calculatedValuesMap.get("SMSAFeeCharges").toString(),
-                    custom.getSmsaFeeVat())); //for pdf
+                    custom.getSmsaFeeVat()));
+
+            calculatedValuesMap.put("TotalAmountCustomerCurrency", calculateTotalAmountForExcel(calculatedValuesMap
+                            .get("VatAmountCustomerCurrency").toString(),
+                    calculatedValuesMap.get("CustomFormChargesCustomerCurrency").toString(),
+                    calculatedValuesMap.get("OtherCustomerCurrency").toString(),
+                    calculatedValuesMap.get("TotalChargesCustomerCurrency").toString())); //for excel
+
 
             calculatedValuesMap.put("CustomPort",custom.getCustom());
             calculatedValuesMap.put("VatOnSmsaFees",
@@ -127,6 +134,16 @@ public class HashMapHelper {
         }
         return resultList;
     }
+
+    private Double calculateTotalAmountForExcel(String vatAmountCustomerCurrency, String customFormChargesCustomerCurrency, String otherCustomerCurrency, String totalChargesCustomerCurrency) {
+        Double vatCharges = Double.valueOf(vatAmountCustomerCurrency);
+        Double customFormChargesValue = Double.valueOf(customFormChargesCustomerCurrency);
+        Double otherChargesValue = Double.valueOf(otherCustomerCurrency);
+        Double totalCharges = Double.valueOf(totalChargesCustomerCurrency);
+
+        return  vatCharges+customFormChargesValue+otherChargesValue+totalCharges;
+    }
+
 
     public Map<String, Double> sumNumericColumns(List<Map<String, Object>> resultList) {
         Map<String, Double> sumMap = new HashMap<>();
@@ -142,6 +159,7 @@ public class HashMapHelper {
         Double customFormChargesCustomerCurrencySum=0.0;
         Double otherCustomerCurrencySum=0.0;
         Double totalChargesCustomerCurrencySum=0.0;
+        Double totalAmountCustomerCurrency=0.0;
 
         for (Map<String, Object> calculatedValuesMap : resultList) {
             customerShipmentValueSum += (Double) calculatedValuesMap.get("CustomerShipmentValue");
@@ -150,10 +168,12 @@ public class HashMapHelper {
             othersSum += (Double) calculatedValuesMap.get("Others");
             totalChargesSum += (Double) calculatedValuesMap.get("TotalCharges");
 
+
             vatAmountCustomerCurrencySum+=(Double) calculatedValuesMap.get("VatAmountCustomerCurrency");
              customFormChargesCustomerCurrencySum+=(Double) calculatedValuesMap.get("CustomFormChargesCustomerCurrency");
              otherCustomerCurrencySum+=(Double) calculatedValuesMap.get("OtherCustomerCurrency");
              totalChargesCustomerCurrencySum+=(Double)calculatedValuesMap.get("TotalChargesCustomerCurrency");
+            totalAmountCustomerCurrency+=(Double)calculatedValuesMap.get("TotalAmountCustomerCurrency");
         }
 
         sumMap.put("CustomerShipmentValueSum", customerShipmentValueSum);
@@ -166,6 +186,7 @@ public class HashMapHelper {
         sumMap.put("CustomFormChargesCustomerCurrencySum",customFormChargesCustomerCurrencySum);
         sumMap.put("OtherCustomerCurrencySum",otherCustomerCurrencySum);
         sumMap.put("TotalChargesCustomerCurrencySum",totalChargesCustomerCurrencySum);
+        sumMap.put("TotalAmountCustomerCurrency",totalAmountCustomerCurrency);
         return sumMap;
     }
 
