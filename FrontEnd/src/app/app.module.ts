@@ -25,6 +25,8 @@ import { UserComponent } from './pages/user/list/user.component';
 import { UserUpdateComponent } from './pages/user/update/user-update.component';
 import { CurrencyListComponent } from './pages/currency/list/currency-list.component';
 import { CurrencyUpdateComponent } from './pages/currency/update/currency-update.component';
+import { RegionListComponent } from './pages/region/list/region-list.component';
+import { RegionUpdateComponent } from './pages/region/update/region-update.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -42,7 +44,9 @@ import { CurrencyUpdateComponent } from './pages/currency/update/currency-update
     UserUpdateComponent,
     UserComponent,
     CurrencyListComponent,
-    CurrencyUpdateComponent
+    CurrencyUpdateComponent,
+    RegionListComponent,
+    RegionUpdateComponent
   ],
   imports: [
     BrowserModule,

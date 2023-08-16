@@ -13,6 +13,8 @@ import { UserComponent } from './pages/user/list/user.component';
 import { UserUpdateComponent } from './pages/user/update/user-update.component';
 import { CurrencyUpdateComponent } from './pages/currency/update/currency-update.component';
 import { CurrencyListComponent } from './pages/currency/list/currency-list.component';
+import { RegionUpdateComponent } from './pages/region/update/region-update.component';
+import { RegionListComponent } from './pages/region/list/region-list.component';
 
 const routes: Routes = [
   {
@@ -77,6 +79,16 @@ const routes: Routes = [
   {
     path: 'currency/view',
     component: CurrencyListComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'region',
+    component: RegionUpdateComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'region/view',
+    component: RegionListComponent,
     canActivate: [AuthGuard],
   }
 ];

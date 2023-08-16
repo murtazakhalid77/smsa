@@ -31,4 +31,7 @@ export class SidebarComponent {
   currency(){
     this.router.navigateByUrl('/currency/view');
   }
+  region(){
+    this.router.navigateByUrl('region/view')
+  }
 }

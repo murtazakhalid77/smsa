@@ -12,6 +12,8 @@ import { MdbModalRef } from 'mdb-angular-ui-kit/modal';
 import { NavigationExtras, Router } from '@angular/router';
 import { IExcelImportDto } from '../model/excel-import.model';
 import { DatePipe } from '@angular/common';
+import { FileService } from 'src/app/services/file-service.service';
+import { saveAs } from 'file-saver';
 
 
 @Component({
@@ -39,7 +41,7 @@ export class ImportComponent {
 
   headers: any = ['mawb', 'manifest date', 'account number', 'awb', 'ordernumber', 'origin', 'destination', 'shipper name', 'consignee name', 'weight', 'declared value', 'value (custom)', 'vat amount', 'custom form', 'other', 'total charges', 'custom declaration', 'ref#', 'custom declaration date'];
 
-  constructor(private service: UploadExcelService, private toastr: ToastrService, private customService: CustomService,     private router:Router, private datePipe: DatePipe) { }
+  constructor(private service: UploadExcelService, private toastr: ToastrService, private customService: CustomService,     private router:Router, private datePipe: DatePipe, private fileService: FileService) { }
 
   reloadPage() {
     window.location.reload()
@@ -142,6 +144,12 @@ export class ImportComponent {
       this.toastr.error('Please select custom port')
     }
 
+  }
+
+  downloadFile(filename: string): void {
+    this.fileService
+      .download()
+      .subscribe(blob => saveAs(blob, filename));
   }
 
   closeModal() {
