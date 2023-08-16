@@ -76,7 +76,7 @@ public class CurrencyService {
         if (currency.isPresent()){
             return currency.get();
         }
-        return null;
+        throw new RecordNotFoundException("Conversion Rate not Found");
     }
 
     public List<String> getDistinctCurrencies() {

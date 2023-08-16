@@ -48,7 +48,7 @@ public class CustomerService {
                     .country(customer.getCountry())
                     .poBox(customer.getPoBox())
                     .nameArabic(customer.getNameArabic())
-                    .currencyRateFromSAR(customer.getCurrencyRateFromSAR())
+                .region(customer.getRegion())
                     .invoiceCurrency(customer.getInvoiceCurrency())
                     .smsaServiceFromSAR(customer.getSmsaServiceFromSAR())
                     .isPresent(customer.isPresent())
@@ -67,7 +67,7 @@ public class CustomerService {
                 .country(customerDTO.getCountry())
                 .poBox(customerDTO.getPoBox())
                 .nameArabic(customerDTO.getNameArabic())
-                .currencyRateFromSAR(customerDTO.getCurrencyRateFromSAR())
+                .region(customerDTO.getRegion())
                 .invoiceCurrency(customerDTO.getInvoiceCurrency())
                 .smsaServiceFromSAR(customerDTO.getSmsaServiceFromSAR())
                 .isPresent(customerDTO.isPresent())
@@ -100,7 +100,7 @@ public class CustomerService {
             customer.get().setVatNumber(customerDTO.getVatNumber());
             customer.get().setSmsaServiceFromSAR(customerDTO.getSmsaServiceFromSAR());
             customer.get().setInvoiceCurrency(customerDTO.getInvoiceCurrency());
-            customer.get().setCurrencyRateFromSAR(customerDTO.getCurrencyRateFromSAR());
+            customer.get().setRegion(customerDTO.getRegion());
             customer.get().setPoBox(customerDTO.getPoBox());
             customer.get().setStatus(customerDTO.getStatus());
             customer.get().setCountry(customerDTO.getCountry());

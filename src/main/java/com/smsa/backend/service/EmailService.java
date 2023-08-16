@@ -24,7 +24,7 @@ import java.io.File;
 @Service
 public class EmailService {
     private static final Logger logger = LoggerFactory.getLogger(EmailSchedular.class);
-    @Autowired
+   @Autowired
     private JavaMailSender javaMailSender;
     @Autowired
     InvoiceDetailsRepository invoiceDetailsRepository;
@@ -60,7 +60,11 @@ public class EmailService {
                             + "<p>"
                             + "إذا كان لديك أي أسئلة بخصوص هذه الفاتورة ، يرجى الاتصال بنا عبر البريد الإلكتروني على <a href='mailto:cdvbill@smsaexpress.com'>cdvbill@smsaexpress.com</a>."
                             + "</p>"
-                            + "</body></html>", true);
+                            +"<p>Regards,</p>"
+                            +"<p>Finance Department</p>"
+                            +"<p>SMSA Express</p>"
+                            + "</body>" +
+                            "</html>", true);
             logger.info("Email Sent to: " + customer.getNameEnglish() + " " + customer.getAccountNumber());
             javaMailSender.send(message);
             invoiceDetailsRepository.updateIsSentInMailByAccountNumberAndSheetUniqueId(customer.getAccountNumber(), sheetUniqueId);

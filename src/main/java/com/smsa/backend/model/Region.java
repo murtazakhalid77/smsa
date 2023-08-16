@@ -18,9 +18,12 @@ public class Region {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String customerRegion;
-    private String vat;
+    private Double vat;
     private String headerName;
     private String vatNumber;
     private String description;
     private boolean status;
+
+    @OneToOne(mappedBy = "region", cascade = CascadeType.ALL)
+    private Customer customer;
 }

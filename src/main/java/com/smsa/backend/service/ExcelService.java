@@ -12,22 +12,18 @@ import com.smsa.backend.repository.*;
 import com.smsa.backend.security.util.ExcelImportHelper;
 import com.smsa.backend.security.util.HashMapHelper;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.xml.bind.Element;
 import java.io.*;
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 
 
@@ -349,7 +345,7 @@ public class ExcelService {
 
         populateCalculatedValues(summarySheet, calculatedValuesList, sheetUniqueId);
 
-        populateSumValues(summarySheet, sumMap);
+        populateSumValues(summarySheet, sumMap,customer);
 
         fileInputStream.close();
 
@@ -363,7 +359,15 @@ public class ExcelService {
 
 
     }
-    public void populateSumValues(Sheet summarySheet, Map<String, Double> sumMap) {
+    public void populateSumValues(Sheet summarySheet, Map<String, Double> sumMap, Customer customer) {
+        CellStyle boldStyle = summarySheet.getWorkbook().createCellStyle();
+        Font boldFont = summarySheet.getWorkbook().createFont();
+        boldFont.setBold(true);
+        boldStyle.setFont(boldFont);
+
+        CellStyle rightAlignedStyle = summarySheet.getWorkbook().createCellStyle();
+        rightAlignedStyle.setAlignment(HorizontalAlignment.RIGHT);
+
         try {
             int lastRowIndex = summarySheet.getLastRowNum();
             int startingRow = findStartingRow(summarySheet);
@@ -399,9 +403,40 @@ public class ExcelService {
                     columnIndex++; // Move to the next column
                 }
             }
+
+            Row SMSAFeeChargesRow = summarySheet.createRow(startingRow + 1);
+            Row vatOnSmsaFeeRow = summarySheet.createRow(startingRow + 2);
+            Row grandTotalRow = summarySheet.createRow(startingRow + 3);
+
+            Cell smsaFeeChargesLabelCell = SMSAFeeChargesRow.createCell(17);
+            smsaFeeChargesLabelCell.setCellValue("SMSA Fee Charges");
+            smsaFeeChargesLabelCell.setCellStyle(boldStyle);
+
+            Cell smsaFeeChargesCell = SMSAFeeChargesRow.createCell(18);
+            smsaFeeChargesCell.setCellValue(formatCurrency(customer.getSmsaServiceFromSAR())); // Empty cell for value
+            smsaFeeChargesCell.setCellStyle(rightAlignedStyle);
+
+            Cell vatOnSmsaFeeLabelCell = vatOnSmsaFeeRow.createCell(17);
+            vatOnSmsaFeeLabelCell.setCellValue("VAT on SMSA Fee");
+            vatOnSmsaFeeLabelCell.setCellStyle(boldStyle);
+
+            vatOnSmsaFeeRow.createCell(18).setCellValue(customer.getRegion().getDescription()); // Empty cell for value
+
+            Cell grandTotalLabelCell = grandTotalRow.createCell(17);
+            grandTotalLabelCell.setCellValue("Grand Total");
+            grandTotalLabelCell.setCellStyle(boldStyle);
+
+            Cell grandTotalValueCell = grandTotalRow.createCell(18);
+            grandTotalValueCell.setCellValue(formatCurrency(calculateGrandTotal(sumMap.get("TotalAmountCustomerCurrency"), customer.getSmsaServiceFromSAR(), customer.getRegion().getVat()))); // Empty cell for value
+            grandTotalValueCell.setCellStyle(rightAlignedStyle);
+
         } catch (ExcelMakingException e) {
             throw new RuntimeException("There was an issue in populating sum values in the summary file");
         }
+    }
+
+    private double calculateGrandTotal(Double totalAmountCustomerCurrency, Double smsaServiceFromSAR, Double vat) {
+    return totalAmountCustomerCurrency+smsaServiceFromSAR+vat;
     }
 
     private List<String> getSumColumnsList() {
@@ -473,7 +508,7 @@ public class ExcelService {
     }
 
     private void setInvoiceDetailsCellValues(Sheet invoiceDetailSheet, List<InvoiceDetails> invoiceDetailsList,Custom custom,Customer customer) {
-        int rowCount = 2;
+        int rowCount = 10;
         try {
             Currency currency = currencyService.findByCurrencyFromAndCurrencyTo(custom,customer);
             Double conversionRate = Double.parseDouble(currency.getConversionRate());
@@ -571,6 +606,7 @@ public class ExcelService {
 
                 startingRow++; // Move to the next row
             }
+
         } catch (ExcelMakingException e) {
             throw new RuntimeException("There was an issue in populating calculated values in the summary file");
         }
@@ -619,6 +655,7 @@ public class ExcelService {
         columnMapping.put("Custom Form Charges-","CustomFormChargesCustomerCurrency");
         columnMapping.put("Other-", "OtherCustomerCurrency");
         columnMapping.put("Total Charges-", "TotalChargesCustomerCurrency");
+        columnMapping.put("Total Amount", "TotalAmountCustomerCurrency");
         return columnMapping;
     }
     private List<String> getColumnNamesList() {
@@ -641,6 +678,7 @@ public class ExcelService {
         columnNames.add("Custom Form Charges-");
         columnNames.add("Other-");
         columnNames.add("Total Charges-");
+        columnNames.add("Total Amount");
         return columnNames;
     }
 

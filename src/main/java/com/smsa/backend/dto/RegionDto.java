@@ -12,7 +12,7 @@ import lombok.*;
 public class RegionDto {
     private Long id;
     private String customerRegion;
-    private String vat;
+    private Double vat;
     private String headerName;
     private String vatNumber;
     private String description;

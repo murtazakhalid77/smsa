@@ -187,8 +187,8 @@ public class PdfService {
 
         // Add the content paragraph
         Paragraph contentParagraph = new Paragraph(String.format("Dear Customer,\n\nThis is Duty & Taxes Invoice in connection with " +
-                "Inbound Shipments mentioned therein, The Charges as per %S Declaration " +
-                "form are paid to %S on behalf of Consignee and as requested by Shipper",custom.getCustom(),custom.getCustom()), englishFont);
+                "Inbound Shipments mentioned therein, The Charges mention below are as per %S Declaration" +
+                "form and paid to %S Custom's on behalf of Consignee and as requested by Shipper",custom.getCustom(),custom.getCustom()), englishFont);
         contentParagraph.setAlignment(Element.ALIGN_LEFT);
         contentParagraph.setSpacingBefore(5); // Add some space before the content paragraph
         document.add(contentParagraph);
@@ -223,7 +223,7 @@ public class PdfService {
 
                 // Align content in the middle
                 cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                cell.setVerticalAlignment(Element.ALIGN_CENTER);
+                cell.setVerticalAlignment(Element.ALIGN_JUSTIFIED);
 
                 columnFontBold.setColor(BaseColor.WHITE);
 
@@ -269,21 +269,20 @@ public class PdfService {
                 }
             }
             // Add grand total cell
-            PdfPCell grandTotalLabelCell = new PdfPCell(new Paragraph("Grand Total:", pdfFont));
-            grandTotalLabelCell.setColspan(columnNames.size() - 1);
-            grandTotalLabelCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            PdfPCell emptyCell = new PdfPCell(new Phrase("")); // Empty cell for the first 7 columns
+            emptyCell.setColspan(7);
+            emptyCell.setBorder(Rectangle.NO_BORDER); // Remove cell border
+            dataTable.addCell(emptyCell);
+
+            PdfPCell grandTotalLabelCell = new PdfPCell(new Paragraph("Grand Total:", englishBoldFont));
+            grandTotalLabelCell.setHorizontalAlignment(Element.ALIGN_CENTER);
             grandTotalLabelCell.setBackgroundColor(new BaseColor(192, 192, 192));
             dataTable.addCell(grandTotalLabelCell);
 
             PdfPCell grandTotalValueCell = new PdfPCell(new Paragraph(formatCurrency(grandTotal), pdfFont));
-            grandTotalValueCell.setColspan(1);
             grandTotalValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
             grandTotalValueCell.setBackgroundColor(new BaseColor(192, 192, 192));
-            dataTable.addCell(grandTotalValueCell);
-
-
-            // Add the table to the document
-        document.add(dataTable);
+            dataTable.addCell(grandTotalValueCell);        document.add(dataTable);
 
 
 
