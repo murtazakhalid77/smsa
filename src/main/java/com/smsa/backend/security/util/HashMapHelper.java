@@ -47,7 +47,7 @@ public class HashMapHelper {
 
             Map<String, Object> calculatedValuesMap = new HashMap<>(); // Create a new Map for each iteration
 
-            Set<Long> customDecarationNumberSet = new HashSet<>();
+            Set<String> customDecarationNumberSet = new HashSet<>();
             Set<String> customDecarationDateSet = new HashSet<>();
 
 
@@ -119,7 +119,7 @@ public class HashMapHelper {
                     custom.getSmsaFeeVat()));
 
 
-            calculatedValuesMap.put("CustomPort",custom.getCustom());
+            calculatedValuesMap.put("CustomPort",custom.getCustomPort());
             calculatedValuesMap.put("VatOnSmsaFees",
                     calculateVatOnSmsaFees(Double.valueOf(calculatedValuesMap.
                             get("SMSAFeeCharges").toString()),custom.getSmsaFeeVat())); //for pdf

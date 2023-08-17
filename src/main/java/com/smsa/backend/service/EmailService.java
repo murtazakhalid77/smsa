@@ -24,7 +24,7 @@ import java.io.File;
 @Service
 public class EmailService {
     private static final Logger logger = LoggerFactory.getLogger(EmailSchedular.class);
-   @Autowired
+    @Autowired
     private JavaMailSender javaMailSender;
     @Autowired
     InvoiceDetailsRepository invoiceDetailsRepository;
@@ -46,25 +46,26 @@ public class EmailService {
 
             // Attach the PDF file
             helper.addAttachment("invoice.pdf", new ByteArrayDataSource(pdfFileData, "application/pdf"));
-
             helper.setText("<html><body>"
-                            + "<p>Dear Customer,</p>"
-                            + "<p>"
-                            + "Please find attached the Invoice for Custom Duty & Taxes for Inbound Shipments, Details are available under the attached file."
-                            + "</p>"
-                            + "<p>If you have any questions regarding this invoice, please contact us by email at <a href='mailto:cdvbill@smsaexpress.com'>cdvbill@smsaexpress.com</a>.</p>"
-                            + "<p dir='rtl'>عزيزي العميل,</p>"
-                            + "<p>"
-                            + "يرجى الاطلاع على الفاتورة المرفقة للرسوم والضرائب المخصصة للشحنات الواردة ، التفاصيل متاحة تحت الملف المرفق."
-                            + "</p>"
-                            + "<p>"
-                            + "إذا كان لديك أي أسئلة بخصوص هذه الفاتورة ، يرجى الاتصال بنا عبر البريد الإلكتروني على <a href='mailto:cdvbill@smsaexpress.com'>cdvbill@smsaexpress.com</a>."
-                            + "</p>"
-                            + "<br>Regards,"
-                            + "<br>Finance Department"
-                            + "<br>SMSA Express"
-                            + "</body>" +
-                            "</html>", true);
+                    + "<p>Dear Customer,</p>"
+                    + "<p>"
+                    + "Please find attached the Invoice for Custom Duty & Taxes for Inbound Shipments, Details are available under the attached file."
+                    + "</p>"
+                    + "<p>If you have any questions regarding this invoice, please contact us by email at <a href='mailto:cdvbill@smsaexpress.com'>cdvbill@smsaexpress.com</a>.</p>"
+                    + "<p dir='rtl'>عزيزي العميل,</p>"
+                    + "<p dir='rtl'>"
+                    + "يرجى الاطلاع على الفاتورة المرفقة للرسوم والضرائب المخصصة للشحنات الواردة ، التفاصيل متاحة تحت الملف المرفق."
+                    + "</p>"
+                    + "<p dir='rtl'>"
+                    + "إذا كان لديك أي أسئلة بخصوص هذه الفاتورة ، يرجى الاتصال بنا عبر البريد الإلكتروني على <a href='mailto:cdvbill@smsaexpress.com'>cdvbill@smsaexpress.com</a>."
+                    + "</p>"
+                    + "<br>Regards,"
+                    + "<br>Finance Department"
+                    + "<br>SMSA Express"
+                    + "</body>" +
+                    "</html>", true);
+
+
             logger.info("Email Sent to: " + customer.getNameEnglish() + " " + customer.getAccountNumber());
             javaMailSender.send(message);
             invoiceDetailsRepository.updateIsSentInMailByAccountNumberAndSheetUniqueId(customer.getAccountNumber(), sheetUniqueId);

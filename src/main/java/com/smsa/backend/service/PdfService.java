@@ -187,8 +187,8 @@ public class PdfService {
 
         // Add the content paragraph
         Paragraph contentParagraph = new Paragraph(String.format("Dear Customer,\n\nThis is Duty & Taxes Invoice in connection with " +
-                "Inbound Shipments mentioned therein, The Charges mention below are as per %S Declaration " +
-                "form and paid to %S Custom's on behalf of Consignee and as requested by Shipper.",custom.getCustom(),custom.getCustom()), englishFont);
+                "Inbound Shipments mentioned therein, The Charges mention below are as per %s Declaration " +
+                "form and paid to %s on behalf of Consignee and as requested by Shipper.",custom.getCustom(),custom.getCustom()), englishFont);
         contentParagraph.setAlignment(Element.ALIGN_LEFT);
         contentParagraph.setSpacingBefore(5); // Add some space before the content paragraph
         document.add(contentParagraph);
@@ -230,7 +230,7 @@ public class PdfService {
                 dataTable.addCell(cell);
             }
 
-        Map<String, List<InvoiceDetails>> filteredRowsMap ;
+        Map<String, List<InvoiceDetails>> filteredRowsMap;
         filteredRowsMap = hashMapHelper.filterRowsByMawbNumber(invoiceDetailsList);
 
         List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap, customer,custom,invoiceNumber,sheetUniqueId);

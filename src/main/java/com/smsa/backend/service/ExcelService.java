@@ -257,7 +257,7 @@ public class ExcelService {
                 .customFormCharges(parseDoubleOrDefault(row.get(13), 0.0))
                 .other(parseDoubleOrDefault(row.get(14), 0.0))
                 .totalCharges(parseDoubleOrDefault(row.get(15), 0.0))
-                .customDeclarationNumber(parseLongOrDefault(row.get(16), 0L))
+                .customDeclarationNumber(row.get(16))
                 .ref(row.get(17))
                 .customDeclarationDate(row.get(18))
                 .build();
