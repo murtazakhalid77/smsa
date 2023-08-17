@@ -4,6 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smsa.backend.dto.ExcelImportDto;
 import com.smsa.backend.model.SheetHistory;
 import com.smsa.backend.repository.SheetHistoryRepository;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.AccessType;
 import org.springframework.stereotype.Service;
@@ -45,7 +49,7 @@ public class HelperService {
         return localDate.format(outputFormatter);
 
     }
-    public String generateInvoiceDate(String sheetUniqueId) {
+    public String generateInvoiceDatePeriod(String sheetUniqueId) {
         SheetHistory history = getSheetHistory(sheetUniqueId);
         String startDate = history.getStartDate() != null ? history.getStartDate().toString() : "";
         String endDate = history.getEndDate() != null ? history.getEndDate().toString() : "";
@@ -53,5 +57,33 @@ public class HelperService {
     }
     public SheetHistory getSheetHistory(String sheetUniqueUUid){
         return  sheetHistoryRepository.findByUniqueUUid(sheetUniqueUUid);
+    }
+    public String generateInvoiceDate(String sheetUniqueId){
+        return getSheetHistory(sheetUniqueId).getInvoiceDate();
+    }
+
+    public  int findStartingRow(Sheet sheet) {
+        DataFormatter dataFormatter = new DataFormatter();
+        int lastRowIndex = sheet.getLastRowNum();
+
+        for (int rowIndex = lastRowIndex; rowIndex >= 0; rowIndex--) {
+            Row row = sheet.getRow(rowIndex);
+            if (row != null) {
+                boolean isRowEmpty = true;
+                for (Cell cell : row) {
+                    String cellValue = dataFormatter.formatCellValue(cell);
+                    if (cellValue != null && !cellValue.trim().isEmpty()) {
+                        isRowEmpty = false;
+                        break;
+                    }
+                }
+
+                if (!isRowEmpty) {
+                    return rowIndex + 1;
+                }
+            }
+        }
+
+        return 0; // If no non-empty row is found, start from the first row
     }
 }

@@ -28,4 +28,5 @@ public class SheetHistory {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "custom_id")
     private Custom custom;
+    private String invoiceDate;
 }

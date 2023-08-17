@@ -21,4 +21,5 @@ public class ExcelImportDto {
     private String date2;
     private String formattedStartDate;
     private String formattedEndDate;
+    private String invoiceDate;
 }
