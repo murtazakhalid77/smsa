@@ -34,6 +34,7 @@ export class ImportComponent {
   selectedCustomPort?: string = '';
   startDate?: string; 
   endDate?: string; 
+  invoiceDate?: string;
   customVat?: any;
   isModalOpen = false;
   accountNumbers:any;
@@ -119,7 +120,8 @@ export class ImportComponent {
               smsaFeeVat: custom.smsaFeeVat,
               present: custom.present,
               date1: this.startDate != null ? new Date(this.startDate!) : undefined,
-              date2: this.endDate != null ? new Date(this.endDate!) : undefined
+              date2: this.endDate != null ? new Date(this.endDate!) : undefined,
+              date3: this.invoiceDate != null ? new Date(this.invoiceDate!) : undefined
             };
             this.service.uploadFile(this.fileToUpload, this.excelImportDto).subscribe(res => {
               this.toastr.success(res.message);

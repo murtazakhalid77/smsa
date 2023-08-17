@@ -5,7 +5,8 @@ export interface IExcelImportDto {
     smsaFeeVat?: number,
     present?: boolean,
     date1?: Date,
-    date2?: Date
+    date2?: Date,
+    date3?: Date
   }
 
   export class Custom implements IExcelImportDto {
@@ -16,6 +17,7 @@ export interface IExcelImportDto {
         public smsaFeeVat?: number,
         public present?: boolean,
         public date1?: Date | undefined,
-        public date2?: Date | undefined
+        public date2?: Date | undefined,
+        public date3?: Date | undefined
     ) {}
   }

@@ -19,6 +19,7 @@ public class ExcelImportDto {
     private boolean isPresent;
     private String date1;
     private String date2;
+    private String date3;
     private String formattedStartDate;
     private String formattedEndDate;
     private String invoiceDate;

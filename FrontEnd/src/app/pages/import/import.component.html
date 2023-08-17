@@ -53,21 +53,6 @@
                   Custom Vat: {{ customVat }}%
                 </span>                
               </div>
-              
-              
-              
-
-            <!-- <div class="col-lg-7 d-flex">
-                    <div class="d-inline-block">
-                        <label for="startDate">Start Date</label>
-                        <input type="date">
-                    </div>
-              
-                    <div class="d-inline-block">
-                        <label for="endDate" class="ml-2">End Date</label>
-                        <input type="date">
-                    </div>
-              </div> -->
 
 
               <div class="col-lg-7">
@@ -106,6 +91,41 @@
             </div> -->
 
         </div>
+
+
+        <div class="row mt-4">
+
+          <div class="col-lg-3">              
+            </div>
+
+
+            <div class="col-lg-7">
+              <div class="row">
+                <div class="col-md-2 mt-1">
+                  <label for="startDate">Invoice Date</label>
+                </div>
+                <div class="col-md-3">
+                  <input type="date" class="form-control" [(ngModel)]="invoiceDate" (input)="onDateChange()">
+                </div>
+              </div>
+            </div>
+            
+            
+            <div class="col-lg-2">
+            </div>
+            
+            
+            
+
+          <!-- <div class="col-lg-2">
+
+              <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg" (click)="reloadPage()">
+                  <i class="fa-solid fa-rotate-right"></i>&nbsp;Refresh
+              </button>
+          </div> -->
+
+      </div>
+
             <br>
             <div class="import-body" *ngIf="!flag">
                 <input type="file" placeholder="Enter your name" class="order-search form-control import-file"

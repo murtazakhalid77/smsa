@@ -34,6 +34,9 @@ public class HelperService {
             if (excelImportDto.getDate2() != null) {
                 excelImportDto.setFormattedEndDate(convertInToLocalDate(excelImportDto.getDate2()));
             }
+            if (excelImportDto.getDate3() != null) {
+                excelImportDto.setInvoiceDate(convertInToLocalDate(excelImportDto.getDate3()));
+            }
 
             return excelImportDto;
         } catch (Exception e) {
