@@ -338,7 +338,7 @@ public class ExcelService {
         setCellValue(accountNumberCell, customer.getAccountNumber());
 
         Cell invoicePeriodCell = sheet.getRow(6).getCell(1);
-        setCellValue(invoicePeriodCell, helperService.generateInvoiceDate(sheetUniqueId));
+        setCellValue(invoicePeriodCell, helperService.generateInvoiceDatePeriod(sheetUniqueId));
 
         Cell invoiceDateCell = sheet.getRow(7).getCell(1);
         setCellValue(invoiceDateCell, helperService.generateInvoiceDate(sheetUniqueId));
