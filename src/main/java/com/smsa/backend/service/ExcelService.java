@@ -6,6 +6,7 @@ import com.smsa.backend.Exception.ExcelMakingException;
 import com.smsa.backend.Exception.ParsingExcelException;
 import com.smsa.backend.Exception.SheetAlreadyExistException;
 import com.smsa.backend.dto.ExcelImportDto;
+import com.smsa.backend.dto.SalesReportHelperDto;
 import com.smsa.backend.model.*;
 import com.smsa.backend.model.Currency;
 import com.smsa.backend.repository.*;
@@ -285,7 +286,11 @@ public class ExcelService {
         return sheetHistoryRepository.findByUniqueUUid(sheetUniqueUUid);
     }
 
-    public byte[] updateExcelFile(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId, Long invoiceNumber) throws Exception {
+    public SalesReportHelperDto updateExcelFile(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId, Long invoiceNumber) throws Exception {
+        Double totalChargesAsPerCustomDeclarationForm=0.0;
+        Double smsaFeesCharges=0.0;
+        Double totalAmount=0.0;
+        Double vatOnsmsaFees=0.0;
         logger.info(String.format("Inside update excel method for account ", customer.getAccountNumber()));
 
         Map<String, List<InvoiceDetails>> filteredRowsMap;
@@ -311,9 +316,25 @@ public class ExcelService {
 
         fileInputStream.close();
 
+        for (Map<String,Object> singleRecord: calculatedValuesList) {
+            totalChargesAsPerCustomDeclarationForm+=Double.parseDouble(singleRecord.get("VatAmountCustomDeclarationForm").toString());
+            smsaFeesCharges+=Double.parseDouble(singleRecord.get("SMSAFeeCharges").toString());
+            totalAmount+=Double.parseDouble(singleRecord.get("TotalAmount").toString());
+            vatOnsmsaFees+=Double.parseDouble(singleRecord.get("VatOnSmsaFees").toString());
+
+
+        }
+
+        SalesReportHelperDto salesReportHelperDto = new SalesReportHelperDto();
+        salesReportHelperDto.setTotalChargesAsPerCustomDeclarationForm(totalChargesAsPerCustomDeclarationForm);
+        salesReportHelperDto.setSmsaFeesCharges(smsaFeesCharges);
+        salesReportHelperDto.setVatOnSmsaFees(vatOnsmsaFees);
+        salesReportHelperDto.setTotalAmount(totalAmount);
+
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             newWorkBook.write(outputStream);
-            return outputStream.toByteArray();
+            salesReportHelperDto.setExcelFile(outputStream.toByteArray());
+            return salesReportHelperDto;
         } catch (IOException e) {
             e.printStackTrace();
             throw new Exception("Failed to create Excel file.");
