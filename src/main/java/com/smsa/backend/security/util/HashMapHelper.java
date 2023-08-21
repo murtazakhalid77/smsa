@@ -122,7 +122,7 @@ public class HashMapHelper {
             calculatedValuesMap.put("CustomPort",custom.getCustomPort());
             calculatedValuesMap.put("VatOnSmsaFees",
                     calculateVatOnSmsaFees(Double.valueOf(calculatedValuesMap.
-                            get("SMSAFeeCharges").toString()),custom.getSmsaFeeVat())); //for pdf
+                            get("SMSAFeeCharges").toString()),customer.getRegion().getVat())); //for pdf
 
             resultList.add(calculatedValuesMap);
         }

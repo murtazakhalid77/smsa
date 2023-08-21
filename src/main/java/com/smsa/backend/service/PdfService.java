@@ -351,7 +351,7 @@ public class PdfService {
         columnMapping.put("Invoice No", "InvoiceNumber");
         columnMapping.put("MAWB No.", "MawbNumber");
         columnMapping.put("Custom Declaration No", "CustomDeclarationNumber");
-        columnMapping.put("Total Charges as per Custom Declaration Form", "VatAmountCustomDeclarationForm");
+        columnMapping.put("Total Charges as per Custom Declaration Form", "TotalChargesCustomerCurrency");
         columnMapping.put("SMSA Fee Charges", "SMSAFeeCharges");
         columnMapping.put("VAT on SMSA Fee", "VatOnSmsaFees");
         columnMapping.put("Total Amount", "TotalAmount");
