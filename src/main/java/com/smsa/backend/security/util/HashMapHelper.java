@@ -111,18 +111,16 @@ public class HashMapHelper {
             calculatedValuesMap.put("InvoiceType", "Bill-Shipper");
             calculatedValuesMap.put("CustomDeclarationDate",dateSetString.substring(1, dateSetString.length() - 1));
             calculatedValuesMap.put("SMSAFeeCharges", customer.getSmsaServiceFromSAR());
-            calculatedValuesMap.put("TotalAmount", calculateTotalAmount(calculatedValuesMap
-                    .get("VatAmountCustomDeclarationForm").toString(),
-                    calculatedValuesMap.get("CustomFormCharges").toString(),
-                    calculatedValuesMap.get("Others").toString(),
-                    calculatedValuesMap.get("SMSAFeeCharges").toString(),
-                    custom.getSmsaFeeVat()));
-
 
             calculatedValuesMap.put("CustomPort",custom.getCustomPort());
             calculatedValuesMap.put("VatOnSmsaFees",
                     calculateVatOnSmsaFees(Double.valueOf(calculatedValuesMap.
                             get("SMSAFeeCharges").toString()),customer.getRegion().getVat())); //for pdf
+
+            calculatedValuesMap.put("TotalAmount", calculateTotalAmount(calculatedValuesMap
+                            .get("TotalChargesCustomerCurrency").toString(),
+                    calculatedValuesMap.get("SMSAFeeCharges").toString(),
+                    calculatedValuesMap.get("VatOnSmsaFees").toString()));
 
             resultList.add(calculatedValuesMap);
         }
@@ -177,17 +175,14 @@ public class HashMapHelper {
         return (smsaFeesCharges * smsaFeeVat) / 100;
     }
 
-    private Double calculateTotalAmount(String vatChargesAsPerCustomDeclarationForm, String customFormCharges, String otherCharges, String smsaFeesCharges, Double vatOnSmsaFees) {
-        Double vatCharges = Double.valueOf(vatChargesAsPerCustomDeclarationForm);
-        Double customFormChargesValue = Double.valueOf(customFormCharges);
-        Double otherChargesValue = Double.valueOf(otherCharges);
+    private Double calculateTotalAmount(String totalChargesCustomerCurrency, String smsaFeesCharges, String vatOnSmsaFees) {
+        Double totalCharges = Double.valueOf(totalChargesCustomerCurrency);
+        Double vatPercentage = Double.valueOf(vatOnSmsaFees);
         Double smsaFeesChargesValue = Double.valueOf(smsaFeesCharges);
 
-        // Calculate the VAT amount on SMSA fees based on the percentage
-        Double vatAmountOnSmsaFees =  calculateVatOnSmsaFees(smsaFeesChargesValue ,vatOnSmsaFees);
 
         // Calculate the total amount by summing up all the charges
-        Double totalAmount = vatCharges + customFormChargesValue + otherChargesValue + smsaFeesChargesValue + vatAmountOnSmsaFees;
+        Double totalAmount = totalCharges + vatPercentage + smsaFeesChargesValue;
 
         return totalAmount;
     }
