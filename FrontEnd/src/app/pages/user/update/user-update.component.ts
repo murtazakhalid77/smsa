@@ -43,7 +43,6 @@ export class UserUpdateComponent {
 
     this.getUserById(id).subscribe(res =>{
       if(res){
-        debugger;
         this.user = res;
         this.userForm.patchValue(this.user);
         this.userForm.get('id')?.disable()
@@ -65,7 +64,6 @@ export class UserUpdateComponent {
   }
 
   submit(userForm: FormGroup){
-    debugger;
 
     let user = {
       id: this.id,

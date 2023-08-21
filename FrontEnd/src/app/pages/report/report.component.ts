@@ -37,7 +37,7 @@ export class ReportComponent {
   salesReportDownload(){}
 
   onSearchOptionChange(selectedOption: string) {
-    debugger;
+
     this.salesReport = [];
     if (selectedOption === 'invoice') {
       this.startDate = '';
@@ -53,7 +53,6 @@ export class ReportComponent {
   }
 
   disableDateInputs() {
-    debugger;
     if(this.invoiceTo!='' || this.invoiceFrom!=''){
       this.dateInputsDisabled = true;
     }else{
@@ -62,13 +61,12 @@ export class ReportComponent {
   }
 
       getSalesReport(){
-        debugger;
 
         this.salesReport = [];
 
         const searchSalesReport = {
-          saledIdStart: this.selectedSearchOption === 'invoice' ? this.invoiceTo : null,
-          saleIdEnd: this.selectedSearchOption === 'invoice' ? this.invoiceFrom : null,
+          invoiceTo: this.selectedSearchOption === 'invoice' ? this.invoiceTo : null,
+          invoiceFrom: this.selectedSearchOption === 'invoice' ? this.invoiceFrom : null,
           startDate: this.selectedSearchOption === 'date' ? this.startDate : null,
           endDate: this.selectedSearchOption === 'date' ? this.endDate : null
         };

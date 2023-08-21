@@ -66,8 +66,6 @@ export class CurrencyUpdateComponent {
   
     
   submit(currencyForm: FormGroup){
-    debugger;
-
     let currency = {
       id: this.id,
       currencyFrom: currencyForm.value.currencyFrom,

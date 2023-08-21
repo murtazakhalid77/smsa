@@ -34,7 +34,6 @@ export type EntityRegionResponseType = HttpResponse<IRegion>;
     }
 
     updateRegion(id:any, region: Region): Observable<EntityRegionResponseType> {
-        debugger;
         let url = `${this._url}/region/${id}`
         return this.http
           .put<IRegion>(url, region, { observe: 'response' })
