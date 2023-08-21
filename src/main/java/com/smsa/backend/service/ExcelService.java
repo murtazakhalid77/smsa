@@ -13,14 +13,19 @@ import com.smsa.backend.repository.*;
 import com.smsa.backend.security.util.ExcelImportHelper;
 import com.smsa.backend.security.util.HashMapHelper;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.hssf.usermodel.HSSFWorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.Element;
 import java.io.*;
 import java.text.NumberFormat;
@@ -46,6 +51,8 @@ public class ExcelService {
     HashMapHelper hashMapHelper;
     @Autowired
     CurrencyService currencyService;
+    @Autowired
+    SalesReportRepository salesReportRepository;
     @Value("${smsa.file.location}")
     String sampleFileLocalLocation;
     List<InvoiceDetails> invoicesWithAccount = new ArrayList<>();
@@ -310,7 +317,7 @@ public class ExcelService {
         Map<String, Double> sumMap = hashMapHelper.sumNumericColumns(calculatedValuesList);
 
 
-        Sheet summarySheet = newWorkBook.getSheetAt(0);
+        Sheet summarySheet = newWorkBook.getSheetAt(1);
         populateCalculatedValues(summarySheet, calculatedValuesList, sheetUniqueId);
         populateSumValues(summarySheet, sumMap, customer);
 
@@ -633,6 +640,72 @@ public class ExcelService {
         columnNames.add("Total Amount");
         return columnNames;
     }
+
+    Workbook newWorkBook;
+    Sheet summarySheet;
+    private List<SalesReport> salesReports;
+    public Resource excelData(List<Long> salesReportIds) throws IOException {
+
+        this.salesReports = this.salesReportRepository.findAllByIdIn(salesReportIds);
+        FileInputStream fileInputStream = new FileInputStream(sampleFileLocalLocation + "/excel.xlsx");
+        newWorkBook = WorkbookFactory.create(fileInputStream);
+        summarySheet = newWorkBook.getSheetAt(0);
+        int rowCount = 1;
+
+
+        CellStyle style = newWorkBook.createCellStyle();
+        for (SalesReport salesReport : salesReports) {
+            Row row = summarySheet.createRow(rowCount++);
+            int columnCount = 0;
+
+            createCell(row, columnCount++, salesReport.getId().toString(), style);
+            createCell(row, columnCount++, salesReport.getInvoiceNumber().toString(), style);
+            createCell(row, columnCount++, salesReport.getCustomerAccountNumber().toString(), style);
+            createCell(row, columnCount++, salesReport.getCustomerName().toString(), style);
+            createCell(row, columnCount++, salesReport.getCustomerRegion().toString(), style);
+            createCell(row, columnCount++, salesReport.getPeriod().toString(), style);
+            createCell(row, columnCount++, salesReport.getTotalChargesAsPerCustomerDeclarationForm().toString(), style);
+            createCell(row, columnCount++, salesReport.getSmsaFeeCharges().toString(), style);
+            createCell(row, columnCount++, salesReport.getVatOnSmsaFees().toString(), style);
+            createCell(row, columnCount++, salesReport.getTotalAmount().toString(), style);
+            createCell(row, columnCount++, salesReport.getInvoiceCurrency().toString(), style);
+            createCell(row, columnCount++, salesReport.getCreatedAt().toString(), style);
+        }
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        newWorkBook.write(byteArrayOutputStream);
+        byte[] workbookBytes = byteArrayOutputStream.toByteArray();
+
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(workbookBytes);
+
+        Resource resource = new InputStreamResource(byteArrayInputStream);
+        return resource;
+
+    }
+
+    private void createCell(Row row, int columnCount, Object value, CellStyle style) {
+        summarySheet.autoSizeColumn(columnCount);
+        Cell cell = row.createCell(columnCount);
+        if (value instanceof Integer) {
+            cell.setCellValue((Integer) value);
+        } else if (value instanceof Boolean) {
+            cell.setCellValue((Boolean) value);
+        }else {
+            cell.setCellValue((String) value);
+        }
+        cell.setCellStyle(style);
+    }
+
+//    public Resource export() throws IOException {
+//
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        newWorkBook.write(byteArrayOutputStream);
+//        byte[] workbookBytes = byteArrayOutputStream.toByteArray();
+//        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(workbookBytes);
+//        Resource resource = new InputStreamResource(byteArrayInputStream);
+//        return resource;
+//    }
+
 
 
 }

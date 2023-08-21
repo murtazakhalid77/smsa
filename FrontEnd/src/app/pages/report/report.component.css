@@ -1,0 +1,38 @@
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+.table td {
+    padding: 0.45rem !important;
+    font-weight: 400 !important;
+}
+
+.table th {
+    padding-left: 0.45rem !important;
+    padding-right: 0.45rem !important;
+    font-weight: 500 !important;
+    border-top: none !important;
+}
+
+.table-responsive {
+    margin: 0px 10px 10px 10px !important;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+.font{
+    font-size: 12px !important;
+    font-weight: 600 !important
+}
+
+.custom-outline-primary {
+    border-color: #400099; /* Replace "your-custom-color" with the color of your choice */
+    color: #400099; /* Replace "your-custom-color" with the color of your choice */
+}
+
+.custom-outline-primary:hover {
+    background-color: #400099;
+    color: white; /* Replace "your-hover-color" with the background color of your choice on hover */
+}

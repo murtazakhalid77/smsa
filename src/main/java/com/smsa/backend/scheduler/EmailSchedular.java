@@ -11,9 +11,7 @@ import org.slf4j.Logger;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -36,7 +34,7 @@ public class EmailSchedular {
     @Autowired
     InvoiceRepository invoiceRepository;
     @Autowired
-    SalesReportRespository salesReportRespository;
+    SalesReportRepository salesReportRepository;
     @Autowired
     HelperService helperService;
     private static final Logger logger = LoggerFactory.getLogger(EmailSchedular.class);
@@ -104,7 +102,7 @@ public class EmailSchedular {
                                     .invoiceCurrency(customer.get().getInvoiceCurrency())
                                     .createdAt(LocalDate.now())
                                     .build();
-                            salesReportRespository.save(salesReport);
+                            salesReportRepository.save(salesReport);
                         }
 
 

@@ -44,14 +44,20 @@ public class HelperService {
         }
     }
 
-    private String convertInToLocalDate(String date){
+    public String convertInToLocalDate(String date){
         DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         LocalDate localDate = LocalDate.parse(date, inputFormatter);
 
         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
         return localDate.format(outputFormatter);
-
     }
+
+    public LocalDate convertStringInToLocalDate(String date){
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(date, inputFormatter);
+        return localDate;
+    }
+
     public String generateInvoiceDatePeriod(String sheetUniqueId) {
         SheetHistory history = getSheetHistory(sheetUniqueId);
         String startDate = history.getStartDate() != null ? history.getStartDate().toString() : "";

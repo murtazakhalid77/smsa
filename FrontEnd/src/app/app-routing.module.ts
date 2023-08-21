@@ -15,6 +15,7 @@ import { CurrencyUpdateComponent } from './pages/currency/update/currency-update
 import { CurrencyListComponent } from './pages/currency/list/currency-list.component';
 import { RegionUpdateComponent } from './pages/region/update/region-update.component';
 import { RegionListComponent } from './pages/region/list/region-list.component';
+import { ReportComponent } from './pages/report/report.component';
 
 const routes: Routes = [
   {
@@ -89,6 +90,11 @@ const routes: Routes = [
   {
     path: 'region/view',
     component: RegionListComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'reports',
+    component: ReportComponent,
     canActivate: [AuthGuard],
   }
 ];

@@ -1,9 +1,10 @@
-package com.smsa.backend.model;
+package com.smsa.backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
-import javax.persistence.*;
 import java.time.LocalDate;
+
 
 @Data
 @AllArgsConstructor
@@ -12,16 +13,9 @@ import java.time.LocalDate;
 @Setter
 @ToString
 @Builder
-@Entity
-@Table(
-        name = "sales_report"
-)
-public class SalesReport {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@JsonFormat
+public class SalesReportDto {
     Long id;
-
     String invoiceNumber;
     String customerAccountNumber;
     String customerName;
@@ -33,4 +27,5 @@ public class SalesReport {
     Double totalAmount;
     String invoiceCurrency;
     LocalDate createdAt;
+
 }
