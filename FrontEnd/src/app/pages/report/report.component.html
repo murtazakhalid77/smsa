@@ -1,0 +1,129 @@
+<app-sidebar></app-sidebar>
+<div class="body-position">
+    <app-dashboard-head></app-dashboard-head>
+    <div class="main-container">
+        <div>
+            <h4>Sales Reports</h4>
+            <p class="page-intro">Whole data about your business here</p>
+        </div>
+        <div class="order-body">
+            <div class="container-fluid mt-2">
+                <div class="search-option">
+                    <input type="radio" name="searchOption" value="invoice" [(ngModel)]="selectedSearchOption" (change)="onSearchOptionChange('invoice')">
+                    <label for="invoice" class="font-size14px mr-2">Invoice</label>
+                
+                    <input type="radio" name="searchOption" value="date" [(ngModel)]="selectedSearchOption" (change)="onSearchOptionChange('date')" class="ml-2">
+                    <label for="date" class="font-size14px">Date</label>
+                </div>
+                
+                
+                <div class="row w-100" *ngIf="!invoiceInputsDisable">
+                    <div class="col-md-4 d-flex">
+                        <input type="text" id="accountTo" class="form-control report-order-search" placeholder="Invoice To" [(ngModel)]="invoiceTo" [disabled]="invoiceInputsDisable">
+                        <input type="text" id="accountFrom" class="form-control report-order-search" placeholder="Invoice From"[(ngModel)]="invoiceFrom" [disabled]="invoiceInputsDisable">
+                    </div>
+
+                    <div class="col-md-4">
+                    </div>
+                
+
+                    <div class="col-md-4 d-flex justify-content-end">
+                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" (click)="getSalesReport()">
+                            <span>Search</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row w-100 mt-2" *ngIf="invoiceInputsDisable">
+                    <div class="col-md-4 d-flex">
+                        <input type="date" class="form-control report-order-search" [(ngModel)]="startDate"
+                        [disabled]="dateInputsDisabled">
+                    <input type="date" class="form-control report-order-search" [(ngModel)]="endDate"
+                        [disabled]="dateInputsDisabled">
+                    </div>
+                    
+                    <div class="col-md-4">
+                    </div>
+                
+                    <div class="col-md-4 d-flex justify-content-end">
+                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" (click)="getSalesReport()">
+                            <span>Search</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            
+            
+            <div class="order-table table-container mt-5">
+                <table class="table table-striped" id="excel-table">
+                    <thead style="
+                    background: #ffffff;
+                    position: sticky;">
+                    <tr class="header-fixed">
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Sale Id</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Invoice Number</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Account Number</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Customer Name</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Customer Region</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Period</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Total Charges</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">SMSA Fee</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">VAT on Smsa</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Total Amount</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Invoice Currency</span>
+                        </th>
+
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Created At</span>
+                        </th>
+
+
+                    </tr>
+                </thead>
+
+                    <tbody>
+                        <tr *ngFor="let saleReport of salesReport" class="order-table-row-hover">
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.id}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.invoiceNumber}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.customerAccountNumber}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.customerName}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.customerRegion}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.period}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.totalChargesAsPerCustomerDeclarationForm}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.smsaFeeCharges}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.vatOnSmsaFees}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.totalAmount}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.invoiceCurrency}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.createdAt}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button *ngIf="salesReport!.length!=0 && salesReport!=null" class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" (click)="downloadFile()">
+                    <span>Download Excel</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

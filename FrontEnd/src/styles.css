@@ -14364,6 +14364,17 @@ nav.main-menu li.active>a,
     top: 6px;
     background: #e5e5e58c;
 }
+.report-order-search {
+    height: fit-content;
+    width: 35%;
+    padding: 11px 4%;
+    border: 0;
+    outline: 0;
+    position: relative;
+    top: 6px;
+    background: #e5e5e58c;
+    margin-left: 2%;
+}
 
 .order-search-container {
     display: flex;
@@ -14673,4 +14684,13 @@ nav.main-menu li.active>a,
 .custom-outline-primary:hover {
     background-color: #400099;
     color: white; /* Replace "your-hover-color" with the background color of your choice on hover */
+}
+.search-option {
+    display: flex;
+    align-items: center;
+    margin-left: 20px; /* Adjust this value as needed */
+}
+
+.search-option label {
+    margin-right: 8px; /* Adjust this value as needed */
 }

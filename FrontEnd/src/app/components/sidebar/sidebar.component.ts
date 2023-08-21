@@ -34,4 +34,7 @@ export class SidebarComponent {
   region(){
     this.router.navigateByUrl('region/view')
   }
+  salesReports(){
+    this.router.navigateByUrl('reports')
+  }
 }

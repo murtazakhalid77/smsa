@@ -1,25 +1,20 @@
 package com.smsa.backend.scheduler;
 
-import com.smsa.backend.model.Customer;
-import com.smsa.backend.model.Invoice;
-import com.smsa.backend.model.InvoiceDetails;
-import com.smsa.backend.model.SheetHistory;
-import com.smsa.backend.repository.CustomerRepository;
-import com.smsa.backend.repository.InvoiceDetailsRepository;
-import com.smsa.backend.repository.InvoiceRepository;
-import com.smsa.backend.repository.SheetHistoryRepository;
+import com.smsa.backend.dto.SalesReportHelperDto;
+import com.smsa.backend.model.*;
+import com.smsa.backend.repository.*;
 import com.smsa.backend.service.EmailService;
 import com.smsa.backend.service.ExcelService;
+import com.smsa.backend.service.HelperService;
 import com.smsa.backend.service.PdfService;
 import org.slf4j.Logger;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -38,6 +33,10 @@ public class EmailSchedular {
     EmailService emailService;
     @Autowired
     InvoiceRepository invoiceRepository;
+    @Autowired
+    SalesReportRepository salesReportRepository;
+    @Autowired
+    HelperService helperService;
     private static final Logger logger = LoggerFactory.getLogger(EmailSchedular.class);
 
     @Scheduled(initialDelay = 5000, fixedDelay = 120000)
@@ -84,11 +83,26 @@ public class EmailSchedular {
                     try {
                         Long invoiceNo = invoiceNumber; // Use the current invoiceNumber
                         invoiceNumber++; //
-                        byte[] excelFileData = excelService.updateExcelFile(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
+                        SalesReportHelperDto salesReportHelperDto = excelService.updateExcelFile(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
                         byte[] pdfFileData = pdfService.makePdf(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
 
-                        if (emailService.sendMailWithAttachments(customer.get(), excelFileData, pdfFileData,sheetUniqueId)){
+                        if (emailService.sendMailWithAttachments(customer.get(), salesReportHelperDto.getExcelFile(), pdfFileData,sheetUniqueId)){
                             logger.info(String.format("All the work done for account number %S with name %S",customer.get().getAccountNumber(),customer.get().getNameEnglish()));
+
+                            SalesReport salesReport =SalesReport.builder()
+                                    .invoiceNumber(String.valueOf(invoiceNumber))
+                                    .customerAccountNumber(customer.get().getAccountNumber())
+                                    .customerName(customer.get().getNameEnglish())
+                                    .customerRegion(customer.get().getRegion().getCustomerRegion())
+                                    .period(helperService.generateInvoiceDatePeriod(sheetUniqueId))
+                                    .totalChargesAsPerCustomerDeclarationForm(salesReportHelperDto.getTotalChargesAsPerCustomDeclarationForm())
+                                    .vatOnSmsaFees(salesReportHelperDto.getVatOnSmsaFees())
+                                    .totalAmount(salesReportHelperDto.getTotalAmount())
+                                    .smsaFeeCharges(salesReportHelperDto.getSmsaFeesCharges())
+                                    .invoiceCurrency(customer.get().getInvoiceCurrency())
+                                    .createdAt(LocalDate.now())
+                                    .build();
+                            salesReportRepository.save(salesReport);
                         }
 
 
