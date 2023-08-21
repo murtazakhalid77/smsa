@@ -1,5 +1,6 @@
 package com.smsa.backend.service;
 
+import com.smsa.backend.Exception.RecordNotFoundException;
 import com.smsa.backend.criteria.SearchCriteria;
 import com.smsa.backend.dto.RegionDto;
 import com.smsa.backend.dto.SalesReportDto;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 @Service
@@ -33,7 +35,14 @@ public class SalesReportService {
         List<SalesReportDto> salesReportDtos = new ArrayList<>();
 
         if(searchSalesReportDto.getInvoiceTo()!=null || searchSalesReportDto.getInvoiceFrom()!=null){
-            salesReports = this.salesReportRepository.findByInvoiceNumberBetween(searchSalesReportDto.getInvoiceTo().toString(), searchSalesReportDto.getInvoiceFrom().toString());
+            if(searchSalesReportDto.getInvoiceTo().length()<5 || searchSalesReportDto.getInvoiceFrom().length()<5){
+                throw new RecordNotFoundException(String.format("Invalid format"));
+            }
+        }
+
+        if(searchSalesReportDto.getInvoiceTo()!=null || searchSalesReportDto.getInvoiceFrom()!=null){
+            salesReports = this.salesReportRepository.findByInvoiceNumberBetween(searchSalesReportDto.getInvoiceTo().substring(5),
+                    searchSalesReportDto.getInvoiceFrom().substring(5));
         }
         else{
             salesReports = this.salesReportRepository.findAllByCreatedAtBetween(
@@ -41,6 +50,7 @@ public class SalesReportService {
                     this.helperService.convertStringInToLocalDate(searchSalesReportDto.getEndDate()));
         }
         for(SalesReport salesReport: salesReports){
+            salesReport.setTotalChargesAsPerCustomerDeclarationForm(Double.valueOf(formatCurrency(salesReport.getTotalChargesAsPerCustomerDeclarationForm())));
             salesReportDtos.add(this.toDTo(salesReport));
         }
         return salesReportDtos;
@@ -51,5 +61,12 @@ public class SalesReportService {
     }
     public SalesReportDto toDTo(SalesReport salesReport){
         return modelMapper.map(salesReport,SalesReportDto.class);
+    }
+
+    private String formatCurrency(Double value) {
+        NumberFormat formatter = NumberFormat.getNumberInstance();
+        formatter.setMinimumFractionDigits(2);
+        formatter.setMaximumFractionDigits(2);
+        return formatter.format(value);
     }
 }

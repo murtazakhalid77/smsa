@@ -11,8 +11,8 @@ import lombok.*;
 @Builder
 public class SearchSalesReportDto {
 
-    Long invoiceTo;
-    Long invoiceFrom;
+    String invoiceTo;
+    String invoiceFrom;
     String startDate;
     String endDate;
 
