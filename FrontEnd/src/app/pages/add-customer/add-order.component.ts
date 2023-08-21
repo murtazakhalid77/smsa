@@ -366,7 +366,6 @@ export class AddOrderComponent implements OnInit {
   }
 
   submit(customerForm: FormGroup) {
-    debugger;
     let customer = {
       email: customerForm.value.email,
       accountNumber: customerForm.value.account,

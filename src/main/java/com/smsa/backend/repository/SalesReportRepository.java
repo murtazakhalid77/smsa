@@ -13,6 +13,7 @@ import java.util.List;
 public interface SalesReportRepository extends JpaRepository<SalesReport,Long>, JpaSpecificationExecutor<SalesReport> {
 
     List<SalesReport> findByIdBetween(Long saleIdStart, Long saleIdEnd);
+    List<SalesReport> findByInvoiceNumberBetween(String invoiceTo, String invoiceFrom);
 
     List<SalesReport> findAllByCreatedAtBetween(LocalDate startDate, LocalDate endDate);
 

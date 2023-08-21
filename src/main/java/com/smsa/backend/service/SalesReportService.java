@@ -32,8 +32,8 @@ public class SalesReportService {
         List<SalesReport> salesReports = null;
         List<SalesReportDto> salesReportDtos = new ArrayList<>();
 
-        if(searchSalesReportDto.getSaledIdStart()!=null || searchSalesReportDto.getSaleIdEnd()!=null){
-            salesReports = this.salesReportRepository.findByIdBetween(searchSalesReportDto.getSaledIdStart(), searchSalesReportDto.getSaleIdEnd());
+        if(searchSalesReportDto.getInvoiceTo()!=null || searchSalesReportDto.getInvoiceFrom()!=null){
+            salesReports = this.salesReportRepository.findByInvoiceNumberBetween(searchSalesReportDto.getInvoiceTo().toString(), searchSalesReportDto.getInvoiceFrom().toString());
         }
         else{
             salesReports = this.salesReportRepository.findAllByCreatedAtBetween(
