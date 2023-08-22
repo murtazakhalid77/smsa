@@ -652,7 +652,8 @@ public class ExcelService {
         summarySheet = newWorkBook.getSheetAt(0);
         int rowCount = 1;
 
-
+        CellStyle rightAlignedStyle = newWorkBook.createCellStyle();
+        rightAlignedStyle.setAlignment(HorizontalAlignment.RIGHT);
         CellStyle style = newWorkBook.createCellStyle();
         for (SalesReport salesReport : salesReports) {
             Row row = summarySheet.createRow(rowCount++);
@@ -664,10 +665,10 @@ public class ExcelService {
             createCell(row, columnCount++, salesReport.getCustomerName().toString(), style);
             createCell(row, columnCount++, salesReport.getCustomerRegion().toString(), style);
             createCell(row, columnCount++, salesReport.getPeriod().toString(), style);
-            createCell(row, columnCount++, salesReport.getTotalChargesAsPerCustomerDeclarationForm().toString(), style);
-            createCell(row, columnCount++, salesReport.getSmsaFeeCharges().toString(), style);
-            createCell(row, columnCount++, salesReport.getVatOnSmsaFees().toString(), style);
-            createCell(row, columnCount++, salesReport.getTotalAmount().toString(), style);
+            createCell(row, columnCount++, formatCurrency(salesReport.getTotalChargesAsPerCustomerDeclarationForm()).toString(), rightAlignedStyle);
+            createCell(row, columnCount++, salesReport.getSmsaFeeCharges().toString(), rightAlignedStyle);
+            createCell(row, columnCount++, salesReport.getVatOnSmsaFees().toString(), rightAlignedStyle);
+            createCell(row, columnCount++, salesReport.getTotalAmount().toString(), rightAlignedStyle);
             createCell(row, columnCount++, salesReport.getInvoiceCurrency().toString(), style);
             createCell(row, columnCount++, salesReport.getCreatedAt().toString(), style);
         }
