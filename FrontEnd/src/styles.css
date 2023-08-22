@@ -14694,3 +14694,6 @@ nav.main-menu li.active>a,
 .search-option label {
     margin-right: 8px; /* Adjust this value as needed */
 }
+.custom-margin {
+    margin-right: 10px; /* Adjust this value to control the margin width */
+}

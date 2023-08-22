@@ -81,7 +81,12 @@ export class ReportComponent {
             } else {
               this.toastr.error("No Data Found");
             }
-          });
+          },
+          error =>{
+            debugger
+            this.toastr.error(error.error.body);
+          }
+          );
         } else {
           this.toastr.error("Please provide valid search criteria");
         }
