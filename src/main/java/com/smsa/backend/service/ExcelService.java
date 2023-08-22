@@ -317,7 +317,7 @@ public class ExcelService {
         Map<String, Double> sumMap = hashMapHelper.sumNumericColumns(calculatedValuesList);
 
 
-        Sheet summarySheet = newWorkBook.getSheetAt(1);
+        Sheet summarySheet = newWorkBook.getSheetAt(0);
         populateCalculatedValues(summarySheet, calculatedValuesList, sheetUniqueId);
         populateSumValues(summarySheet, sumMap, customer);
 
@@ -470,7 +470,7 @@ public class ExcelService {
         int rowCount = 11;
         try {
             Currency currency = currencyService.findByCurrencyFromAndCurrencyTo(custom,customer);
-            Double conversionRate = Double.parseDouble(currency.getConversionRate());
+            Double conversionRate = currency.getConversionRate();
 
             CellStyle rightAlignedStyle = invoiceDetailSheet.getWorkbook().createCellStyle();
             rightAlignedStyle.setAlignment(HorizontalAlignment.RIGHT);

@@ -20,6 +20,6 @@ public class Currency {
     Long id;
     String currencyFrom;
     String currencyTo;
-    String conversionRate;
+    Double conversionRate;
     Boolean isPresent;
 }
