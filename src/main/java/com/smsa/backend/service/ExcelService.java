@@ -55,26 +55,32 @@ public class ExcelService {
     SalesReportRepository salesReportRepository;
     @Value("${smsa.file.location}")
     String sampleFileLocalLocation;
-    List<InvoiceDetails> invoicesWithAccount = new ArrayList<>();
-    List<InvoiceDetails> invoicesWithoutAccount = new ArrayList<>();
+
     private static final Logger logger = LoggerFactory.getLogger(ExcelService.class);
 
-    public void saveInvoicesToDatabase(MultipartFile file, ExcelImportDto excelImportDto) throws Exception {
-        invoicesWithAccount.clear();
-        invoicesWithoutAccount.clear();
+    public HashMap<String,List<InvoiceDetails>> saveInvoicesToDatabase(MultipartFile file, ExcelImportDto excelImportDto) throws Exception {
+        HashMap<String,List<InvoiceDetails>> invoicesHashmap = new HashMap<>();
+
+        List<InvoiceDetails> invoicesWithAccount = new ArrayList<>();
+        List<InvoiceDetails> invoicesWithoutAccount = new ArrayList<>();
+
         Map<String, List<InvoiceDetails>> filterd;
         try {
-            filterd = filterRowsByAccountNumber(file, excelImportDto);
+            filterd = filterRowsByAccountNumber(file, excelImportDto,invoicesWithAccount,invoicesWithoutAccount);
         } catch (Exception e) {
+
             throw new Exception(e.getMessage());
         }
 
         for (List<InvoiceDetails> invoiceDetailsList : filterd.values()) {
             invoiceDetailsRepository.saveAll(invoiceDetailsList);
         }
+        invoicesHashmap.put("invoicesWithAccount",invoicesWithAccount);
+        invoicesHashmap.put("invoicesWithoutAccount",invoicesWithoutAccount);
+        return invoicesHashmap;
     }
 
-    public Map<String, List<InvoiceDetails>> filterRowsByAccountNumber(MultipartFile multipartFile, ExcelImportDto excelImportDto) {
+    public Map<String, List<InvoiceDetails>> filterRowsByAccountNumber(MultipartFile multipartFile, ExcelImportDto excelImportDto,List<InvoiceDetails> invoiceWithAccount,List<InvoiceDetails> invoicesWithoutAccount) {
 
         LocalDate currentDate = LocalDate.now();
         String sheetId = UUID.randomUUID().toString();
@@ -132,7 +138,7 @@ public class ExcelService {
                         // Add the InvoiceDetails object to the list associated with the common key in the map
                         mappedRowsMap.get(commonKey).add(invoiceDetails);
 
-                        filterAccountAndNonAccountInvoice(invoiceDetails, accountNumber);
+                        filterAccountAndNonAccountInvoice(invoiceDetails, accountNumber,invoiceWithAccount,invoicesWithoutAccount);
 
                     } catch (Exception e) {
                         logger.error("Error mapping row to InvoiceDetails: " + e.getMessage());
@@ -174,7 +180,7 @@ public class ExcelService {
         }
     }
 
-    private void filterAccountAndNonAccountInvoice(InvoiceDetails invoiceDetails, String accountNumber) {
+    private void filterAccountAndNonAccountInvoice(InvoiceDetails invoiceDetails, String accountNumber,List<InvoiceDetails> invoicesWithAccount,List<InvoiceDetails> invoicesWithoutAccount) {
         if (checkAccountNumberInCustomerTable(accountNumber)) {
             invoicesWithAccount.add(invoiceDetails);
         } else {
@@ -184,9 +190,6 @@ public class ExcelService {
         }
     }
 
-    public List<InvoiceDetails> getInvoicesWithoutAccount() {
-        return invoicesWithoutAccount;
-    }
 
     private String generateCustomerUniqueId(String accountNumber) {
         Map<String, String> accountNumberUuidMap = new HashMap<>();
