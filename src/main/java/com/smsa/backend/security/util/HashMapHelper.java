@@ -24,7 +24,7 @@ public class HashMapHelper {
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         Currency currency = currencyService.findByCurrencyFromAndCurrencyTo(custom,customer);
-        Double conversionRate = Double.parseDouble(currency.getConversionRate());
+        Double conversionRate = currency.getConversionRate();
 
 
         Long totalAwbCount = 0L;
