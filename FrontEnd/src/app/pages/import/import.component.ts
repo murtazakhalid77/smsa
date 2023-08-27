@@ -131,7 +131,8 @@ export class ImportComponent {
               }
             },
             error =>{
-              this.toastr.error(error.error.message)
+              console.error('Error response:', error);
+              this.toastr.error(error.error.body);
             });
           }else{
             this.toastr.error('The format of the file is Incorrect')

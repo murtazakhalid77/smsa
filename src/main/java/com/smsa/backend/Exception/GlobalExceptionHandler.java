@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity(errorMessage, HttpStatus.NOT_FOUND);
     }
     @ExceptionHandler(value = SheetAlreadyExistException.class)
-    public ResponseEntity<ErrorMessage> sheetAlreadyExistException(RecordAlreadyExistException ex){
+    public ResponseEntity<ErrorMessage> sheetAlreadyExistException(SheetAlreadyExistException ex){
         ErrorMessage errorMessage = ErrorMessage.builder()
                 .body(ex.getMessage()).build();
         return new ResponseEntity(errorMessage, HttpStatus.NOT_FOUND);
@@ -41,12 +41,19 @@ public class GlobalExceptionHandler {
                 .body(ex.getMessage()).build();
         return new ResponseEntity(errorMessage, HttpStatus.NOT_FOUND);
     }
+
     @ExceptionHandler(value = AwbDublicateException.class)
-    public ResponseEntity<ErrorMessage> awbDublicateException(AwbDublicateException ex){
+    public ResponseEntity<?> awbDublicateException(AwbDublicateException ex){
         ErrorMessage errorMessage = ErrorMessage.builder()
                 .body(ex.getMessage()).build();
-        return new ResponseEntity(errorMessage, HttpStatus.NOT_FOUND);
+        return new ResponseEntity(errorMessage,HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(value = SalesReportException.class)
+    public ResponseEntity<ErrorMessage> salesReportException(SalesReportException ex){
+        ErrorMessage errorMessage = ErrorMessage.builder()
+                .body(ex.getMessage()).build();
+        return new ResponseEntity(errorMessage, HttpStatus.REQUEST_TIMEOUT);
     }
 
-
 }
+

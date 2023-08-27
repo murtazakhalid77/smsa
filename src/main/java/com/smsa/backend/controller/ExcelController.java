@@ -48,7 +48,7 @@ public class ExcelController {
 
     //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/upload")
-    public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("excelImport") String excelImport) {
+    public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("excelImport") String excelImport) throws Exception {
         Map<String, Object> response = new HashMap<>();
         Set<String> accountNumbers = new HashSet<>();
         String message = "";
@@ -57,7 +57,6 @@ public class ExcelController {
 
 
         if (excelImportHelper.hasExcelFormat(file)) {
-            try {
               HashMap<String,List<InvoiceDetails>> invoices= excelService.saveInvoicesToDatabase(file,excelImportDto1);
 
                 for (InvoiceDetails invoiceDetails : invoices.get("invoicesWithoutAccount")) {
@@ -69,11 +68,6 @@ public class ExcelController {
                 response.put("accountNumbers", accountNumbers);
 
                 return ResponseEntity.ok(response);
-            } catch (Exception e) {
-                message = e.getMessage();
-                response.put("message", message);
-                return ResponseEntity.ok(response);
-            }
 
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);

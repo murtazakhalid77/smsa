@@ -6,8 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+
 import javax.transaction.Transactional;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface InvoiceDetailsRepository extends JpaRepository<InvoiceDetails, InvoiceDetailsId> {
     List<InvoiceDetails> findBySheetUniqueId(String sheetUniqueId);
@@ -22,4 +25,9 @@ public interface InvoiceDetailsRepository extends JpaRepository<InvoiceDetails, 
     void revertIsSentInMailByAccountNumberAndSheetUniqueId(String accountNumber, String sheetUniqueId);
 
     List<InvoiceDetails> findAllBySheetUniqueId(String sheetUniqueId);
+
+    @Query("SELECT details.invoiceDetailsId.awb FROM InvoiceDetails details WHERE details.invoiceDetailsId.awb IN :awbList")
+    List<String> findDuplicateAwbs(Set<String> awbList);;
+
+
 }

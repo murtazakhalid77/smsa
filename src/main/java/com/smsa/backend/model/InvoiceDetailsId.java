@@ -16,7 +16,7 @@ public class InvoiceDetailsId implements Serializable {
             name = "account_number_id"
     )
     private String accountNumber;
-    private Long awb;
+    private String awb;
 
     public static InvoiceDetailsIdBuilder builder() {
         return new InvoiceDetailsIdBuilder();
@@ -99,7 +99,7 @@ public class InvoiceDetailsId implements Serializable {
         return result;
     }
 
-    public InvoiceDetailsId(final String mawb, final String manifestDate, final String accountNumber, final Long awb) {
+    public InvoiceDetailsId(final String mawb, final String manifestDate, final String accountNumber, final String awb) {
         this.mawb = mawb;
         this.manifestDate = manifestDate;
         this.accountNumber = accountNumber;
@@ -121,7 +121,7 @@ public class InvoiceDetailsId implements Serializable {
         return this.accountNumber;
     }
 
-    public Long getAwb() {
+    public String getAwb() {
         return this.awb;
     }
 
@@ -137,7 +137,7 @@ public class InvoiceDetailsId implements Serializable {
         this.accountNumber = accountNumber;
     }
 
-    public void setAwb(final Long awb) {
+    public void setAwb(final String awb) {
         this.awb = awb;
     }
 
@@ -145,7 +145,7 @@ public class InvoiceDetailsId implements Serializable {
         private String mawb;
         private String manifestDate;
         private String accountNumber;
-        private Long awb;
+        private String awb;
 
         InvoiceDetailsIdBuilder() {
         }
@@ -165,7 +165,7 @@ public class InvoiceDetailsId implements Serializable {
             return this;
         }
 
-        public InvoiceDetailsIdBuilder awb(final Long awb) {
+        public InvoiceDetailsIdBuilder awb(final String awb) {
             this.awb = awb;
             return this;
         }
