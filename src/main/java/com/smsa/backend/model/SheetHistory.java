@@ -1,5 +1,7 @@
 package com.smsa.backend.model;
 
+
+
 import lombok.*;
 
 import javax.persistence.*;

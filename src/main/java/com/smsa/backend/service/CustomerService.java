@@ -15,8 +15,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class CustomerService {
-
-//    ModelMapper modelMapper;
     @Autowired
     CustomerRepository customerRepository;
 
@@ -41,8 +39,9 @@ public class CustomerService {
     }
 
     CustomerDTO toDto(Customer customer){
-        return new CustomerDTO().builder()
+        return CustomerDTO.builder()
                     .email(customer.getEmail())
+                .Ccmail(customer.getCcMail())
                     .address(customer.getAddress())
                     .accountNumber(customer.getAccountNumber())
                     .country(customer.getCountry())
@@ -60,8 +59,9 @@ public class CustomerService {
     }
 
     Customer toDomain(CustomerDTO customerDTO){
-        return new Customer().builder()
+        return Customer.builder()
                 .email(customerDTO.getEmail())
+                .ccMail(customerDTO.getCcmail())
                 .address(customerDTO.getAddress())
                 .accountNumber(customerDTO.getAccountNumber())
                 .country(customerDTO.getCountry())
@@ -92,6 +92,7 @@ public class CustomerService {
         Optional<Customer> customer = customerRepository.findByAccountNumber(accountNumber);
         if(customer.isPresent()){
             customer.get().setAccountNumber(accountNumber);
+            customer.get().setCcMail(customerDTO.getCcmail());
             customer.get().setNameEnglish(customerDTO.getNameEnglish());
             customer.get().setNameArabic(customerDTO.getNameArabic());
             customer.get().setEmail(customerDTO.getEmail());

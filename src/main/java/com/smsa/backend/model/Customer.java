@@ -30,6 +30,7 @@ public class Customer {
     private Region region;
     private Double smsaServiceFromSAR;
     private String email;
+    private String ccMail;
     private String nameArabic;
     private String nameEnglish;
     private String VatNumber;
@@ -44,8 +45,8 @@ public class Customer {
     @JsonIgnore
     private Set<InvoiceDetails> invoiceDetailsSet = new HashSet();
 
-    public static Customer.CustomerBuilder builder() {
-        return new Customer.CustomerBuilder();
+    public static CustomerBuilder builder() {
+        return new CustomerBuilder();
     }
 
     public boolean equals(final Object o) {
@@ -60,17 +61,13 @@ public class Customer {
             } else if (this.isPresent() != other.isPresent()) {
                 return false;
             } else {
-                label169: {
-                    Object this$smsaServiceFromSAR = this.getSmsaServiceFromSAR();
-                    Object other$smsaServiceFromSAR = other.getSmsaServiceFromSAR();
-                    if (this$smsaServiceFromSAR == null) {
-                        if (other$smsaServiceFromSAR == null) {
-                            break label169;
-                        }
-                    } else if (this$smsaServiceFromSAR.equals(other$smsaServiceFromSAR)) {
-                        break label169;
+                Object this$smsaServiceFromSAR = this.getSmsaServiceFromSAR();
+                Object other$smsaServiceFromSAR = other.getSmsaServiceFromSAR();
+                if (this$smsaServiceFromSAR == null) {
+                    if (other$smsaServiceFromSAR != null) {
+                        return false;
                     }
-
+                } else if (!this$smsaServiceFromSAR.equals(other$smsaServiceFromSAR)) {
                     return false;
                 }
 
@@ -84,27 +81,31 @@ public class Customer {
                     return false;
                 }
 
-                label155: {
+                label167: {
                     Object this$accountNumber = this.getAccountNumber();
                     Object other$accountNumber = other.getAccountNumber();
                     if (this$accountNumber == null) {
                         if (other$accountNumber == null) {
-                            break label155;
+                            break label167;
                         }
                     } else if (this$accountNumber.equals(other$accountNumber)) {
-                        break label155;
+                        break label167;
                     }
 
                     return false;
                 }
 
-                Object this$invoiceCurrency = this.getInvoiceCurrency();
-                Object other$invoiceCurrency = other.getInvoiceCurrency();
-                if (this$invoiceCurrency == null) {
-                    if (other$invoiceCurrency != null) {
-                        return false;
+                label160: {
+                    Object this$invoiceCurrency = this.getInvoiceCurrency();
+                    Object other$invoiceCurrency = other.getInvoiceCurrency();
+                    if (this$invoiceCurrency == null) {
+                        if (other$invoiceCurrency == null) {
+                            break label160;
+                        }
+                    } else if (this$invoiceCurrency.equals(other$invoiceCurrency)) {
+                        break label160;
                     }
-                } else if (!this$invoiceCurrency.equals(other$invoiceCurrency)) {
+
                     return false;
                 }
 
@@ -118,31 +119,37 @@ public class Customer {
                     return false;
                 }
 
-                label134: {
-                    Object this$email = this.getEmail();
-                    Object other$email = other.getEmail();
-                    if (this$email == null) {
-                        if (other$email == null) {
-                            break label134;
+                Object this$email = this.getEmail();
+                Object other$email = other.getEmail();
+                if (this$email == null) {
+                    if (other$email != null) {
+                        return false;
+                    }
+                } else if (!this$email.equals(other$email)) {
+                    return false;
+                }
+
+                label139: {
+                    Object this$ccMail = this.getCcMail();
+                    Object other$ccMail = other.getCcMail();
+                    if (this$ccMail == null) {
+                        if (other$ccMail == null) {
+                            break label139;
                         }
-                    } else if (this$email.equals(other$email)) {
-                        break label134;
+                    } else if (this$ccMail.equals(other$ccMail)) {
+                        break label139;
                     }
 
                     return false;
                 }
 
-                label127: {
-                    Object this$nameArabic = this.getNameArabic();
-                    Object other$nameArabic = other.getNameArabic();
-                    if (this$nameArabic == null) {
-                        if (other$nameArabic == null) {
-                            break label127;
-                        }
-                    } else if (this$nameArabic.equals(other$nameArabic)) {
-                        break label127;
+                Object this$nameArabic = this.getNameArabic();
+                Object other$nameArabic = other.getNameArabic();
+                if (this$nameArabic == null) {
+                    if (other$nameArabic != null) {
+                        return false;
                     }
-
+                } else if (!this$nameArabic.equals(other$nameArabic)) {
                     return false;
                 }
 
@@ -156,39 +163,43 @@ public class Customer {
                     return false;
                 }
 
-                Object this$VatNumber = this.getVatNumber();
-                Object other$VatNumber = other.getVatNumber();
-                if (this$VatNumber == null) {
-                    if (other$VatNumber != null) {
-                        return false;
+                label118: {
+                    Object this$VatNumber = this.getVatNumber();
+                    Object other$VatNumber = other.getVatNumber();
+                    if (this$VatNumber == null) {
+                        if (other$VatNumber == null) {
+                            break label118;
+                        }
+                    } else if (this$VatNumber.equals(other$VatNumber)) {
+                        break label118;
                     }
-                } else if (!this$VatNumber.equals(other$VatNumber)) {
+
                     return false;
                 }
 
-                label106: {
+                label111: {
                     Object this$address = this.getAddress();
                     Object other$address = other.getAddress();
                     if (this$address == null) {
                         if (other$address == null) {
-                            break label106;
+                            break label111;
                         }
                     } else if (this$address.equals(other$address)) {
-                        break label106;
+                        break label111;
                     }
 
                     return false;
                 }
 
-                label99: {
+                label104: {
                     Object this$poBox = this.getPoBox();
                     Object other$poBox = other.getPoBox();
                     if (this$poBox == null) {
                         if (other$poBox == null) {
-                            break label99;
+                            break label104;
                         }
                     } else if (this$poBox.equals(other$poBox)) {
-                        break label99;
+                        break label104;
                     }
 
                     return false;
@@ -224,9 +235,9 @@ public class Customer {
     }
 
     public int hashCode() {
-        Boolean PRIME = true;
+        boolean PRIME = true;
         int result = 1;
-        int result1 = result * 59 + (this.isPresent() ? 79 : 97);
+        result = result * 59 + (this.isPresent() ? 79 : 97);
         Object $smsaServiceFromSAR = this.getSmsaServiceFromSAR();
         result = result * 59 + ($smsaServiceFromSAR == null ? 43 : $smsaServiceFromSAR.hashCode());
         Object $status = this.getStatus();
@@ -239,6 +250,8 @@ public class Customer {
         result = result * 59 + ($region == null ? 43 : $region.hashCode());
         Object $email = this.getEmail();
         result = result * 59 + ($email == null ? 43 : $email.hashCode());
+        Object $ccMail = this.getCcMail();
+        result = result * 59 + ($ccMail == null ? 43 : $ccMail.hashCode());
         Object $nameArabic = this.getNameArabic();
         result = result * 59 + ($nameArabic == null ? 43 : $nameArabic.hashCode());
         Object $nameEnglish = this.getNameEnglish();
@@ -256,12 +269,14 @@ public class Customer {
         return result;
     }
 
-    public Customer(final String accountNumber, final String invoiceCurrency, final Region region, final Double smsaServiceFromSAR, final String email, final String nameArabic, final String nameEnglish, final String VatNumber, final String address, final String poBox, final String country, final Boolean status, final boolean isPresent, final Set<InvoiceDetails> invoiceDetailsSet) {
+
+    public Customer(final String accountNumber, final String invoiceCurrency, final Region region, final Double smsaServiceFromSAR, final String email, final String ccMail, final String nameArabic, final String nameEnglish, final String VatNumber, final String address, final String poBox, final String country, final Boolean status, final boolean isPresent, final Set<InvoiceDetails> invoiceDetailsSet) {
         this.accountNumber = accountNumber;
         this.invoiceCurrency = invoiceCurrency;
         this.region = region;
         this.smsaServiceFromSAR = smsaServiceFromSAR;
         this.email = email;
+        this.ccMail = ccMail;
         this.nameArabic = nameArabic;
         this.nameEnglish = nameEnglish;
         this.VatNumber = VatNumber;
@@ -294,6 +309,10 @@ public class Customer {
 
     public String getEmail() {
         return this.email;
+    }
+
+    public String getCcMail() {
+        return this.ccMail;
     }
 
     public String getNameArabic() {
@@ -352,6 +371,10 @@ public class Customer {
         this.email = email;
     }
 
+    public void setCcMail(final String ccMail) {
+        this.ccMail = ccMail;
+    }
+
     public void setNameArabic(final String nameArabic) {
         this.nameArabic = nameArabic;
     }
@@ -389,14 +412,13 @@ public class Customer {
         this.invoiceDetailsSet = invoiceDetailsSet;
     }
 
-
-
     public static class CustomerBuilder {
         private String accountNumber;
         private String invoiceCurrency;
         private Region region;
         private Double smsaServiceFromSAR;
         private String email;
+        private String ccMail;
         private String nameArabic;
         private String nameEnglish;
         private String VatNumber;
@@ -410,79 +432,85 @@ public class Customer {
         CustomerBuilder() {
         }
 
-        public Customer.CustomerBuilder accountNumber(final String accountNumber) {
+        public CustomerBuilder accountNumber(final String accountNumber) {
             this.accountNumber = accountNumber;
             return this;
         }
 
-        public Customer.CustomerBuilder invoiceCurrency(final String invoiceCurrency) {
+        public CustomerBuilder invoiceCurrency(final String invoiceCurrency) {
             this.invoiceCurrency = invoiceCurrency;
             return this;
         }
 
-        public Customer.CustomerBuilder region(final Region region) {
+        public CustomerBuilder region(final Region region) {
             this.region = region;
             return this;
         }
 
-        public Customer.CustomerBuilder smsaServiceFromSAR(final Double smsaServiceFromSAR) {
+        public CustomerBuilder smsaServiceFromSAR(final Double smsaServiceFromSAR) {
             this.smsaServiceFromSAR = smsaServiceFromSAR;
             return this;
         }
 
-        public Customer.CustomerBuilder email(final String email) {
+        public CustomerBuilder email(final String email) {
             this.email = email;
             return this;
         }
 
-        public Customer.CustomerBuilder nameArabic(final String nameArabic) {
+        public CustomerBuilder ccMail(final String ccMail) {
+            this.ccMail = ccMail;
+            return this;
+        }
+
+        public CustomerBuilder nameArabic(final String nameArabic) {
             this.nameArabic = nameArabic;
             return this;
         }
 
-        public Customer.CustomerBuilder nameEnglish(final String nameEnglish) {
+        public CustomerBuilder nameEnglish(final String nameEnglish) {
             this.nameEnglish = nameEnglish;
             return this;
         }
 
-        public Customer.CustomerBuilder VatNumber(final String VatNumber) {
+        public CustomerBuilder VatNumber(final String VatNumber) {
             this.VatNumber = VatNumber;
             return this;
         }
 
-        public Customer.CustomerBuilder address(final String address) {
+        public CustomerBuilder address(final String address) {
             this.address = address;
             return this;
         }
 
-        public Customer.CustomerBuilder poBox(final String poBox) {
+        public CustomerBuilder poBox(final String poBox) {
             this.poBox = poBox;
             return this;
         }
 
-        public Customer.CustomerBuilder country(final String country) {
+        public CustomerBuilder country(final String country) {
             this.country = country;
             return this;
         }
 
-        public Customer.CustomerBuilder status(final Boolean status) {
+        public CustomerBuilder status(final Boolean status) {
             this.status = status;
             return this;
         }
 
-        public Customer.CustomerBuilder isPresent(final boolean isPresent) {
+        public CustomerBuilder isPresent(final boolean isPresent) {
             this.isPresent = isPresent;
             return this;
         }
 
         @JsonIgnore
-        public Customer.CustomerBuilder invoiceDetailsSet(final Set<InvoiceDetails> invoiceDetailsSet) {
+        public CustomerBuilder invoiceDetailsSet(final Set<InvoiceDetails> invoiceDetailsSet) {
             this.invoiceDetailsSet = invoiceDetailsSet;
             return this;
         }
 
         public Customer build() {
-            return new Customer(this.accountNumber, this.invoiceCurrency, this.region, this.smsaServiceFromSAR, this.email, this.nameArabic, this.nameEnglish, this.VatNumber, this.address, this.poBox, this.country, this.status, this.isPresent, this.invoiceDetailsSet);
+            return new Customer(this.accountNumber, this.invoiceCurrency, this.region, this.smsaServiceFromSAR, this.email, this.ccMail, this.nameArabic, this.nameEnglish, this.VatNumber, this.address, this.poBox, this.country, this.status, this.isPresent, this.invoiceDetailsSet);
         }
+
     }
 }

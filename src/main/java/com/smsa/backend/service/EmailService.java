@@ -38,7 +38,12 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
             helper.setFrom(sender);
-            helper.setTo(customer.getEmail());
+            String[] emailAddresses = customer.getEmail().split(",");
+            helper.setTo(emailAddresses);
+
+            String[] ccEmails = customer.getCcMail().split(",");
+            helper.setCc(ccEmails);
+
             helper.setSubject("SMSA Express Invoice for Custom Duty & Taxes for Inbound Shipments");
 
             // Attach the Excel file

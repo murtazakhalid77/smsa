@@ -49,6 +49,8 @@ public class ExcelService {
     @Value("${smsa.file.location}")
     String sampleFileLocalLocation;
 
+    private static final String DUPLICATE_AWB_STRING="There was a duplication of these AWBs ";
+
     private static final Logger logger = LoggerFactory.getLogger(ExcelService.class);
 
     public HashMap<String,List<InvoiceDetails>> saveInvoicesToDatabase(MultipartFile file, ExcelImportDto excelImportDto) throws Exception {
@@ -82,7 +84,7 @@ public class ExcelService {
 
         validateSheetName(originalFilename);
 
-        rowsToBeFiltered = excelImportHelper.parseExcelFile(multipartFile);
+        rowsToBeFiltered = ExcelImportHelper.parseExcelFile(multipartFile);
 
         findDuplicatesOfAwb(rowsToBeFiltered);
 
@@ -139,7 +141,7 @@ public class ExcelService {
         throw new RecordNotFoundException("Invoice detail is null");
     }
 
-    public  List<String> findDuplicatesOfAwb(List<List<String>> data) {
+    public void findDuplicatesOfAwb(List<List<String>> data) {
         Map<String, Integer> valueCountMap = new HashMap<>();
         List<String> duplicates = new ArrayList<>();
 
@@ -159,7 +161,9 @@ public class ExcelService {
         }
 
         if (!duplicates.isEmpty()) {
-            throw new AwbDublicateException("There was a duplication of AWB in the excel, couldn't upload the file");
+            String duplicateAwbList = String.join(", ", duplicates);
+            String errorMessage = DUPLICATE_AWB_STRING + " (" + duplicateAwbList + ") in the excel, couldn't upload the file";
+            throw new AwbDublicateException(errorMessage);
         }
 
         Set<String> keys = valueCountMap.keySet();
@@ -168,14 +172,10 @@ public class ExcelService {
         List<String> dbDuplicates = invoiceDetailsRepository.findDuplicateAwbs(keys);
 
         if (!dbDuplicates.isEmpty()) {
-
-            throw new AwbDublicateException("There were duplicates of AWB in the database, couldn't upload the file");
+            String dbDuplicatesAwbList=String.join(",",dbDuplicates);
+            String errorMessage = DUPLICATE_AWB_STRING + "(" + dbDuplicatesAwbList + ") in the database, couldn't upload the file";
+            throw new AwbDublicateException(errorMessage);
         }
-
-
-
-            return duplicates;
-
 
     }
 
@@ -211,14 +211,12 @@ public class ExcelService {
         }
     }
 
-    private InvoiceDetails mapHelperFields(InvoiceDetails invoiceDetails, String sheetId, LocalDate currentDate) {
-
+    private void mapHelperFields(InvoiceDetails invoiceDetails, String sheetId, LocalDate currentDate) {
 
         invoiceDetails.setSheetTimesStamp(currentDate);
         invoiceDetails.setSheetUniqueId(sheetId);
         invoiceDetails.setIsSentInMail(Boolean.FALSE);
         invoiceDetails.setCustomerTimestamp(currentDate);
-        return invoiceDetails;
     }
 
     private SheetHistory createSheetHistory(String originalFilename, ExcelImportDto excelImportDto, String sheetId) {
@@ -264,7 +262,7 @@ public class ExcelService {
                 .awb(row.get(3))
                 .build();
 
-        InvoiceDetails invoiceDetails = InvoiceDetails.builder()
+        return InvoiceDetails.builder()
                 .invoiceDetailsId(invoiceDetailsId)
                 .orderNumber(row.get(4))
                 .origin(row.get(5))
@@ -282,8 +280,6 @@ public class ExcelService {
                 .ref(row.get(17))
                 .customDeclarationDate(row.get(18))
                 .build();
-
-        return invoiceDetails;
     }
 
 
@@ -292,7 +288,7 @@ public class ExcelService {
         Double smsaFeesCharges=0.0;
         Double totalAmount=0.0;
         Double vatOnsmsaFees=0.0;
-        logger.info(String.format("Inside update excel method for account ", customer.getAccountNumber()));
+        logger.info(String.format("Inside update excel method for account %s ", customer.getAccountNumber()));
 
         Map<String, List<InvoiceDetails>> filteredRowsMap;
         Custom custom = getSheetHistory(sheetUniqueId).getCustom();
