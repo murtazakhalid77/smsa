@@ -12,9 +12,7 @@ import javax.persistence.Column;
 public class InvoiceDetailsId implements Serializable {
     private String mawb;
     private String manifestDate;
-    @Column(
-            name = "account_number_id"
-    )
+
     private String accountNumber;
     private String awb;
 

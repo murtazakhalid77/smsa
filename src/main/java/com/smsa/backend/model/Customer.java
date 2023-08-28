@@ -39,11 +39,6 @@ public class Customer {
     private String country;
     private Boolean status;
     private boolean isPresent;
-    @OneToMany(
-            mappedBy = "customer"
-    )
-    @JsonIgnore
-    private Set<InvoiceDetails> invoiceDetailsSet = new HashSet();
 
     public static CustomerBuilder builder() {
         return new CustomerBuilder();
@@ -215,16 +210,6 @@ public class Customer {
                     return false;
                 }
 
-                Object this$invoiceDetailsSet = this.getInvoiceDetailsSet();
-                Object other$invoiceDetailsSet = other.getInvoiceDetailsSet();
-                if (this$invoiceDetailsSet == null) {
-                    if (other$invoiceDetailsSet != null) {
-                        return false;
-                    }
-                } else if (!this$invoiceDetailsSet.equals(other$invoiceDetailsSet)) {
-                    return false;
-                }
-
                 return true;
             }
         }
@@ -264,8 +249,6 @@ public class Customer {
         result = result * 59 + ($poBox == null ? 43 : $poBox.hashCode());
         Object $country = this.getCountry();
         result = result * 59 + ($country == null ? 43 : $country.hashCode());
-        Object $invoiceDetailsSet = this.getInvoiceDetailsSet();
-        result = result * 59 + ($invoiceDetailsSet == null ? 43 : $invoiceDetailsSet.hashCode());
         return result;
     }
 
@@ -285,7 +268,6 @@ public class Customer {
         this.country = country;
         this.status = status;
         this.isPresent = isPresent;
-        this.invoiceDetailsSet = invoiceDetailsSet;
     }
 
     public Customer() {
@@ -347,10 +329,6 @@ public class Customer {
         return this.isPresent;
     }
 
-    public Set<InvoiceDetails> getInvoiceDetailsSet() {
-        return this.invoiceDetailsSet;
-    }
-
     public void setAccountNumber(final String accountNumber) {
         this.accountNumber = accountNumber;
     }
@@ -405,11 +383,6 @@ public class Customer {
 
     public void setPresent(final boolean isPresent) {
         this.isPresent = isPresent;
-    }
-
-    @JsonIgnore
-    public void setInvoiceDetailsSet(final Set<InvoiceDetails> invoiceDetailsSet) {
-        this.invoiceDetailsSet = invoiceDetailsSet;
     }
 
     public static class CustomerBuilder {
