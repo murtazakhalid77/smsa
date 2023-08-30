@@ -1,11 +1,9 @@
 package com.smsa.backend.controller;
 
 import com.smsa.backend.dto.CustomDto;
-import com.smsa.backend.model.Custom;
 import com.smsa.backend.service.CustomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

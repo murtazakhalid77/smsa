@@ -410,6 +410,7 @@ public class ExcelService {
                 }
             }
         } catch (ExcelMakingException e) {
+            e.printStackTrace();
             throw new RuntimeException("There was an issue in populating sum values in the summary file");
         }
     }
@@ -673,18 +674,13 @@ public class ExcelService {
     private LocalDate getTodaysDate(){
         return LocalDate.now();
     }
-    private Long parseLongOrDefault(String value, Long defaultValue) {
-        try {
-            return Long.parseLong(value);
-        } catch (NumberFormatException e) {
-            return defaultValue;
-        }
-    }
+
 
     private Double parseDoubleOrDefault(String value, Double defaultValue) {
         try {
             return Double.parseDouble(value);
         } catch (NumberFormatException e) {
+            e.printStackTrace();
             return defaultValue;
         }
     }

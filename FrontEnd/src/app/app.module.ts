@@ -59,7 +59,7 @@ import { ReportComponent } from './pages/report/report.component';
     ReactiveFormsModule,
     BrowserAnimationsModule,
     ToastrModule.forRoot({
-      timeOut: 2000,
+      timeOut: 10000,
       progressBar: true,
       progressAnimation: 'increasing',
       preventDuplicates: true

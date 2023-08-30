@@ -285,8 +285,8 @@ export class AddOrderComponent implements OnInit {
  regions?: IRegion[];
 
   constructor(
-      private formbuilder: FormBuilder, 
-      private customerService: CustomerService, 
+      private formbuilder: FormBuilder,
+      private customerService: CustomerService,
       private router: Router,
       private route: ActivatedRoute,
       private toastr: ToastrService,
@@ -375,7 +375,7 @@ export class AddOrderComponent implements OnInit {
       smsaServiceFromSAR: customerForm.value.smsaServiceFee,
       nameArabic: customerForm.value.nameArabic,
       nameEnglish: customerForm.value.nameEnglish,
-      vatNumber: customerForm.value.customerVAT,  
+      vatNumber: customerForm.value.customerVAT,
       address: customerForm.value.address,
       poBox: customerForm.value.poBox,
       country: customerForm.value.country

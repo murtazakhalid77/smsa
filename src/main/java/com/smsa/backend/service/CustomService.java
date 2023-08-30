@@ -46,6 +46,7 @@ public class CustomService {
         try {
             return this.customRepository.getDistinctCurrencies();
         }catch (Exception e){
+            e.printStackTrace();
             throw new RecordNotFoundException(String.format("Currency Not Found"));
         }
     }

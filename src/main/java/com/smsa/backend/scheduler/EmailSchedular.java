@@ -109,6 +109,7 @@ public class EmailSchedular {
                     } catch (Exception e) {
                         logger.error(String.format("Error while creating Excel for Account Number %S: " , accountNumber));
                         anyUnsentInvoice = true;
+                        e.printStackTrace();
                         throw new Exception(e);
                         //continue
                     }
