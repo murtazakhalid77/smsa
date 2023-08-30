@@ -24,7 +24,6 @@ export class CustomerService {
   }
 
   // getOrders() {
-  //   debugger;
   //   let url = `${this._url}/customer`;
   //   return this.http.get(url);
   // }

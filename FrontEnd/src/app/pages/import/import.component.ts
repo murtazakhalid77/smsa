@@ -134,7 +134,6 @@ export class ImportComponent {
               }
             },
             error =>{
-              debugger;
               if(error.error.body.includes(this.duplicateExceptionMessage)){
                 this.duplicateAwbsMessage = error.error.body;
                 this.errorModalOpen = true;

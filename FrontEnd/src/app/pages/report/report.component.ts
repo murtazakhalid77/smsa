@@ -83,7 +83,6 @@ export class ReportComponent {
             }
           },
           error =>{
-            debugger
             this.toastr.error(error.error.body);
           }
           );

@@ -70,7 +70,6 @@ export class CurrencyUpdateComponent {
   
     
   submit(currencyForm: FormGroup){
-    debugger;
     let currency = {
       id: this.id,
       currencyFrom: currencyForm.value.currencyFrom !== undefined ? currencyForm.value.currencyFrom : this.currency?.currencyFrom,
@@ -102,7 +101,6 @@ export class CurrencyUpdateComponent {
       }
     },
     error =>{
-      debugger;
       this.toastr.error(error.error.body);
     })
   }
