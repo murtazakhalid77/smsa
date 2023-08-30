@@ -16,6 +16,7 @@ import { CurrencyListComponent } from './pages/currency/list/currency-list.compo
 import { RegionUpdateComponent } from './pages/region/update/region-update.component';
 import { RegionListComponent } from './pages/region/list/region-list.component';
 import { ReportComponent } from './pages/report/report.component';
+import { CurrencyHistoryComponent } from './pages/currency/currency-history/currency-history.component';
 
 const routes: Routes = [
   {
@@ -80,6 +81,11 @@ const routes: Routes = [
   {
     path: 'currency/view',
     component: CurrencyListComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'currency/history',
+    component: CurrencyHistoryComponent,
     canActivate: [AuthGuard],
   },
   {

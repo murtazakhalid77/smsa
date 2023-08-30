@@ -9,12 +9,15 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.AccessType;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class HelperService {
@@ -69,6 +72,16 @@ public class HelperService {
     }
     public String generateInvoiceDate(String sheetUniqueId){
         return getSheetHistory(sheetUniqueId).getInvoiceDate();
+    }
+
+    public static String getLoggedInUserName() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            String currentUserName = authentication.getName();
+            return currentUserName;
+        }else{
+            return null;
+        }
     }
 
     public  int findStartingRow(Sheet sheet) {

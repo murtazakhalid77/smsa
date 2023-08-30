@@ -1,10 +1,12 @@
 package com.smsa.backend.dto;
 
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -20,4 +22,8 @@ public class CurrencyDto {
     String currencyTo;
     Double conversionRate;
     Boolean isPresent;
+    String createdBy;
+    String createdAt;
+    String updatedBy;
+    String updatedAt;
 }

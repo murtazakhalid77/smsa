@@ -28,6 +28,7 @@ import { CurrencyUpdateComponent } from './pages/currency/update/currency-update
 import { RegionListComponent } from './pages/region/list/region-list.component';
 import { RegionUpdateComponent } from './pages/region/update/region-update.component';
 import { ReportComponent } from './pages/report/report.component';
+import { CurrencyHistoryComponent } from './pages/currency/currency-history/currency-history.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -48,7 +49,8 @@ import { ReportComponent } from './pages/report/report.component';
     CurrencyUpdateComponent,
     RegionListComponent,
     RegionUpdateComponent,
-    ReportComponent
+    ReportComponent,
+    CurrencyHistoryComponent
   ],
   imports: [
     BrowserModule,

@@ -1,17 +1,20 @@
 package com.smsa.backend.service;
 
+import com.smsa.backend.Exception.RecordAlreadyExistException;
 import com.smsa.backend.Exception.RecordNotFoundException;
 import com.smsa.backend.dto.CurrencyDto;
 import com.smsa.backend.model.Currency;
+import com.smsa.backend.model.CurrencyAuditLog;
 import com.smsa.backend.model.Custom;
 import com.smsa.backend.model.Customer;
 import com.smsa.backend.repository.CurrencyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
 
 @Service
 public class CurrencyService {
@@ -19,8 +22,17 @@ public class CurrencyService {
     CurrencyRepository currencyRepository;
     @Autowired
     CustomService customService;
+    @Autowired
+    CurrencyAuditLogService currencyAuditLogService;
     public CurrencyDto addCurrency(CurrencyDto currencyDto) {
-        return toDto(this.currencyRepository.save(toDomain(currencyDto)));
+        Currency currency = this.currencyRepository.findCurrencyBYCurrencyToFrom(currencyDto.getCurrencyTo(), currencyDto.getCurrencyFrom());
+        if(currency == null){
+            currencyDto.setCreatedBy(HelperService.getLoggedInUserName());
+            currencyDto.setCreatedAt(LocalDate.now().toString());
+            return toDto(this.currencyRepository.save(toDomain(currencyDto)));
+        }else{
+            throw new RecordAlreadyExistException("Entry against currency to and currency from exist");
+        }
     }
 
     public List<CurrencyDto> getAllCurrency() {
@@ -56,17 +68,32 @@ public class CurrencyService {
 
 
     public CurrencyDto updateCurrency(CurrencyDto currencyDto, Long id) {
-        Optional<Currency> currency = this.currencyRepository.findById(id);
+        double tolerance = 0.0001;
+        Currency currency = this.currencyRepository.findById(id).get();
+        if(!(Math.abs(currency.getConversionRate() - currencyDto.getConversionRate()) < tolerance)){
+            CurrencyAuditLog currencyAuditLog = new CurrencyAuditLog()
+                    .builder()
+                    .conversionRate(currency.getConversionRate())
+                    .currencyTo(currency.getCurrencyTo())
+                    .currencyFrom(currency.getCurrencyFrom())
+                    .createdAt(currency.getCreatedAt())
+                    .createdBy(currency.getCreatedBy())
+                    .updatedAt(currency.getUpdatedAt())
+                    .updatedBy(currency.getUpdatedBy())
+                    .isPresent(currency.getIsPresent())
+                    .currency(currency)
+                    .build();
 
-        if(currency.isPresent()){
-            currency.get().setId(id);
-            currency.get().setCurrencyFrom(currencyDto.getCurrencyFrom());
-            currency.get().setCurrencyTo(currencyDto.getCurrencyTo());
-            currency.get().setConversionRate(currencyDto.getConversionRate());
-            currency.get().setIsPresent(currencyDto.getIsPresent());
-            return toDto(this.currencyRepository.save(currency.get()));
+            CurrencyAuditLog currencyAuditLog1 = this.currencyAuditLogService.save(currencyAuditLog);
         }
-        throw new RecordNotFoundException(String.format("Currency Not Found On this Id => %d",id));
+                currency.setId(id);
+                currency.setCurrencyFrom(currencyDto.getCurrencyFrom());
+                currency.setCurrencyTo(currencyDto.getCurrencyTo());
+                currency.setConversionRate(currencyDto.getConversionRate());
+                currency.setIsPresent(currencyDto.getIsPresent());
+                currency.setUpdatedAt(LocalDate.now().toString());
+                currency.setUpdatedBy(HelperService.getLoggedInUserName());
+                return toDto(this.currencyRepository.save(currency));
     }
 
     public Currency findByCurrencyFromAndCurrencyTo(Custom custom, Customer customer) {
@@ -89,6 +116,10 @@ public class CurrencyService {
                 .currencyFrom(currency.getCurrencyFrom())
                 .currencyTo(currency.getCurrencyTo())
                 .conversionRate(currency.getConversionRate())
+                .createdBy(currency.getCreatedBy())
+                .createdAt(currency.getCreatedAt())
+                .updatedBy(currency.getUpdatedBy())
+                .updatedAt(currency.getUpdatedAt())
                 .isPresent(currency.getIsPresent())
                 .build();
     }
@@ -98,8 +129,20 @@ public class CurrencyService {
                 .currencyFrom(currencyDto.getCurrencyFrom())
                 .currencyTo(currencyDto.getCurrencyTo())
                 .conversionRate(currencyDto.getConversionRate())
+                .createdBy(currencyDto.getCreatedBy())
+                .createdAt(currencyDto.getCreatedAt())
+                .updatedBy(currencyDto.getUpdatedBy())
+                .updatedAt(currencyDto.getUpdatedAt())
                 .isPresent(currencyDto.getIsPresent())
                 .build();
     }
+
+    private LocalDate convertDateInToLocalDate(Date date) {
+
+        return Instant.ofEpochMilli(date.getTime())
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+    }
+
 
 }

@@ -4,9 +4,11 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Custom } from '../../custom-port/custom.model';
 import { ICurrencyDto, Currency } from '../../model/Currency.model';
+import { CurrencyHistory, ICurrencyHistory } from '../../model/currency-history.model';
 
 export type EntityAllCurrencyResponseType = HttpResponse<ICurrencyDto[]>;
 export type EntityCurrencyResponseType = HttpResponse<ICurrencyDto>;
+export type EntityCurrencyHistoryResponseType = HttpResponse<ICurrencyHistory[]>;
 
 @Injectable({
   providedIn: 'root'
@@ -51,6 +53,12 @@ export class CurrencyService {
   getDistinctCurrencies(): Observable<any> {
     let url = `${this._url}/currency-distinct`;
     return this.http.get<any>(`${url}`, { observe: 'response' });
+  }
+
+  getCurrencyHistory(id: any): Observable<EntityCurrencyHistoryResponseType> {
+    let url = `${this._url}/currency-audit-log/${id}`;
+    return this.http.get<CurrencyHistory[]>(`${url}`, { observe: 'response' });
+    // .pipe(map((res: EntityUserResponse) => res));
   }
 
 }

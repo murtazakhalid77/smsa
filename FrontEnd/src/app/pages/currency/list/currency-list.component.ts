@@ -43,4 +43,9 @@ export class CurrencyListComponent {
     this.router.navigate(['/currency'], { queryParams: { id: id } });
   }
 
+  showHistory(id: any){
+    this.router.navigate(['/currency/history'], { queryParams: { id: id } });
+  }
+
+
 }
