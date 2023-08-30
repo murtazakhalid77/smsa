@@ -342,13 +342,14 @@ export class AddOrderComponent implements OnInit {
   updateForm(accountNumber?: number){
 
     this.getCustomerByAccountNumber(accountNumber).subscribe((customer) => {
+      debugger;
       if(customer){
         this.customer = customer;
         const formData = {
           email: this.customer.email,
           account: this.customer.accountNumber,
           invoice: this.customer.invoiceCurrency,
-          region: this.customer.region,
+          region: this.customer.region?.customerRegion,
           status: this.customer.status,
           smsaServiceFee: this.customer.smsaServiceFromSAR,
           nameArabic: this.customer.nameArabic,

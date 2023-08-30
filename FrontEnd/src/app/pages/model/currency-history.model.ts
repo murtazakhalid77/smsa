@@ -1,4 +1,4 @@
-export interface ICurrencyDto {
+export interface ICurrencyHistory{
     id?: number;
     currencyFrom?: string,
     currencyTo?: string,
@@ -11,7 +11,7 @@ export interface ICurrencyDto {
   }
 
   
-  export class Currency implements ICurrencyDto {
+  export class CurrencyHistory implements ICurrencyHistory {
     constructor(
       public  id?: number,
       public currencyFrom?: string,
