@@ -7,6 +7,7 @@ export interface ICustomer {
     region?: Region;
     smsaServiceFromSAR?: string;
     email?: string;
+    ccMail?: string;
     nameArabic?: string;
     nameEnglish?: string;
     vatNumber?: string;
@@ -25,6 +26,7 @@ export interface ICustomer {
         public region?: Region,
         public smsaServiceFromSAR?: string,
         public email?: string,
+        public ccMail?: string,
         public customerNameArabic?: string,
         public nameEnglish?: string,
         public vatNumber?: string,

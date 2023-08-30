@@ -41,13 +41,13 @@ public class CustomerService {
     CustomerDTO toDto(Customer customer){
         return CustomerDTO.builder()
                     .email(customer.getEmail())
-                .Ccmail(customer.getCcMail())
+                    .ccMail(customer.getCcMail())
                     .address(customer.getAddress())
                     .accountNumber(customer.getAccountNumber())
                     .country(customer.getCountry())
                     .poBox(customer.getPoBox())
                     .nameArabic(customer.getNameArabic())
-                .region(customer.getRegion())
+                    .region(customer.getRegion())
                     .invoiceCurrency(customer.getInvoiceCurrency())
                     .smsaServiceFromSAR(customer.getSmsaServiceFromSAR())
                     .isPresent(customer.isPresent())
@@ -61,7 +61,7 @@ public class CustomerService {
     Customer toDomain(CustomerDTO customerDTO){
         return Customer.builder()
                 .email(customerDTO.getEmail())
-                .ccMail(customerDTO.getCcmail())
+                .ccMail(customerDTO.getCcMail())
                 .address(customerDTO.getAddress())
                 .accountNumber(customerDTO.getAccountNumber())
                 .country(customerDTO.getCountry())
@@ -92,7 +92,7 @@ public class CustomerService {
         Optional<Customer> customer = customerRepository.findByAccountNumber(accountNumber);
         if(customer.isPresent()){
             customer.get().setAccountNumber(accountNumber);
-            customer.get().setCcMail(customerDTO.getCcmail());
+            customer.get().setCcMail(customerDTO.getCcMail());
             customer.get().setNameEnglish(customerDTO.getNameEnglish());
             customer.get().setNameArabic(customerDTO.getNameArabic());
             customer.get().setEmail(customerDTO.getEmail());

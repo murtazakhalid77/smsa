@@ -285,8 +285,8 @@ export class AddOrderComponent implements OnInit {
  regions?: IRegion[];
 
   constructor(
-      private formbuilder: FormBuilder,
-      private customerService: CustomerService,
+      private formbuilder: FormBuilder, 
+      private customerService: CustomerService, 
       private router: Router,
       private route: ActivatedRoute,
       private toastr: ToastrService,
@@ -319,7 +319,8 @@ export class AddOrderComponent implements OnInit {
       address: ['', [Validators.required]],
       poBox: ['', [Validators.required]],
       country: ['', [Validators.required]],
-      email: ['', [Validators.required]]
+      email: ['', [Validators.required]],
+      ccMail: ['', [Validators.required]]
     })
   }
 
@@ -342,14 +343,14 @@ export class AddOrderComponent implements OnInit {
   updateForm(accountNumber?: number){
 
     this.getCustomerByAccountNumber(accountNumber).subscribe((customer) => {
-      debugger;
       if(customer){
         this.customer = customer;
         const formData = {
           email: this.customer.email,
+          ccMail: this.customer.ccMail,
           account: this.customer.accountNumber,
           invoice: this.customer.invoiceCurrency,
-          region: this.customer.region?.customerRegion,
+          region: this.customer.region,
           status: this.customer.status,
           smsaServiceFee: this.customer.smsaServiceFromSAR,
           nameArabic: this.customer.nameArabic,
@@ -369,6 +370,7 @@ export class AddOrderComponent implements OnInit {
   submit(customerForm: FormGroup) {
     let customer = {
       email: customerForm.value.email,
+      ccMail: customerForm.value.ccMail,
       accountNumber: customerForm.value.account,
       invoiceCurrency: customerForm.value.invoice,
       region: this.regions?.find(region => region.customerRegion === customerForm.value.region),
@@ -376,7 +378,7 @@ export class AddOrderComponent implements OnInit {
       smsaServiceFromSAR: customerForm.value.smsaServiceFee,
       nameArabic: customerForm.value.nameArabic,
       nameEnglish: customerForm.value.nameEnglish,
-      vatNumber: customerForm.value.customerVAT,
+      vatNumber: customerForm.value.customerVAT,  
       address: customerForm.value.address,
       poBox: customerForm.value.poBox,
       country: customerForm.value.country

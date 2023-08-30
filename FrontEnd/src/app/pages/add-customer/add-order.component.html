@@ -142,8 +142,18 @@
                 </div>
 
                 <div class="order-form">
-                    <div class="col-md-12 form-group d-flex justify-content-end" style="padding: 0 10px;">
-                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" [disabled]="customerForm.invalid">
+                        <div class="col-md-4 form-group" style="padding: 0 10px;">
+                            <label class="add-order-label">CC Email</label>
+                            <input type="text" formControlName="ccMail" placeholder="Enter cc email"
+                                class="order-search form-control order-form-input">
+                            <span class="inputValidators" style="color: red; margin-left: 2%;"
+                                *ngIf="customerForm.get('ccMail')?.invalid && (customerForm.get('ccMail')?.dirty || customerForm.get('ccMail')?.touched)">
+                                Please provide cc email.
+                            </span>
+                        </div>
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4 form-group d-flex justify-content-end">
+                        <button style="width: 17%; height: 38px;" class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-5" type="submit" [disabled]="customerForm.invalid">
                             <span>Submit</span>
                         </button>
                     </div>

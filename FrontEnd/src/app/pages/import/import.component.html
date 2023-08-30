@@ -27,6 +27,24 @@
       </div>
     </div>
   </div>
+
+  <div class="modal" [class.open]="errorModalOpen">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Error</h5>
+        </div>
+        <div class="modal-body">
+          <p>
+            Error: {{duplicateAwbsMessage}}
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeErrorModalModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
   
   
 

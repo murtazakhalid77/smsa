@@ -61,7 +61,7 @@ import { CurrencyHistoryComponent } from './pages/currency/currency-history/curr
     ReactiveFormsModule,
     BrowserAnimationsModule,
     ToastrModule.forRoot({
-      timeOut: 10000,
+      timeOut: 5000,
       progressBar: true,
       progressAnimation: 'increasing',
       preventDuplicates: true
