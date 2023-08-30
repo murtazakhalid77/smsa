@@ -1,5 +1,6 @@
 package com.smsa.backend.service;
 
+import com.smsa.backend.Exception.InvalidEmailException;
 import com.smsa.backend.model.Custom;
 import com.smsa.backend.model.Customer;
 import com.smsa.backend.repository.InvoiceDetailsRepository;
@@ -37,12 +38,23 @@ public class EmailService {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-            helper.setFrom(sender);
+
             String[] emailAddresses = customer.getEmail().split(",");
-            helper.setTo(emailAddresses);
+            if(HelperService.checkValidEmail(emailAddresses)){
+                helper.setTo(emailAddresses);
+            }else {
+                logger.warn("One or more email addresses do not follow the valid email pattern or are null.");
+                throw new InvalidEmailException("One or more email addresses do not follow the valid email pattern or are null.");
+            }
+
 
             String[] ccEmails = customer.getCcMail().split(",");
-            helper.setCc(ccEmails);
+            if(HelperService.checkValidEmail(ccEmails)){
+                helper.setCc(ccEmails);
+            }else {
+                logger.warn("One or more CCemail addresses do not follow the valid email pattern or are null.");
+                throw new InvalidEmailException("One or more CCemail addresses do not follow the valid email pattern or are null.");
+            }
 
             helper.setSubject("SMSA Express Invoice for Custom Duty & Taxes for Inbound Shipments");
 

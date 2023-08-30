@@ -136,13 +136,4 @@ public class CurrencyService {
                 .isPresent(currencyDto.getIsPresent())
                 .build();
     }
-
-    private LocalDate convertDateInToLocalDate(Date date) {
-
-        return Instant.ofEpochMilli(date.getTime())
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-    }
-
-
 }

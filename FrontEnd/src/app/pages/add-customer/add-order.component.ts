@@ -350,7 +350,7 @@ export class AddOrderComponent implements OnInit {
           ccMail: this.customer.ccMail,
           account: this.customer.accountNumber,
           invoice: this.customer.invoiceCurrency,
-          region: this.customer.region,
+          region: this.customer.region?.customerRegion,
           status: this.customer.status,
           smsaServiceFee: this.customer.smsaServiceFromSAR,
           nameArabic: this.customer.nameArabic,

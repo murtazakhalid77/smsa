@@ -41,18 +41,23 @@ public class EmailSchedular {
 
     @Scheduled(initialDelay = 5000, fixedDelay = 120000)
     public void markSentAndProcessInvoices() throws Exception {
-        List<SheetHistory> sheetsToBeSent = sheetHistoryRepository.findAllByIsEmail(false);
-        if(!sheetsToBeSent.isEmpty()){
-            for (SheetHistory sheetHistory : sheetsToBeSent) {
-                String sheetUniqueId = sheetHistory.getUniqueUUid();
+       try {
+           List<SheetHistory> sheetsToBeSent = sheetHistoryRepository.findAllByIsEmail(false);
+           if(!sheetsToBeSent.isEmpty()){
+               for (SheetHistory sheetHistory : sheetsToBeSent) {
+                   String sheetUniqueId = sheetHistory.getUniqueUUid();
 
-                // Call a method to process invoices for this sheetUniqueId
-                processInvoicesForSheet(sheetUniqueId);
-                logger.info(String.format("work done sheet %S",sheetHistory.getName()));
-            }
-        }
-        logger.info("No work to do");
-    }
+                   // Call a method to process invoices for this sheetUniqueId
+                   processInvoicesForSheet(sheetUniqueId);
+                   logger.info(String.format("work done sheet %S",sheetHistory.getName()));
+               }
+           }
+           logger.info("No work to do");
+       }catch (Exception e){
+           e.printStackTrace();
+       }
+       }
+
     public void processInvoicesForSheet(String sheetUniqueId) throws Exception {
         Map<String, List<InvoiceDetails>> invoiceDetailsMap = new HashMap<>();
 

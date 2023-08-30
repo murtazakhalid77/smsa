@@ -55,5 +55,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity(errorMessage, HttpStatus.REQUEST_TIMEOUT);
     }
 
+    @ExceptionHandler(value = InvalidEmailException.class)
+    public ResponseEntity<ErrorMessage> invalidEmailException(InvalidEmailException ex){
+        ErrorMessage errorMessage = ErrorMessage.builder()
+                .body(ex.getMessage()).build();
+        return new ResponseEntity(errorMessage, HttpStatus.NOT_ACCEPTABLE);
+    }
+
 }
 

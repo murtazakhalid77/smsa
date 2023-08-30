@@ -108,4 +108,13 @@ public class HelperService {
 
         return 0; // If no non-empty row is found, start from the first row
     }
+    public static boolean checkValidEmail(String[] emailList) {
+        for (String mail : emailList) {
+            if (mail == null || !mail.matches("^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+)$")) {
+                return false; // Return false if any email is invalid or null
+            }
+        }
+        return true; // Return true if all emails are valid
+    }
+
 }
