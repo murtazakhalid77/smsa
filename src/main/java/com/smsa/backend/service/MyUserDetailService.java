@@ -1,5 +1,6 @@
 package com.smsa.backend.service;
 
+import com.smsa.backend.Exception.RecordNotFoundException;
 import com.smsa.backend.model.User;
 import com.smsa.backend.dto.CustomUserDetail;
 import com.smsa.backend.repository.UserRepository;
@@ -20,7 +21,7 @@ public class MyUserDetailService implements UserDetailsService {
 
            User user = userRepository.findByName(username);
             if(user == null){
-//                throw new UserNotFoundException("Wrong Email Address "+username);
+            throw new RuntimeException("Wrong Credentials"+username);
             }
             return new CustomUserDetail(user);
     }

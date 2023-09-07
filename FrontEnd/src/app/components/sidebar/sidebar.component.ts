@@ -1,14 +1,25 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { SessionStorageService } from 'src/app/services/session-storage.service';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit{
 
-  constructor(private router: Router) { }
+  
+  permissions1!:String[]
+
+  constructor(private router: Router, public sessionStorageService:SessionStorageService) {
+  
+   }
+
+  ngOnInit():void {
+    
+  }
+  
   dashboard() {
     this.router.navigateByUrl('/dashboard');
   }
@@ -36,5 +47,8 @@ export class SidebarComponent {
   }
   salesReports(){
     this.router.navigateByUrl('reports')
+  }
+  permissions(){
+    this.router.navigateByUrl('permissions')
   }
 }

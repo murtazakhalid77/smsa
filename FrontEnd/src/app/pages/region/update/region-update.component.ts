@@ -100,6 +100,8 @@ export class RegionUpdateComponent {
   }
 
   createRegion(region: Region){
+    debugger
+    console.log(region)
     this.regionService.createRegion(region).subscribe((res: any)=>{
       if(res){
         this.router.navigateByUrl('/region/view')

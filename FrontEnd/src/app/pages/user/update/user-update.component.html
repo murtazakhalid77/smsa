@@ -37,6 +37,8 @@
                             Please provide password.
                         </span> -->
                     </div>
+
+                    
                 </div>
 
                 <div class="order-form">
@@ -51,26 +53,36 @@
                     </div>
 
                     <div class="col-md-6 form-group" style="padding: 0 10px;">
-                        <label class="add-order-label">Is-Active</label>
-                        <select class="order-search form-control order-form-input" formControlName="status">
-                          <option value="true">True</option>
-                          <option value="false">False</option>
+                        <label class="add-order-label">Role</label>
+                        <select class="order-search form-control order-form-input" aria-label="Default select example"
+                          formControlName="role" (change)="changeRole()" [(ngModel)]="selectedRole">
+                          <option value="" disabled selected>Role</option>
+                          <option *ngFor="let role of roles" [value]="role.name">{{ role.name }}</option>
                         </select>
                         <span class="inputValidators" style="color: red; margin-left: 2%;"
-                          *ngIf="userForm.get('status')?.invalid && (userForm.get('status')?.dirty || userForm.get('status')?.touched)">
-                          Please provide isActive.
+                          *ngIf="userForm.get('role')?.invalid && (userForm?.get('role')?.dirty || userForm?.get('role')?.touched)">
+                          Please provide Role.
                         </span>
+                      </div>
+                    
+
+                      
+                      <div  *ngIf="!id" class="col-md-6 form-group" style="padding: 0 10px;padding-top: 40px;">
+                        <button type="button" class="btn btn-primary" (click)="gotoRole()">Go to -> {{ selectedRole || 'Role' }}</button>
                       </div>
                 </div>
 
+                
+
                 <div class="order-form">
                     <div class="col-md-12 form-group d-flex justify-content-end" style="padding: 0 10px;">
-                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" [disabled]="userForm.invalid">
+                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit">
                           <span>Submit</span>
                         </button>
                       </div>         
                 </div>
             </form>
         </div>
+     
     </div>
 </div>

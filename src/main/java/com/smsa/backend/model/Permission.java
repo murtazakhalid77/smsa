@@ -1,10 +1,11 @@
 package com.smsa.backend.model;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -14,20 +15,17 @@ import java.util.Set;
 @Setter
 @ToString
 @Builder
-
 @Entity
-@Table(name = "roles")
-public class Roles {
+@Table(name = "permission")
+public class Permission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long id;
 
     private String name;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "role_permission",
-            joinColumns = @JoinColumn(name = "roles_id") ,
-            inverseJoinColumns = @JoinColumn(name = "permission_id"))
-    private Set<Permission> permissions = new HashSet<>();
+    private String description;
+
+    private boolean value;
+
 }

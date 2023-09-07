@@ -20,7 +20,17 @@ public class CustomUserDetail implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
-        this.user.getRoles().stream().forEach(roles -> authorityList.add(new SimpleGrantedAuthority(roles.getName())));
+
+        // Add roles to authorities
+        this.user.getRoles().forEach(role -> {
+            authorityList.add(new SimpleGrantedAuthority(role.getName()));
+
+            // Add permissions associated with the role to authorities
+            role.getPermissions().forEach(permission -> {
+                authorityList.add(new SimpleGrantedAuthority(permission.getName()));
+            });
+        });
+
         return authorityList;
     }
 

@@ -4,8 +4,11 @@ package com.smsa.backend.controller;
 import com.smsa.backend.dto.LoginCredentials;
 import com.smsa.backend.security.util.AuthenticationResponse;
 import com.smsa.backend.security.util.JwtUtil;
+import com.smsa.backend.service.ExcelService;
 import com.smsa.backend.service.MyUserDetailService;
 import com.smsa.backend.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +29,7 @@ public class LoginController {
     @Autowired
     private MyUserDetailService myUserDetailService;
 
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
     @PostMapping("/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody LoginCredentials loginCredentials) throws Exception {
         try {
@@ -34,6 +38,7 @@ public class LoginController {
             );
         }
         catch(BadCredentialsException e){
+            logger.warn("User Not found....");
             throw new Exception("Incorrect Username or Password ! ",e);
         }
 

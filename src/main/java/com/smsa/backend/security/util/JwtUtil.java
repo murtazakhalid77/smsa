@@ -1,14 +1,13 @@
 package com.smsa.backend.security.util;
 
+import com.smsa.backend.dto.CustomUserDetail;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -37,9 +36,27 @@ public class JwtUtil {
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("ROLES",userDetails.getAuthorities().toString());
+
+        // Extract roles and permissions into separate lists
+        List<String> roles = new ArrayList<>();
+        List<String> permissions = new ArrayList<>();
+
+        userDetails.getAuthorities().forEach(authority -> {
+            String authorityName = authority.getAuthority();
+            if (authorityName.startsWith("ROLE_")) {
+                roles.add(authorityName.substring(5));
+            } else {
+                permissions.add(authorityName);
+            }
+        });
+
+        claims.put("ROLES", roles);
+        claims.put("PERMISSIONS", permissions);
+
         return createToken(claims, userDetails.getUsername());
     }
+
+
 
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))

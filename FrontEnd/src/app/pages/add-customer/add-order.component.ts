@@ -21,6 +21,7 @@ import { RegionService } from '../region/service/region.service';
 export class AddOrderComponent implements OnInit {
 
   customerForm!: FormGroup
+  
   accountNumber?: any;
   customer?: ICustomer;
   status?: boolean;

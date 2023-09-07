@@ -28,6 +28,11 @@ import { CurrencyUpdateComponent } from './pages/currency/update/currency-update
 import { RegionListComponent } from './pages/region/list/region-list.component';
 import { RegionUpdateComponent } from './pages/region/update/region-update.component';
 import { ReportComponent } from './pages/report/report.component';
+import { PermissionListComponent } from './pages/permission/permission-list/permission-list.component';
+import { PermissionUpdateComponent } from './pages/permission/permission-update/permission-update.component';
+import { RoleBasedAccessDirectiveDirective } from './directive/role-based-access-directive.directive';
+import { CommonModule } from '@angular/common';
+import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.component';  
 @NgModule({
   declarations: [
     AppComponent,
@@ -48,7 +53,11 @@ import { ReportComponent } from './pages/report/report.component';
     CurrencyUpdateComponent,
     RegionListComponent,
     RegionUpdateComponent,
-    ReportComponent
+    ReportComponent,
+    PermissionListComponent,
+    PermissionUpdateComponent,
+    RoleBasedAccessDirectiveDirective,
+    UnauthorizedComponent,
   ],
   imports: [
     BrowserModule,
@@ -56,6 +65,7 @@ import { ReportComponent } from './pages/report/report.component';
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
+    CommonModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
     ToastrModule.forRoot({

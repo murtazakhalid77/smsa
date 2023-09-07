@@ -15,16 +15,8 @@ export class DashboardComponent implements OnInit {
               private loginService: LoginService) { }
 
   ngOnInit(): void {
-    // this.getcards();
+   
   }
+ 
 
-
-
-  // getcards() {
-  //   this.service.getcards().subscribe(res => {
-  //     this.cardsArray = res
-  //   })
-  // }
-
-// }
 }

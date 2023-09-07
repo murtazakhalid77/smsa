@@ -1,5 +1,6 @@
 package com.smsa.backend.controller;
 
+import com.smsa.backend.dto.UserDto;
 import com.smsa.backend.model.User;
 import com.smsa.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,9 @@ public class UserController {
 
 //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/user")
-    public User addUser(@RequestBody User user){
+    public User addUser(@RequestBody UserDto userDto){
         try{
-            return userService.addUser(user);
+            return userService.addUser(userDto);
         }catch (Exception e){
             return null;
         }
@@ -35,8 +36,10 @@ public class UserController {
         return ResponseEntity.ok(this.userService.findUserById(id));
     }
 
+
+
     @PatchMapping("/user/{id}")
-    ResponseEntity<User> updateUser(@RequestBody User user){
+    ResponseEntity<User> updateUser(@RequestBody UserDto user){
         return ResponseEntity.ok(this.userService.updateUser(user));
     }
 }

@@ -16,6 +16,8 @@ import { CurrencyListComponent } from './pages/currency/list/currency-list.compo
 import { RegionUpdateComponent } from './pages/region/update/region-update.component';
 import { RegionListComponent } from './pages/region/list/region-list.component';
 import { ReportComponent } from './pages/report/report.component';
+import { PermissionUpdateComponent } from './pages/permission/permission-update/permission-update.component';
+import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.component';
 
 const routes: Routes = [
   {
@@ -96,6 +98,21 @@ const routes: Routes = [
     path: 'reports',
     component: ReportComponent,
     canActivate: [AuthGuard],
+  }
+  ,
+  {
+    path: 'permissions',
+    component: PermissionUpdateComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'permissions/:role', 
+    component: PermissionUpdateComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'unauthorized', 
+    component: UnauthorizedComponent,
   }
 ];
 

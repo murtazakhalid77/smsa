@@ -64,6 +64,7 @@ export class LoginFormComponent implements OnInit {
     
         // Navigate to the dashboard
         this.router.navigate(['/dashboard']);
+       
       },
       (error) => {
         this.toastr.error('Incorrect Username or Password:')

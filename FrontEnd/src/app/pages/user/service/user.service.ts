@@ -32,7 +32,7 @@ export type EntityUserResponseType = HttpResponse<IUser>;
 
     getUserById(id: any): Observable<EntityUserResponseType> {
       let url = `${this._url}/user/${id}`;
-      return this.http.get<User>(`${url}`, { observe: 'response' });
+      return this.http.get<any>(`${url}`, { observe: 'response' });
       // .pipe(map((res: EntityUserResponse) => res));
     }
 
@@ -42,4 +42,6 @@ export type EntityUserResponseType = HttpResponse<IUser>;
       return this.http
         .patch<IUser>(url, user, { observe: 'response' })
     }
+
+    
 }

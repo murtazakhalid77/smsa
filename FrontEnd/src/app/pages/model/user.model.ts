@@ -3,6 +3,7 @@ export interface IUser{
     name?: string,
     password?: string,
     status?: boolean,
+    role?: any  
   }
 
   export class User implements IUser {
@@ -11,5 +12,6 @@ export interface IUser{
         public name?: string,
         public password?: string,
         public status?: boolean,
+      public role?:any
     ) {}
   }

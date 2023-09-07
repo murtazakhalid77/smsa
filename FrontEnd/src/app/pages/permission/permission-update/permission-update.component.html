@@ -1,0 +1,47 @@
+<app-sidebar></app-sidebar>
+<div class="body-position">
+  <app-dashboard-head></app-dashboard-head>
+  <div class="main-container">
+    <div>
+      <h4>Add Permission To Role</h4>
+    </div>
+
+    <div class="order-body">
+      <form>
+       
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="dropdown">Select an option:</label>
+                <select id="dropdown" name="dropdown" [(ngModel)]="selectedRole" (change)="onRoleChange()" class="form-control">
+                  <option value="" disabled selected>Select an option</option>
+                  <option *ngFor="let option of roles" [value]="option.id">{{ option.name }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row" >
+            <div class="col-md-4" *ngFor="let permission of permissions; let i = index">
+              <div class="form-check">
+                <input class="form-check-input" id="checkbox{{ i }}" name="checkbox" type="checkbox" [checked]="permission.value" (change)="addPermission(permission)">&nbsp;
+                <label class="form-check-label" for="checkbox{{ i }}">{{ permission.name }}</label>
+              </div>
+            </div>
+          </div>
+        
+          
+          <div class="order-form">
+            <div class="col-md-12 form-group d-flex justify-content-end" style="padding: 0 10px;">
+                <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" (click)="onSubmit()">
+                  <span>Submit</span>
+                </button>
+              </div>         
+        </div>
+        
+      </form>
+
+
+
+    </div>
+  </div>
