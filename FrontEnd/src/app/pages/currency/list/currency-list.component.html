@@ -82,5 +82,13 @@
                 </table>
             </div>
         </div>
+        <div class="row mt-4" *ngIf="currency!.length > 0">
+            <div class="col">
+              <!-- Your content here -->
+            </div>
+            <div class="col-auto">
+                <mat-paginator [pageSize]="itemsPerPage" [length]="totalItems" (page)="changePage($event)"> </mat-paginator>
+            </div>
+        </div>
     </div>
 </div>

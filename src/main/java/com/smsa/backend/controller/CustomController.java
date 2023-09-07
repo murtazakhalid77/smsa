@@ -1,8 +1,12 @@
 package com.smsa.backend.controller;
 
 import com.smsa.backend.dto.CustomDto;
+import com.smsa.backend.model.Custom;
 import com.smsa.backend.service.CustomService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +26,13 @@ public class CustomController {
     }
 
     @GetMapping("/custom")
-    ResponseEntity<List<CustomDto>> getAllCustoms(){
-        return ResponseEntity.ok(this.customService.getAllCustoms());
+    ResponseEntity<List<CustomDto>> getAllCustoms(Pageable pageable){
+        Page<Custom> customs = this.customService.getAllCustoms(pageable);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(customs.getTotalElements()));
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(customService.toDto(customs.getContent()));
     }
 
     @GetMapping("/custom-import")

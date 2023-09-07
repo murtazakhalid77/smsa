@@ -112,6 +112,14 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>       
+        </div>
+        <div class="row mt-4" *ngIf="customers!.length > 0">
+            <div class="col">
+              <!-- Your content here -->
+            </div>
+            <div class="col-auto">
+                <mat-paginator [pageSize]="itemsPerPage" [length]="totalItems" (page)="changePage($event)"> </mat-paginator>
             </div>
         </div>
     </div>

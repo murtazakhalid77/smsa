@@ -13,6 +13,10 @@ export class CurrencyHistoryComponent {
 
   id?: any;
   currencyHistory?: ICurrencyHistory[];
+  currentPage:number  = 0;
+  itemsPerPage: number = 10;
+  totalItems?: string;
+
   
   constructor(private router: Router, private loginService: LoginService, private route: ActivatedRoute, private currencyService: CurrencyService){}
 
@@ -20,12 +24,24 @@ export class CurrencyHistoryComponent {
     this.route.queryParams.subscribe( params => {
       this.id = params['id'];
       if(this.id!=null){
-       this.currencyService.getCurrencyHistory(this.id).subscribe(res =>{
-        if(res && res.body){
-          this.currencyHistory = res.body;
-        }
-       });
+        this.getCurrencyHistory(this.currentPage, this.itemsPerPage);
       }
     });
   }
+
+  getCurrencyHistory(page?: any, size?: any){
+    if(this.id!=null){
+      this.currencyService.getCurrencyHistory(this.id, page, size).subscribe(res =>{
+        if(res && res.body){
+          this.currencyHistory = res.body;
+          this.totalItems = res.headers.get('X-Total-Count') ?? '';
+        }
+       });
+    }
+  }
+
+  changePage(value: any){
+    this.getCurrencyHistory(value.pageIndex, this.itemsPerPage);
+  }
+
 }

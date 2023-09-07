@@ -2350,7 +2350,7 @@ progress {
 } */
 
 .table-container {
-    max-height: 520px;
+    max-height: 395px;
     /* Adjust the max height as needed */ 
     overflow-y: auto;
 }
@@ -14697,3 +14697,12 @@ nav.main-menu li.active>a,
 .custom-margin {
     margin-right: 10px; /* Adjust this value to control the margin width */
 }
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* styles.css */
+mat-paginator {
+    background-color: #400099 !important;
+    border-radius: 3px !important;
+}
+  

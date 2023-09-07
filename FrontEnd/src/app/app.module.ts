@@ -18,7 +18,7 @@ import { CustomPortComponent } from './pages/custom-port/list/custom-port.compon
 import { CustomUpdateComponent } from './pages/custom-port/update/custom-update.component';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { LoaderComponent } from './pages/loader/loader.component';
 import { LoaderInterceptor } from './services/interceptors/loader.interceptor';
 import { UserComponent } from './pages/user/list/user.component';
@@ -29,6 +29,8 @@ import { RegionListComponent } from './pages/region/list/region-list.component';
 import { RegionUpdateComponent } from './pages/region/update/region-update.component';
 import { ReportComponent } from './pages/report/report.component';
 import { CurrencyHistoryComponent } from './pages/currency/currency-history/currency-history.component';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { MatPaginatorModule } from '@angular/material/paginator';
 @NgModule({
   declarations: [
     AppComponent,
@@ -43,7 +45,7 @@ import { CurrencyHistoryComponent } from './pages/currency/currency-history/curr
     CustomPortComponent,
     CustomUpdateComponent,
     LoaderComponent,
-    UserUpdateComponent,
+    UserUpdateComponent,  
     UserComponent,
     CurrencyListComponent,
     CurrencyUpdateComponent,
@@ -53,8 +55,9 @@ import { CurrencyHistoryComponent } from './pages/currency/currency-history/curr
     CurrencyHistoryComponent
   ],
   imports: [
+    NgxPaginationModule,
     BrowserModule,
-    // BrowserAnimationsModule,
+    MatPaginatorModule,
     AppRoutingModule,
     FormsModule,
     HttpClientModule,

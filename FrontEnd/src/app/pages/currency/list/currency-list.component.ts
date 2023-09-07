@@ -13,18 +13,22 @@ import { ICurrencyDto } from '../../model/Currency.model';
 export class CurrencyListComponent {
 
   currency?: ICurrencyDto[];
+  currentPage:number  = 0;
+  itemsPerPage: number = 10;
+  totalItems?: string;
 
   constructor(private router: Router, private loginService: LoginService, private currencyService: CurrencyService){}
 
   ngOnInit(){
-    this.getCurrency();
+    this.getCurrency(this.currentPage, this.itemsPerPage);
   }
 
-  getCurrency(){
-    this.currencyService.getCurrency().subscribe(
+  getCurrency(page?: any, size?: any){
+    this.currencyService.getCurrency(page, size).subscribe(
       (res: EntityAllCurrencyResponseType) => {
         if(res && res.body){
           this.currency = res.body;
+          this.totalItems = res.headers.get('X-Total-Count') ?? '';
         } 
       },
       (error) => {
@@ -47,5 +51,8 @@ export class CurrencyListComponent {
     this.router.navigate(['/currency/history'], { queryParams: { id: id } });
   }
 
+  changePage(value: any){
+    this.getCurrency(value.pageIndex, this.itemsPerPage);
+  }
 
 }

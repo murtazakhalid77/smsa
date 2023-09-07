@@ -7,10 +7,13 @@ import com.smsa.backend.model.Region;
 import com.smsa.backend.repository.CurrencyAuditLogRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CurrencyAuditLogService {
@@ -19,15 +22,14 @@ public class CurrencyAuditLogService {
     ModelMapper modelMapper;
     @Autowired
     CurrencyAuditLogRepository currencyAuditLogRepository;
-    public List<CurrencyAuditLogDto> getCurrencyAuditLogById(Long currencyId) {
-        List<CurrencyAuditLogDto> currencyAuditLogDtos = new ArrayList<>();
-        List<CurrencyAuditLog> currencyAuditLogs = this.currencyAuditLogRepository.findCurrencyAuditByCurrencyId(currencyId);
-        for(CurrencyAuditLog currencyAuditLog1: currencyAuditLogs){
-            currencyAuditLog1.setCurrency(null);
-            currencyAuditLogDtos.add(toDTo(currencyAuditLog1));
-        }
-        return currencyAuditLogDtos;
+    public Page<CurrencyAuditLog> getCurrencyAuditLogById(Long currencyId, Pageable pageable) {
+        Page<CurrencyAuditLog> currencyAuditLogs = this.currencyAuditLogRepository.findCurrencyAuditByCurrencyId(currencyId, pageable);
+        currencyAuditLogs.getContent().forEach(currencyAuditLog -> currencyAuditLog.setCurrency(null));
+        return currencyAuditLogs;
+
     }
+
+
 
     public CurrencyAuditLog save(CurrencyAuditLog currencyAuditLog){
        return this.currencyAuditLogRepository.save(currencyAuditLog);

@@ -1,4 +1,4 @@
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/Environments/environment';
@@ -28,9 +28,12 @@ export class CustomerService {
   //   return this.http.get(url);
   // }
 
-  getCustomers(): Observable<EntityAllCustomersResponseType> {
+  getCustomers(page?: any, size?: any): Observable<EntityAllCustomersResponseType> {
     let url = `${this._url}/customer`;
-    return this.http.get<Customer[]>(`${url}`, { observe: 'response' });
+    const params = new HttpParams()
+    .set('page', page.toString())
+    .set('size', size.toString());
+    return this.http.get<Customer[]>(`${url}`, {params, observe: 'response' });
     // .pipe(map((res: EntityUserResponse) => res));
   }
 

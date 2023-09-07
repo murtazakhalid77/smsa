@@ -15,7 +15,7 @@ public class FilterSpecification<T>{
         return new Specification<T>() {
             @Override
             public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-                return criteriaBuilder.between(root.get(searchCriteria.getColumn()), searchCriteria.getStartDate(), searchCriteria.getColumn());
+                return criteriaBuilder.between(root.get(searchCriteria.getColumn()), searchCriteria.getValue(), searchCriteria.getColumn());
             }
         };
     }

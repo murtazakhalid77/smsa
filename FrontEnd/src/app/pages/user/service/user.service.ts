@@ -1,6 +1,6 @@
 export type EntityUsersResponseType = HttpResponse<IUser[]>;
 
-import { HttpClient, HttpResponse } from "@angular/common/http";
+import { HttpClient, HttpParams, HttpResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "src/Environments/environment";
 import { IUser, User } from "../../model/user.model";
@@ -18,9 +18,12 @@ export type EntityUserResponseType = HttpResponse<IUser>;
   
     constructor(private http: HttpClient) { }
 
-    getUsers(): Observable<EntityUsersResponseType> {
+    getUsers(page?: any, size?: any): Observable<EntityUsersResponseType> {
         let url = `${this._url}/user`;
-        return this.http.get<User[]>(`${url}`, { observe: 'response' });
+        const params = new HttpParams()
+        .set('page', page.toString())
+        .set('size', size.toString());
+        return this.http.get<User[]>(`${url}`, { params, observe: 'response' });
     }
 
     addUser(user: User): Observable<EntityUserResponseType> {

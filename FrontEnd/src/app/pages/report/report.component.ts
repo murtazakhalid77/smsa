@@ -24,6 +24,9 @@ export class ReportComponent {
   salesReport?: ISalesReport[];
   selectedSearchOption: string = 'invoice'; 
   criteria: any;
+  currentPage:number  = 0;
+  itemsPerPage: number = 10;
+  totalItems?: string;
   _url = environment.backend;
 
   constructor(private salesReportService: SaleReportService, private excelService: ExcelService, private http: HttpClient,

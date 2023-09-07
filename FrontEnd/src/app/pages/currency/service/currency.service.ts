@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/Environments/environment';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Custom } from '../../custom-port/custom.model';
 import { ICurrencyDto, Currency } from '../../model/Currency.model';
@@ -38,9 +38,12 @@ export class CurrencyService {
   }
 
   
-  getCurrency(): Observable<EntityAllCurrencyResponseType> {
+  getCurrency(page?: any, size?: any): Observable<EntityAllCurrencyResponseType> {
     let url = `${this._url}/currency`;
-    return this.http.get<Currency[]>(`${url}`, { observe: 'response' });
+    const params = new HttpParams()
+    .set('page', page.toString())
+    .set('size', size.toString());
+    return this.http.get<Currency[]>(`${url}`, { params, observe: 'response' });
     // .pipe(map((res: EntityUserResponse) => res));
   }
 
@@ -55,9 +58,12 @@ export class CurrencyService {
     return this.http.get<any>(`${url}`, { observe: 'response' });
   }
 
-  getCurrencyHistory(id: any): Observable<EntityCurrencyHistoryResponseType> {
+  getCurrencyHistory(id: any, page: any, size: any): Observable<EntityCurrencyHistoryResponseType> {
     let url = `${this._url}/currency-audit-log/${id}`;
-    return this.http.get<CurrencyHistory[]>(`${url}`, { observe: 'response' });
+    const params = new HttpParams()
+    .set('page', page.toString())
+    .set('size', size.toString());
+    return this.http.get<CurrencyHistory[]>(`${url}`, { params,  observe: 'response' });
     // .pipe(map((res: EntityUserResponse) => res));
   }
 

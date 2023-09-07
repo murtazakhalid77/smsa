@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { environment } from "src/Environments/environment";
 import { Custom, ICustom } from "../custom.model";
-import { HttpClient, HttpResponse } from "@angular/common/http";
+import { HttpClient, HttpParams, HttpResponse } from "@angular/common/http";
 import { Observable } from "rxjs";
 
 export type EntityAllCustomsResponseType = HttpResponse<ICustom[]>;
@@ -32,9 +32,12 @@ export class CustomService {
       .patch<ICustom>(url, custom, { observe: 'response' })
   }
 
-  getCustoms(): Observable<EntityAllCustomsResponseType> {
+  getCustoms(page?: any, size?: any): Observable<EntityAllCustomsResponseType> {
     let url = `${this._url}/custom`;
-    return this.http.get<Custom[]>(`${url}`, { observe: 'response' });
+    const params = new HttpParams()
+    .set('page', page.toString())
+    .set('size', size.toString());
+    return this.http.get<Custom[]>(`${url}`, { params, observe: 'response' });
     // .pipe(map((res: EntityUserResponse) => res));
   }
 

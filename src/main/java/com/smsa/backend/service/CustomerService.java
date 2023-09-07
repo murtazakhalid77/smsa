@@ -5,10 +5,13 @@ import com.smsa.backend.Exception.RecordNotFoundException;
 import com.smsa.backend.dto.CustomerDTO;
 import com.smsa.backend.model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.smsa.backend.repository.CustomerRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,12 +21,12 @@ public class CustomerService {
     @Autowired
     CustomerRepository customerRepository;
 
-    public List<CustomerDTO> getAllCustomer() {
-        List<Customer> customer = this.customerRepository.findAll();
+    public Page<Customer> getAllCustomer(Pageable pageable) {
+        Page<Customer> customer =this.customerRepository.findAll(pageable);
         if(!customer.isEmpty()){
-          return   customer.stream().map(c->toDto(c)).collect(Collectors.toList());
+            return customer;
         }
-        return new ArrayList<>();
+        return null;
 
     }
 
@@ -36,6 +39,11 @@ public class CustomerService {
             Customer customer = toDomain(customerDTO);
             return toDto(customerRepository.save(toDomain(customerDTO)));
         }
+    }
+
+   public List<CustomerDTO> toDto(Page<Customer> customer){
+      List<CustomerDTO> customerDTOS = customer.getContent().stream().map(c->toDto((Customer) c)).collect(Collectors.toList());
+      return customerDTOS;
     }
 
     CustomerDTO toDto(Customer customer){

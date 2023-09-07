@@ -15,22 +15,22 @@
                     </button>
                 </div>
             </div>
-            <div class="order-table">
+            <div class="order-table table-container">
                 <table class="table table-striped">
-                    <thead style="position: sticky;
-                    top: 0%;
-                    background: #ffffff;">
-                    <tr>
-                        <th class="text-center nowrap">
+                    <thead style="
+                    background: #ffffff;
+                    position: sticky;">
+                    <tr class="header-fixed">
+                        <th class="text-center nowrap col-md-2 col-lg-1">
                             <span class="font">Id</span>
                         </th>
-                        <th class="text-center nowrap">
+                        <th class="text-center nowrap col-md-2 col-lg-1">
                             <span class="font">User Name</span>
                         </th>
-                        <th class="text-center nowrap">
+                        <th class="text-center nowrap col-md-2 col-lg-1">
                             <span class="font">status</span>
                         </th>
-                        <th class="text-center nowrap">
+                        <th class="text-center nowrap col-md-2 col-lg-1">
                             <span class="font">Actions</span>
                         </th>
                     </tr>
@@ -38,15 +38,23 @@
 
                     <tbody>
                         <tr *ngFor="let user of users" class="order-table-row-hover">
-                            <th scope="row" class="tracking-id text-center">{{user?.id}}</th>
-                            <td class="text-center w-auto">{{user?.name}}</td>
-                            <td class="text-center w-auto">{{user?.status}}</td>
-                            <td class="order-table-btns-container text-center w-auto">
+                            <th class="text-center w-auto col-md-2 col-lg-1">{{user?.id}}</th>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{user?.name}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{user?.status}}</td>
+                            <td class="order-table-btns-container text-center w-auto col-md-2 col-lg-1">
                                 <i [style.color]="user?.status ? 'black' : 'red'" style="cursor: pointer !important;" class="fa-solid fa-pen"(click)="updateUser(user?.id)"></i>&nbsp;
                             </td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+        </div>
+        <div class="row mt-4" *ngIf="users!.length > 0">
+            <div class="col">
+            </div>
+            <div class="col-auto">
+                <mat-paginator [pageSize]="itemsPerPage" [length]="totalItems" (page)="changePage($event)"> </mat-paginator>
             </div>
         </div>
     </div>

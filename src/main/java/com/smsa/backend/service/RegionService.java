@@ -7,6 +7,8 @@ import com.smsa.backend.model.Region;
 import com.smsa.backend.repository.RegionRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,11 +31,10 @@ public class RegionService {
         throw new RecordAlreadyExistException(String.format("Region already exist"));
     }
 
-    public List<RegionDto> getAllRegions() {
-        List<Region> regions = this.regionRepository.findAll();
-        if(regions.size() > 0){
-            List<RegionDto> regionDtos = regions.stream().map(region -> toDTo(region)).collect(Collectors.toList());
-            return regionDtos;
+    public Page<Region> getAllRegions(Pageable pageable) {
+        Page<Region> regions = this.regionRepository.findAll(pageable);
+        if(!regions.isEmpty()){
+            return regions;
         }
         throw new RecordNotFoundException(String.format("Regions not found"));
     }
@@ -59,6 +60,11 @@ public class RegionService {
         }
         throw new RecordNotFoundException(String.format("Region not found"));
     }
+
+    public List<RegionDto> toDto(List<Region> regions){
+        return regions.stream().map(region -> toDTo(region)).collect(Collectors.toList());
+    }
+
     public Region toDomain(RegionDto regionDto){
         return modelMapper.map(regionDto,Region.class);
     }

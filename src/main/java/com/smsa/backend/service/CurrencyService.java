@@ -3,18 +3,22 @@ package com.smsa.backend.service;
 import com.smsa.backend.Exception.RecordAlreadyExistException;
 import com.smsa.backend.Exception.RecordNotFoundException;
 import com.smsa.backend.dto.CurrencyDto;
+import com.smsa.backend.dto.CustomerDTO;
 import com.smsa.backend.model.Currency;
 import com.smsa.backend.model.CurrencyAuditLog;
 import com.smsa.backend.model.Custom;
 import com.smsa.backend.model.Customer;
 import com.smsa.backend.repository.CurrencyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CurrencyService {
@@ -35,16 +39,14 @@ public class CurrencyService {
         }
     }
 
-    public List<CurrencyDto> getAllCurrency() {
+    public Page<Currency> getAllCurrency(Pageable pageable) {
         List<CurrencyDto> currencyDtos = new ArrayList<>();
 
-        List<Currency> currencies = this.currencyRepository.findAll();
-
-        for(Currency currency: currencies){
-            currencyDtos.add(toDto(currency));
+        Page<Currency> currencies = this.currencyRepository.findAll(pageable);
+        if(!currencies.isEmpty()){
+            return currencies;
         }
-
-        return currencyDtos;
+        return null;
     }
 
     public List<CurrencyDto> getAllCurrencyForImport() {
@@ -123,6 +125,12 @@ public class CurrencyService {
                 .isPresent(currency.getIsPresent())
                 .build();
     }
+
+    public List<CurrencyDto> toDto(Page<Currency> currencies){
+        List<CurrencyDto> customerDTOS = currencies.getContent().stream().map(c->toDto((Currency) c)).collect(Collectors.toList());
+        return customerDTOS;
+    }
+
     private Currency toDomain(CurrencyDto currencyDto){
         return new Currency().builder()
                 .id(currencyDto.getId())
