@@ -18,7 +18,7 @@ import { CustomPortComponent } from './pages/custom-port/list/custom-port.compon
 import { CustomUpdateComponent } from './pages/custom-port/update/custom-update.component';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { LoaderComponent } from './pages/loader/loader.component';
 import { LoaderInterceptor } from './services/interceptors/loader.interceptor';
 import { UserComponent } from './pages/user/list/user.component';
@@ -32,7 +32,10 @@ import { PermissionListComponent } from './pages/permission/permission-list/perm
 import { PermissionUpdateComponent } from './pages/permission/permission-update/permission-update.component';
 import { RoleBasedAccessDirectiveDirective } from './directive/role-based-access-directive.directive';
 import { CommonModule } from '@angular/common';
-import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.component';  
+import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.component';
+import { CurrencyHistoryComponent } from './pages/currency/currency-history/currency-history.component';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { MatPaginatorModule } from '@angular/material/paginator';
 @NgModule({
   declarations: [
     AppComponent,
@@ -58,10 +61,13 @@ import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.compone
     PermissionUpdateComponent,
     RoleBasedAccessDirectiveDirective,
     UnauthorizedComponent,
+    ReportComponent,
+    CurrencyHistoryComponent
   ],
   imports: [
+    NgxPaginationModule,
     BrowserModule,
-    // BrowserAnimationsModule,
+    MatPaginatorModule,
     AppRoutingModule,
     FormsModule,
     HttpClientModule,

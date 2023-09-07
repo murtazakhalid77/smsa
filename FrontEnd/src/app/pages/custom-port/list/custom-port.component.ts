@@ -12,19 +12,24 @@ import {DashboardHeadComponent} from 'src/app/components/dashboard-head/dashboar
 export class CustomPortComponent implements OnInit {
 
   customs?: ICustom[];
+  currentPage:number  = 0;
+  itemsPerPage: number = 10;
+  totalItems?: string;
+
 
 
   constructor(private router: Router, private loginService: LoginService, private customService: CustomService) { }
 
   ngOnInit(): void {
-    this.getCustoms();
+    this.getCustoms(this.currentPage, this.itemsPerPage);
   }
 
-  getCustoms() {
-    this.customService.getCustoms().subscribe(
+  getCustoms(page?: any, size?: any) {
+    this.customService.getCustoms(page, size).subscribe(
       (res: EntityAllCustomsResponseType) => {
         if(res && res.body){
           this.customs = res.body;
+          this.totalItems = res.headers.get('X-Total-Count') ?? '';
         } 
       },
       (error) => {
@@ -43,6 +48,8 @@ export class CustomPortComponent implements OnInit {
     this.router.navigateByUrl('/custom')
   }
 
-
+  changePage(value: any){
+    this.getCustoms(value.pageIndex, this.itemsPerPage);
+  }
 
 }

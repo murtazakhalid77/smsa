@@ -16,28 +16,27 @@
                     </button>
                 </div>
             </div>
-            <div class="order-table">
+            <div class="order-table table-container">
                 <table class="table table-striped">
-                    <thead style="position: sticky;
-                    top: 0%;
-                    background: #ffffff;">
-                    <tr>
-                        <th class="text-center nowrap">
+                    <thead style=" background: #ffffff;
+                    position: sticky;">
+                    <tr class="header-fixed">
+                        <th class="text-center nowrap col-md-2 col-lg-1">
                             <span class="font">Id</span>
                         </th>
-                        <th class="text-center nowrap">
+                        <th class="text-center nowrap col-md-2 col-lg-1">
                             <span class="font">Custom</span>
                         </th>
-                        <th class="text-center nowrap">
+                        <th class="text-center nowrap col-md-2 col-lg-1">
                             <span class="font">Custom Port</span>
                         </th>
-                        <th class="text-center nowrap">
+                        <th class="text-center nowrap col-md-2 col-lg-1">
                             <span class="font">SMSA Fee (VAT)</span>
                         </th>
-                        <th class="text-center nowrap">
+                        <th class="text-center nowrap col-md-2 col-lg-1">
                             <span class="font">Currency</span>
                         </th>
-                        <th class="text-center nowrap">
+                        <th class="text-center nowrap col-md-2 col-lg-1">
                             <span class="font">Actions</span>
                         </th>
                     </tr>
@@ -45,12 +44,12 @@
 
                     <tbody>
                         <tr *ngFor="let custom of customs" class="order-table-row-hover">
-                            <th scope="row" class="tracking-id text-center">{{custom?.id}}</th>
-                            <td class="text-center w-auto">{{custom?.custom}}</td>
-                            <td class="text-center w-auto">{{custom?.customPort}}</td>
-                            <td class="text-center w-auto">{{custom?.smsaFeeVat}}</td>
-                            <td class="text-center w-auto">{{custom?.currency}}</td>
-                            <td class="order-table-btns-container text-center w-auto">
+                            <th class="text-center w-auto col-md-2 col-lg-1">{{custom?.id}}</th>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{custom?.custom}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{custom?.customPort}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{custom?.smsaFeeVat}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{custom?.currency}}</td>
+                            <td class="order-table-btns-container text-center w-auto col-md-2 col-lg-1">
                                 <i [style.color]="custom?.present ? 'black' : 'red'" style="cursor: pointer !important;" class="fa-solid fa-pen"(click)="updateCustom(custom?.id)"></i>&nbsp;
                             </td>
                         </tr>
@@ -58,5 +57,14 @@
                 </table>
             </div>
         </div>
+        
+        <div class="row mt-4">
+            <div class="col">
+            </div>
+            <div class="col-auto">
+                <mat-paginator [pageSize]="itemsPerPage" [length]="totalItems" (page)="changePage($event)"> </mat-paginator>
+            </div>
+        </div>
+        
     </div>
 </div>

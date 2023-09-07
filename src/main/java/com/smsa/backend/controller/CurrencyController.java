@@ -1,8 +1,12 @@
 package com.smsa.backend.controller;
 
 import com.smsa.backend.dto.CurrencyDto;
+import com.smsa.backend.model.Currency;
 import com.smsa.backend.service.CurrencyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +25,13 @@ public class CurrencyController {
     }
 
     @GetMapping("/currency")
-    ResponseEntity<List<CurrencyDto>> getAllCurrency(){
-        return ResponseEntity.ok(this.currencyService.getAllCurrency());
+    ResponseEntity<List<CurrencyDto>> getAllCurrency(Pageable pageable){
+        Page<Currency> currencies = this.currencyService.getAllCurrency(pageable);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(currencies.getTotalElements()));
+        return ResponseEntity.ok()
+                .headers(headers)// Set the headers
+                .body(currencyService.toDto(currencies));
     }
 
 

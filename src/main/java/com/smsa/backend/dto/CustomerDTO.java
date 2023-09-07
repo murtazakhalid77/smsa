@@ -40,7 +40,7 @@ public class CustomerDTO {
 
     @NotBlank(message = "CC Emails are required")
     @Email(message = "Invalid email format")
-    private String Ccmail;
+    private String ccMail;
 
     @NotBlank(message = "Customer name (Arabic) is required")
     private String nameArabic;

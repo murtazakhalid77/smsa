@@ -5,11 +5,14 @@ import com.smsa.backend.dto.CustomDto;
 import com.smsa.backend.model.Custom;
 import com.smsa.backend.repository.CustomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomService {
@@ -20,16 +23,15 @@ public class CustomService {
         return toDto(this.customRepository.save(toDomain(customDto)));
     }
 
-    public List<CustomDto> getAllCustoms() {
+    public Page<Custom> getAllCustoms(Pageable pageable) {
         List<CustomDto> customDtos = new ArrayList<>();
 
-        List<Custom> customs = this.customRepository.findAll();
+        Page<Custom> customs = this.customRepository.findAll(pageable);
 
-        for(Custom custom: customs){
-            customDtos.add(toDto(custom));
+        if(!customs.isEmpty()){
+            return customs;
         }
-
-        return customDtos;
+        return null;
     }
 
     public List<CustomDto> getAllCustomForImport() {
@@ -77,6 +79,10 @@ public class CustomService {
         throw new RecordNotFoundException(String.format("Custom Not Found On this Id => %d",id));
     }
 
+
+    public List<CustomDto> toDto(List<Custom> customs){
+        return customs.stream().map(custom -> toDto(custom)).collect(Collectors.toList());
+    }
 
     private CustomDto toDto(Custom custom){
         return new CustomDto().builder()

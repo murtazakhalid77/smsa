@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LoginService } from 'src/app/services/login.service';
 import { CustomerService, EntityCustomerResponseType, EntityAllCustomersResponseType} from 'src/app/services/orders.service';
 import { Customer, ICustomer } from './customer.model';
+import { PagingConfig } from '../model/paging-config-model';
 
 @Component({
   selector: 'app-orders',
@@ -18,8 +19,40 @@ export class OrdersComponent implements OnInit {
   currentUser: any
   originalCustomers: Customer[] = [];
   accountNumbers: any = null;
+  currentPage:number  = 0;
+  itemsPerPage: number = 10;
+  totalItems?: string;
 
-  constructor(private customerService: CustomerService, private router: Router, private loginService: LoginService, private route: ActivatedRoute,) { }
+
+
+  constructor(private customerService: CustomerService, private router: Router, private loginService: LoginService, private route: ActivatedRoute,) { 
+
+    // this.customerService.getCustomers(this.currentPage - 1, this.itemsPerPage).subscribe(
+    //   (res: EntityAllCustomersResponseType) => {
+    //     if(res && res.body){
+    //       this.customers = res.body;
+    //       this.originalCustomers = this.customers!;
+    //       debugger;
+    //       this.totalItems = res.headers.has('X-Total-Count')
+    //     ? res.headers.get('X-Total-Count')!
+    //     : '1'; // Set a default value if X-Total-Count is not present
+
+    //       this.pagingConfig = {
+    //         itemsPerPage: this.itemsPerPage,
+    //         currentPage: this.currentPage,
+    //         totalItems: Number(this.totalItems)
+    //       }
+    //     } 
+    //   },
+    //   (error) => {
+    //     // Handle the error if needed
+    //     console.error('Error fetching customers:', error);
+    //   }
+    // );
+
+
+    this.getCustomers(this.currentPage, this.itemsPerPage);
+  }
 
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {
@@ -27,19 +60,20 @@ export class OrdersComponent implements OnInit {
         this.accountNumbers = params['accountNumbers'];
       }
     });
-      this.getCustomers();
+      // this.getCustomers(1, 5);
   }
 
   addCustomer() {
     this.router.navigateByUrl('/customer')
   }
 
-  getCustomers() {
-    this.customerService.getCustomers().subscribe(
+  getCustomers(page: any, size: any) {
+    this.customerService.getCustomers(page, size).subscribe(
       (res: EntityAllCustomersResponseType) => {
         if(res && res.body){
           this.customers = res.body;
           this.originalCustomers = this.customers!;
+          this.totalItems = res.headers.get('X-Total-Count') ?? '';
         } 
       },
       (error) => {
@@ -66,7 +100,7 @@ export class OrdersComponent implements OnInit {
 
         if(res && res.body){
           this.customer = res.body;
-          this.getCustomers();
+          this.getCustomers(this.currentPage, this.itemsPerPage);
         } 
       },
       (error) => {
@@ -90,7 +124,8 @@ export class OrdersComponent implements OnInit {
       }
     }
   }
-  
-  
 
+  changePage(value: any){
+    this.getCustomers(value.pageIndex, this.itemsPerPage);
+  }
 }

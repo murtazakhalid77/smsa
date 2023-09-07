@@ -5,18 +5,13 @@
 
     <div class="main-container">
         <div>
-            <h4>Currency</h4>
+            <h4>Currency History</h4>
             <p class="page-intro">Whole data about your business here</p>
         </div>
         <div class="order-body">
             <div class="order-search-panel">
-                <input type="text" placeholder="Search Custom" class="order-search form-control"
+                <input type="text" placeholder="Search History" class="order-search form-control"
                     >
-                <div>
-                    <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg" type="submit" (click)="addCurrency()">
-                        <span>Add Currency</span>
-                    </button>
-                </div>
             </div>
             <div class="order-tablet table-container">
                 <table class="table table-striped">
@@ -51,17 +46,11 @@
                         <th class="nowrap col-md-2 col-lg-1 text-center">
                             <span class="font">Status</span>
                         </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
-                            <span class="font">History</span>
-                        </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
-                            <span class="font">Actions</span>
-                        </th>
                     </tr>
                 </thead>
 
                     <tbody>
-                        <tr *ngFor="let data of currency" class="order-table-row-hover">
+                        <tr *ngFor="let data of currencyHistory" class="order-table-row-hover">
                             <th scope="row" class="tracking-id text-center">{{data?.id}}</th>
                             <td class="text-center w-auto">{{data?.currencyFrom}}</td>
                             <td class="text-center w-auto">{{data?.currencyTo}}</td>
@@ -71,18 +60,12 @@
                             <td class="text-center w-auto">{{data?.updatedBy}}</td>
                             <td class="text-center w-auto">{{data?.updatedAt}}</td>
                             <td class="text-center w-auto">{{data?.isPresent}}</td>
-                            <td class="order-table-btns-container text-center w-auto">
-                                <i class="fa-solid fa-history" style="cursor: pointer !important;" (click)="showHistory(data?.id)"></i>&nbsp;
-                            </td>
-                            <td class="order-table-btns-container text-center w-auto">
-                                <i [style.color]="data?.isPresent ? 'black' : 'red'" style="cursor: pointer !important;" class="fa-solid fa-pen"(click)="updateCurrency(data?.id)"></i>&nbsp;
-                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-        <div class="row mt-4" *ngIf="currency!.length > 0">
+        <div class="row mt-4" *ngIf="currencyHistory!.length > 0">
             <div class="col">
               <!-- Your content here -->
             </div>

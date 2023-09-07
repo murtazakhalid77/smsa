@@ -9,6 +9,8 @@ import com.smsa.backend.repository.RolesRepository;
 import com.smsa.backend.repository.UserRepository;
 import org.modelmapper.Converters;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -48,8 +50,12 @@ public class UserService {
         return rolesSet;
     }
 
-    public List<User> getAllUsers() {
-        return this.userRepository.findAll();
+    public Page<User> getAllUsers(Pageable pageable) {
+        Page<User> users = this.userRepository.findAll(pageable);
+        if(!users.isEmpty()){
+            return users;
+        }
+        throw new RecordNotFoundException(String.format("Users not found"));
     }
 
     public User findUserById(Long id) {

@@ -9,12 +9,15 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.AccessType;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class HelperService {
@@ -71,6 +74,16 @@ public class HelperService {
         return getSheetHistory(sheetUniqueId).getInvoiceDate();
     }
 
+    public static String getLoggedInUserName() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            String currentUserName = authentication.getName();
+            return currentUserName;
+        }else{
+            return null;
+        }
+    }
+
     public  int findStartingRow(Sheet sheet) {
         DataFormatter dataFormatter = new DataFormatter();
         int lastRowIndex = sheet.getLastRowNum();
@@ -95,4 +108,13 @@ public class HelperService {
 
         return 0; // If no non-empty row is found, start from the first row
     }
+    public static boolean checkValidEmail(String[] emailList) {
+        for (String mail : emailList) {
+            if (mail == null || !mail.matches("^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+)$")) {
+                return false; // Return false if any email is invalid or null
+            }
+        }
+        return true; // Return true if all emails are valid
+    }
+
 }

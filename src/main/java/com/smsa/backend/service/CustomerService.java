@@ -5,10 +5,13 @@ import com.smsa.backend.Exception.RecordNotFoundException;
 import com.smsa.backend.dto.CustomerDTO;
 import com.smsa.backend.model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.smsa.backend.repository.CustomerRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,12 +21,12 @@ public class CustomerService {
     @Autowired
     CustomerRepository customerRepository;
 
-    public List<CustomerDTO> getAllCustomer() {
-        List<Customer> customer = this.customerRepository.findAll();
+    public Page<Customer> getAllCustomer(Pageable pageable) {
+        Page<Customer> customer =this.customerRepository.findAll(pageable);
         if(!customer.isEmpty()){
-          return   customer.stream().map(c->toDto(c)).collect(Collectors.toList());
+            return customer;
         }
-        return new ArrayList<>();
+        return null;
 
     }
 
@@ -38,16 +41,21 @@ public class CustomerService {
         }
     }
 
+   public List<CustomerDTO> toDto(Page<Customer> customer){
+      List<CustomerDTO> customerDTOS = customer.getContent().stream().map(c->toDto((Customer) c)).collect(Collectors.toList());
+      return customerDTOS;
+    }
+
     CustomerDTO toDto(Customer customer){
         return CustomerDTO.builder()
                     .email(customer.getEmail())
-                .Ccmail(customer.getCcMail())
+                    .ccMail(customer.getCcMail())
                     .address(customer.getAddress())
                     .accountNumber(customer.getAccountNumber())
                     .country(customer.getCountry())
                     .poBox(customer.getPoBox())
                     .nameArabic(customer.getNameArabic())
-                .region(customer.getRegion())
+                    .region(customer.getRegion())
                     .invoiceCurrency(customer.getInvoiceCurrency())
                     .smsaServiceFromSAR(customer.getSmsaServiceFromSAR())
                     .isPresent(customer.isPresent())
@@ -61,7 +69,7 @@ public class CustomerService {
     Customer toDomain(CustomerDTO customerDTO){
         return Customer.builder()
                 .email(customerDTO.getEmail())
-                .ccMail(customerDTO.getCcmail())
+                .ccMail(customerDTO.getCcMail())
                 .address(customerDTO.getAddress())
                 .accountNumber(customerDTO.getAccountNumber())
                 .country(customerDTO.getCountry())
@@ -92,7 +100,7 @@ public class CustomerService {
         Optional<Customer> customer = customerRepository.findByAccountNumber(accountNumber);
         if(customer.isPresent()){
             customer.get().setAccountNumber(accountNumber);
-            customer.get().setCcMail(customerDTO.getCcmail());
+            customer.get().setCcMail(customerDTO.getCcMail());
             customer.get().setNameEnglish(customerDTO.getNameEnglish());
             customer.get().setNameArabic(customerDTO.getNameArabic());
             customer.get().setEmail(customerDTO.getEmail());

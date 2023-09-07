@@ -4,6 +4,9 @@ import com.smsa.backend.dto.RegionDto;
 import com.smsa.backend.model.Region;
 import com.smsa.backend.service.RegionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
@@ -25,8 +28,14 @@ public class RegionController {
     }
 
     @GetMapping("/region")
-    ResponseEntity<List<RegionDto>> getAllRegions(){
-        return ResponseEntity.ok(this.regionService.getAllRegions());
+    ResponseEntity<List<RegionDto>> getAllRegions(Pageable pageable){
+        Page<Region> regions = this.regionService.getAllRegions(pageable);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(regions.getTotalElements()));
+        return ResponseEntity.ok()
+                .headers(headers)// Set the headers
+                .body(regionService.toDto(regions.getContent()));
+
     }
 
     @GetMapping("/region/{id}")

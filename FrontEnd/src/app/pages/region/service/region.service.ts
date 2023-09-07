@@ -1,4 +1,4 @@
-import { HttpClient, HttpResponse } from "@angular/common/http";
+import { HttpClient, HttpParams, HttpResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "src/Environments/environment";
 import { IRegion, Region } from "../../model/region.model";
@@ -16,9 +16,12 @@ export type EntityRegionResponseType = HttpResponse<IRegion>;
   
     constructor(private http: HttpClient) { }
 
-    getRegions(): Observable<EntityRegionsResponseType> {
+    getRegions(page?: any, size?: any): Observable<EntityRegionsResponseType> {
         let url = `${this._url}/region`;
-        return this.http.get<Region[]>(`${url}`, { observe: 'response' });
+        const params = new HttpParams()
+        .set('page', page.toString())
+        .set('size', size.toString());
+        return this.http.get<Region[]>(`${url}`, { params, observe: 'response' });
     }
 
     getRegionById(id?: any): Observable<EntityRegionResponseType> {

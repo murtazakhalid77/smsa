@@ -11,8 +11,6 @@ import lombok.*;
 @Builder
 public class SearchCriteria {
     String column;
-    Long saledIdStart;
-    Long saleIdEnd;
-    String startDate;
-    String endDate;
+    String value;
+    String operator;
 }

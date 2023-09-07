@@ -37,8 +37,11 @@ export class ImportComponent {
   invoiceDate?: string;
   customVat?: any;
   isModalOpen = false;
+  errorModalOpen = false;
   accountNumbers:any;
   excelImportDto?: IExcelImportDto = {};
+  duplicateExceptionMessage?:string = 'There was a duplication of these AWBs'
+  duplicateAwbsMessage?: string = ''
 
   headers: any = ['mawb', 'manifest date', 'account number', 'awb', 'ordernumber', 'origin', 'destination', 'shipper name', 'consignee name', 'weight', 'declared value', 'value (custom)', 'vat amount', 'custom form', 'other', 'total charges', 'custom declaration', 'ref#', 'custom declaration date'];
 
@@ -131,8 +134,12 @@ export class ImportComponent {
               }
             },
             error =>{
-              console.error('Error response:', error);
-              this.toastr.error(error.error.body);
+              if(error.error.body.includes(this.duplicateExceptionMessage)){
+                this.duplicateAwbsMessage = error.error.body;
+                this.errorModalOpen = true;
+              }else{
+                this.toastr.error(error.error.body);
+              }
             });
           }else{
             this.toastr.error('The format of the file is Incorrect')
@@ -157,6 +164,9 @@ export class ImportComponent {
 
   closeModal() {
     this.isModalOpen = false;
+  }
+  closeErrorModalModal(){
+    this.errorModalOpen = false;
   }
 
   navigateToCustomer(){

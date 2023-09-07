@@ -11,18 +11,22 @@ import { IUser } from '../../model/user.model';
 export class UserComponent implements OnInit{
 
   users?: IUser[];
+  currentPage:number  = 0;
+  itemsPerPage: number = 10;
+  totalItems?: string;
 
   constructor(private router: Router, private userService: UserService) { }
 
   ngOnInit(): void {
-    this.getUsers();
+    this.getUsers(this.currentPage, this.itemsPerPage);
   }
 
-  getUsers() {
-    this.userService.getUsers().subscribe(
+  getUsers(page?: any, size?: any) {
+    this.userService.getUsers(page, size).subscribe(
       (res: EntityUsersResponseType) => {
         if(res && res.body){
           this.users = res.body;
+          this.totalItems = res.headers.get('X-Total-Count') ?? '';
           console.log(this.users)
         } 
       },
@@ -40,5 +44,8 @@ export class UserComponent implements OnInit{
     this.router.navigate(['/user'], { queryParams: { id: id } });
   }
 
+  changePage(value: any){
+    this.getUsers(value.pageIndex, this.itemsPerPage);
+  }
 
 }

@@ -4,6 +4,7 @@ import { Currency, ICurrencyDto } from '../../model/Currency.model';
 import { CurrencyService, EntityCurrencyResponseType } from '../service/currency.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, map } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-currency-update',
@@ -20,6 +21,7 @@ export class CurrencyUpdateComponent {
     private currencyService: CurrencyService, 
     private router: Router,
     private route: ActivatedRoute,
+    private toastr: ToastrService
     ) { }
 
     ngOnInit(): void {
@@ -48,6 +50,8 @@ export class CurrencyUpdateComponent {
           this.currency = res;
           this.currencyForm.patchValue(this.currency);
           this.currencyForm.get('isActive')?.setValue(this.currency?.isPresent);
+          this.currencyForm.get('currencyTo')?.disable()
+          this.currencyForm.get('currencyFrom')?.disable()
         }
       })
   
@@ -68,11 +72,12 @@ export class CurrencyUpdateComponent {
   submit(currencyForm: FormGroup){
     let currency = {
       id: this.id,
-      currencyFrom: currencyForm.value.currencyFrom,
-      currencyTo: currencyForm.value.currencyTo,
+      currencyFrom: currencyForm.value.currencyFrom !== undefined ? currencyForm.value.currencyFrom : this.currency?.currencyFrom,
+      currencyTo: currencyForm.value.currencyTo !== undefined ? currencyForm.value.currencyTo : this.currency?.currencyTo,
       conversionRate: currencyForm.value.conversionRate,
       isPresent: currencyForm.value.isActive
-    }
+    };
+    
 
     if(this.id!=null ){
       this.updateCurrency(currency);
@@ -82,11 +87,11 @@ export class CurrencyUpdateComponent {
   }
 
   updateCurrency(currency: Currency) {
-    this.currencyService.updateCurrency(currency).subscribe((res: any)=>{
-      if(res){
-        this.router.navigateByUrl('/currency/view')
-      }
-    })
+      this.currencyService.updateCurrency(currency).subscribe((res: any)=>{
+        if(res){
+          this.router.navigateByUrl('/currency/view')
+        }
+      })
   }
 
   createCurrency(currency: Currency){
@@ -94,6 +99,9 @@ export class CurrencyUpdateComponent {
       if(res){
         this.router.navigateByUrl('/currency/view')
       }
+    },
+    error =>{
+      this.toastr.error(error.error.body);
     })
   }
 }

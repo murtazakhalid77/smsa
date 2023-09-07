@@ -60,6 +60,9 @@
                             <span class="font">Email</span>
                         </th>
                         <th class="nowrap col-md-2 col-lg-1">
+                            <span class="font">CC Email</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1">
                             <span class="font">Customer VAT</span>
                         </th>
                         <th class="nowrap col-md-2 col-lg-1">
@@ -88,6 +91,7 @@
                             <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.nameArabic}}</td>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.nameEnglish}}</td>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.email}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.ccMail}}</td>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.vatNumber}}</td>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.address}}</td>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{customer?.poBox}}</td>
@@ -108,6 +112,14 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>       
+        </div>
+        <div class="row mt-4" *ngIf="customers!.length > 0">
+            <div class="col">
+              <!-- Your content here -->
+            </div>
+            <div class="col-auto">
+                <mat-paginator [pageSize]="itemsPerPage" [length]="totalItems" (page)="changePage($event)"> </mat-paginator>
             </div>
         </div>
     </div>

@@ -11,19 +11,24 @@ import { Router } from '@angular/router';
 export class RegionListComponent {
 
   regions?: IRegion[];
+  currentPage:number  = 0;
+  itemsPerPage: number = 10;
+  totalItems?: string;
+
 
   constructor(private regionService: RegionService,
               private router: Router){}
 
   ngOnInit(){
-    this.getAllRegions()
+    this.getAllRegions(this.currentPage, this.itemsPerPage);
   }
 
   
-  getAllRegions(){
-    this.regionService.getRegions().subscribe(res =>{
+  getAllRegions(page?: any, size?: any){
+    this.regionService.getRegions(page, size).subscribe(res =>{
       if(res && res.body){
         this.regions = res.body;
+        this.totalItems = res.headers.get('X-Total-Count') ?? '';
       }
     })
   }
@@ -38,4 +43,9 @@ export class RegionListComponent {
   }
   
   searchRegion(search: any){}
+
+  changePage(value: any){
+    this.getAllRegions(value.pageIndex, this.itemsPerPage);
+  }
+
 }
