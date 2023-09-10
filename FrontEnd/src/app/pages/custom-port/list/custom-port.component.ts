@@ -21,6 +21,7 @@ export class CustomPortComponent implements OnInit {
   constructor(private router: Router, private loginService: LoginService, private customService: CustomService) { }
 
   ngOnInit(): void {
+    debugger
     this.getCustoms(this.currentPage, this.itemsPerPage);
   }
 

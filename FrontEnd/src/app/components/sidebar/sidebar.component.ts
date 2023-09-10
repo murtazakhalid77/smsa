@@ -51,4 +51,7 @@ export class SidebarComponent implements OnInit{
   permissions(){
     this.router.navigateByUrl('permissions')
   }
+  sheetHistory(){
+    this.router.navigateByUrl('sheetHistory')
+  }
 }

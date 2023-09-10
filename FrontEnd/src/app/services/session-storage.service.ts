@@ -9,7 +9,7 @@ export class SessionStorageService  {
   userPermissions: string[] = [];
 
   constructor(private authGuardSerivce:AuthGuard) {
-    debugger
+
     const token = sessionStorage.getItem('jwtToken');
     const decodedToken =authGuardSerivce.getDecodedAccessToken(token!);
     if (decodedToken) {
@@ -22,7 +22,7 @@ export class SessionStorageService  {
     return this.userPermissions.includes(requiredPermission);
   }
 
-  private reloadSubject = new Subject<void>();
+  
 
 
   

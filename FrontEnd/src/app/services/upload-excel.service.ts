@@ -16,6 +16,7 @@ export class UploadExcelService {
 
   public uploadFile(file:File, excelImportDto: any){
       const formData: FormData = new FormData();
+      debugger
       formData.append('file', file);
       formData.append('excelImport', JSON.stringify(excelImportDto));
       return this.http.post<any>(`${this._url}/excel/upload`, formData);

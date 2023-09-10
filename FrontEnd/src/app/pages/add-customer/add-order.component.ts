@@ -296,12 +296,13 @@ export class AddOrderComponent implements OnInit {
       ) { }
 
   ngOnInit(): void {
+      debugger
     this.getAllRegions();
     this.countryCodes = this.countries.map(country => country.code);
-
+  
 
     this.route.queryParams.subscribe( params => {
-      this.accountNumber = params['accountNumber'];
+      this.accountNumber = params['id'];
       if(this.accountNumber!=null){
         this.updateForm(this.accountNumber);
       }
@@ -328,6 +329,7 @@ export class AddOrderComponent implements OnInit {
   getAllRegions(){
     this.regionService.getRegions().subscribe(res =>{
       if(res && res.body){
+        debugger
         this.regions = res.body;
       }
     })
@@ -342,9 +344,10 @@ export class AddOrderComponent implements OnInit {
   // }
 
   updateForm(accountNumber?: number){
-
+debugger
     this.getCustomerByAccountNumber(accountNumber).subscribe((customer) => {
       if(customer){
+    
         this.customer = customer;
         const formData = {
           email: this.customer.email,

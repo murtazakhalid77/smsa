@@ -91,7 +91,7 @@ export class OrdersComponent implements OnInit {
 
   updateCustomer(accountNumber?: any){
 
-    this.router.navigate(['/customer'], { queryParams: { accountNumber: accountNumber } });
+    this.router.navigate(['/customer'], { queryParams: { id: accountNumber } });
   }
 
   deleteCustomer(accountNumber?: any) {

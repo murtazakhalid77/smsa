@@ -38,6 +38,7 @@ public class RegionController {
 
     }
 
+
     @GetMapping("/region/{id}")
     ResponseEntity<RegionDto> getRegionById(@PathVariable Long id){
         return ResponseEntity.ok(this.regionService.getRegionById(id));

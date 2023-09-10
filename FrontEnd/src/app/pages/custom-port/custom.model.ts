@@ -1,4 +1,4 @@
-export interface ICustom {
+export interface    ICustom {
     id?: number;
     customPort?: string,
     custom?: string,

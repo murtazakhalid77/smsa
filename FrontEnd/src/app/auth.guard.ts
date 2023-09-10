@@ -24,9 +24,8 @@ import { UserService } from './pages/user/service/user.service';
     constructor(private authService: AuthguardService, private router: Router,userService:UserService) { }
 
     canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-      debugger;
+      debugger
       const jwtToken = sessionStorage.getItem('jwtToken');
-      
       if (jwtToken) {
         const decodedToken = this.getDecodedAccessToken(jwtToken);
         const userPermissions = decodedToken.PERMISSIONS;
@@ -71,12 +70,12 @@ getPermissionsObj():any{
     permissions:'USER_MANAGEMENT'
    }
    const currencyObj={
-    url:['/currency/view','/currency'],
+    url:['/currency/view','/currency','/currency/history'],
     permissions:'CURRENCY_MANAGEMENT'
    }
-   const customObj={
+   const customObj={  
     url:['/custom/view','/custom'],
-    permissions:'CUSTOM_MANAGEMENT'
+    permissions:'CUSTOM_PORT_MANAGEMENT'
    }
    const regionObj={
     url:['/region/view','/region'],
@@ -88,7 +87,7 @@ getPermissionsObj():any{
    }
    const salesReportObj={
     url:['/reports'],
-    permissions:'SALES_EXCEL_MANAGEMENT'
+    permissions:'SALES_REPORT_MANAGEMENT'
    }
    const permissionsObj={
     url:['/permissions'],
@@ -98,8 +97,13 @@ getPermissionsObj():any{
     url:['/dashboard'],
     permissions:'DASHBOARD_MANAGEMENT'
    }
+   const sheetHistoryObj={
+    url:['/sheetHistory '],
+    permissions:'SHEET_HISTORY_REPOSITORY'
+   }
    
-   return  [customerObj,userObj,currencyObj,customObj,regionObj,importObj,salesReportObj,permissionsObj,dashboardObj]
+   
+   return  [customerObj,userObj,currencyObj,customObj,regionObj,importObj,salesReportObj,permissionsObj,dashboardObj,sheetHistoryObj]
 }
 private urlMatches(pattern: string, url: string): boolean {
   const patternSegments = pattern.split('?')[0].split('/'); // Get URL segments without query parameters

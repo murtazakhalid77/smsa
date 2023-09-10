@@ -5,6 +5,8 @@
 
 package com.smsa.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -29,6 +31,7 @@ public class Custom {
         private Double smsaFeeVat;
         private String currency;
         private boolean isPresent;
+        @JsonIgnore
         @OneToMany(
                 mappedBy = "custom",
                 cascade = {CascadeType.ALL},

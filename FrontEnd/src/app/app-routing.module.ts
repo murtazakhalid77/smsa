@@ -19,6 +19,7 @@ import { ReportComponent } from './pages/report/report.component';
 import { PermissionUpdateComponent } from './pages/permission/permission-update/permission-update.component';
 import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.component';
 import { CurrencyHistoryComponent } from './pages/currency/currency-history/currency-history.component';
+import { SheetHistoryListComponent } from './pages/sheetHistory/sheet-history-list/sheet-history-list.component';
 
 const routes: Routes = [
   {
@@ -45,9 +46,9 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
-    path: 'customer/:id',
-    component: EditOrderComponent,
-    canActivate: [AuthGuard],
+    path: 'customer/:id',  // Define the route with the parameter ':id'
+    component: AddOrderComponent,
+    canActivate: [AuthGuard],  // Optional: Add canActivate guard if needed
   },
   {
     path: 'import',
@@ -119,6 +120,10 @@ const routes: Routes = [
   {
     path: 'unauthorized',
     component: UnauthorizedComponent,
+  },
+  {
+    path: 'sheetHistory',
+    component: SheetHistoryListComponent,
   }
 ];
 

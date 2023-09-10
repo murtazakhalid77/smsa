@@ -30,12 +30,12 @@ import { RegionUpdateComponent } from './pages/region/update/region-update.compo
 import { ReportComponent } from './pages/report/report.component';
 import { PermissionListComponent } from './pages/permission/permission-list/permission-list.component';
 import { PermissionUpdateComponent } from './pages/permission/permission-update/permission-update.component';
-import { RoleBasedAccessDirectiveDirective } from './directive/role-based-access-directive.directive';
-import { CommonModule } from '@angular/common';
 import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.component';
 import { CurrencyHistoryComponent } from './pages/currency/currency-history/currency-history.component';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { SheetHistoryListComponent } from './pages/sheetHistory/sheet-history-list/sheet-history-list.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -59,10 +59,10 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     ReportComponent,
     PermissionListComponent,
     PermissionUpdateComponent,
-    RoleBasedAccessDirectiveDirective,
     UnauthorizedComponent,
     ReportComponent,
-    CurrencyHistoryComponent
+    CurrencyHistoryComponent,
+    SheetHistoryListComponent,
   ],
   imports: [
     NgxPaginationModule,
