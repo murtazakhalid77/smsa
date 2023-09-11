@@ -40,7 +40,7 @@ public class EmailSchedular {
     private static final Logger logger = LoggerFactory.getLogger(EmailSchedular.class);
 
     @Scheduled(initialDelay = 5000, fixedDelay = 120000)
-    public void markSentAndProcessInvoices() throws Exception {
+    public void markSentAndProcessInvoices()  {
        try {
            List<SheetHistory> sheetsToBeSent = sheetHistoryRepository.findAllByIsEmail(false);
            if(!sheetsToBeSent.isEmpty()){

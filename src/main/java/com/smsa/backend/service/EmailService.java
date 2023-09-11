@@ -15,6 +15,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,7 @@ public class EmailService {
     private String sender;
     @Value("${smsa.file.location}")
     private String smsaFolderLocation;
+    @Async
     public boolean sendMailWithAttachments(Customer customer, byte[] excelFileData, byte[] pdfFileData,String sheetUniqueId) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
