@@ -30,16 +30,16 @@ public class EmailService {
     private JavaMailSender javaMailSender;
     @Autowired
     InvoiceDetailsRepository invoiceDetailsRepository;
+
     @Value("${spring.mail.username}")
     private String sender;
-    @Value("${smsa.file.location}")
-    private String smsaFolderLocation;
     @Async
     public boolean sendMailWithAttachments(Customer customer, byte[] excelFileData, byte[] pdfFileData,String sheetUniqueId) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
+                helper.setFrom(sender);
 
             String[] emailAddresses = customer.getEmail().split(",");
             if(HelperService.checkValidEmail(emailAddresses)){
@@ -50,13 +50,17 @@ public class EmailService {
             }
 
 
-            String[] ccEmails = customer.getCcMail().split(",");
-            if(HelperService.checkValidEmail(ccEmails)){
-                helper.setCc(ccEmails);
-            }else {
-                logger.warn("One or more CCemail addresses do not follow the valid email pattern or are null.");
-                throw new InvalidEmailException("One or more CCemail addresses do not follow the valid email pattern or are null.");
+            String ccEmails = customer.getCcMail();
+            if (ccEmails != null && !ccEmails.isEmpty()) {
+                String[] ccEmailAddresses = ccEmails.split(",");
+                if (HelperService.checkValidEmail(ccEmailAddresses)) {
+                    helper.setCc(ccEmailAddresses);
+                } else {
+                    logger.warn("One or more CC email addresses do not follow the valid email pattern or are null.");
+                    throw new InvalidEmailException("One or more CC email addresses do not follow the valid email pattern or are null.");
+                }
             }
+
 
             helper.setSubject("SMSA Express Invoice for Custom Duty & Taxes for Inbound Shipments");
 

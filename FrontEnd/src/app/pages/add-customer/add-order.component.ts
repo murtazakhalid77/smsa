@@ -322,7 +322,6 @@ export class AddOrderComponent implements OnInit {
       poBox: ['', [Validators.required]],
       country: ['', [Validators.required]],
       email: ['', [Validators.required]],
-      ccMail: ['', [Validators.required]]
     })
   }
 

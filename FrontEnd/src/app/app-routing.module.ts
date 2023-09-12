@@ -21,7 +21,7 @@ import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.compone
 import { CurrencyHistoryComponent } from './pages/currency/currency-history/currency-history.component';
 import { SheetHistoryListComponent } from './pages/sheetHistory/sheet-history-list/sheet-history-list.component';
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: '',
     component: LoginFormComponent

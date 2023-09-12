@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ public class SalesReportService {
 
     @Autowired
     HelperService helperService;
+
 
     public List<SalesReportDto> getSalesReport(SearchSalesReportDto searchSalesReportDto) {
         List<SalesReport> salesReports = null;
@@ -49,10 +51,24 @@ public class SalesReportService {
                     this.helperService.convertStringInToLocalDate(searchSalesReportDto.getStartDate()),
                     this.helperService.convertStringInToLocalDate(searchSalesReportDto.getEndDate()));
         }
-        for(SalesReport salesReport: salesReports){
-            salesReport.setTotalChargesAsPerCustomerDeclarationForm(Double.valueOf(formatCurrency(salesReport.getTotalChargesAsPerCustomerDeclarationForm())));
+        DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+        for (SalesReport salesReport : salesReports) {
+            String totalChargesString = String.valueOf(salesReport.getTotalChargesAsPerCustomerDeclarationForm());
+            totalChargesString = totalChargesString.replace(",", "").trim();
+            double totalCharges = Double.parseDouble(totalChargesString);
+
+            // Format the double value with exactly two decimal places
+            String formattedTotalCharges = decimalFormat.format(totalCharges);
+
+            // Parse the formatted string back to double
+            totalCharges = Double.parseDouble(formattedTotalCharges);
+
+            // Set the parsed double value back to the sales report
+            salesReport.setTotalChargesAsPerCustomerDeclarationForm(totalCharges);
+
             salesReportDtos.add(this.toDTo(salesReport));
         }
+
         return salesReportDtos;
     }
 

@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
+import { provideRouter, withHashLocation } from '@angular/router';
 import { AppComponent } from './app.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { DashboardHeadComponent } from './components/dashboard-head/dashboard-head.component';
@@ -35,7 +36,7 @@ import { CurrencyHistoryComponent } from './pages/currency/currency-history/curr
 import { NgxPaginationModule } from 'ngx-pagination';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { SheetHistoryListComponent } from './pages/sheetHistory/sheet-history-list/sheet-history-list.component';
-
+import {routes} from './app-routing.module'
 @NgModule({
   declarations: [
     AppComponent,
@@ -86,7 +87,8 @@ import { SheetHistoryListComponent } from './pages/sheetHistory/sheet-history-li
     DatePipe,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true }, // Register the AuthInterceptor
-  ],
+    provideRouter(routes, withHashLocation()),
+],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

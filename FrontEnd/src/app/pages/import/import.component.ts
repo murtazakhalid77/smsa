@@ -22,18 +22,18 @@ import { saveAs } from 'file-saver';
   styleUrls: ['./import.component.css']
 })
 export class ImportComponent {
-  
+
 
   dataArray: any = [];
   arr: any = []
   flag: Boolean = false;
   fileToUpload: any;
-  
+
   tableHeader: any = []
   customs?: ICustom[];
   selectedCustomPort?: string = '';
-  startDate?: string; 
-  endDate?: string; 
+  startDate?: string;
+  endDate?: string;
   invoiceDate?: string;
   customVat?: any;
   isModalOpen = false;
@@ -65,7 +65,7 @@ export class ImportComponent {
       (res: EntityAllCustomsResponseType) => {
         if(res && res.body){
           this.customs = res.body;
-        } 
+        }
       },
       (error) => {
         // Handle the error if needed
@@ -100,8 +100,8 @@ export class ImportComponent {
     reader.readAsArrayBuffer(file);
   }
 
-  importExcel() {
-    
+  async importExcel() {
+
 
     let flag = true;
     for(let i = 0; i< this.dataArray.length; i++){
@@ -111,7 +111,7 @@ export class ImportComponent {
       }
     }
     const custom = this.getCustom(this.selectedCustomPort);
-  
+
     if(custom){
       if(this.startDate || this.endDate){
         if(this.fileToUpload!==undefined){
@@ -126,21 +126,25 @@ export class ImportComponent {
               date2: this.endDate != null ? new Date(this.endDate!) : undefined,
               date3: this.invoiceDate != null ? new Date(this.invoiceDate!) : undefined
             };
-            this.service.uploadFile(this.fileToUpload, this.excelImportDto).subscribe(res => {
+            try {
+              const res = await this.service.uploadFile(this.fileToUpload, this.excelImportDto);
               this.toastr.success(res.message);
               this.accountNumbers = res.accountNumbers;
-              if(this.accountNumbers.length>0){
+              
+              if (this.accountNumbers.length > 0) {
                 this.isModalOpen = true;
               }
-            },
-            error =>{
-              if(error.error.body.includes(this.duplicateExceptionMessage)){
-                this.duplicateAwbsMessage = error.error.body;
-                this.errorModalOpen = true;
-              }else{
-                this.toastr.error(error.error.body);
-              }
-            });
+            } catch (error) {
+            console.log(error);
+            
+              // if (error.error.body.includes(this.duplicateExceptionMessage)) {
+              //   this.duplicateAwbsMessage = error.error.body;
+              //   this.errorModalOpen = true;
+              // } else {
+              //   this.toastr.error(error.error.body);
+              // }
+            }
+            
           }else{
             this.toastr.error('The format of the file is Incorrect')
           }
@@ -177,17 +181,17 @@ export class ImportComponent {
   }
 
 
-  
+
   dateRangeCreated($event: any) {
-        // this.products = this.tempproducts;  
-        let startDate = $event[0].toJSON().split('T')[0];  
-        let endDate = $event[1].toJSON().split('T')[0];  
+        // this.products = this.tempproducts;
+        let startDate = $event[0].toJSON().split('T')[0];
+        let endDate = $event[1].toJSON().split('T')[0];
 
         // console.log(startDate);
         // console.log(endDate);
         // this.products = this.products.filter(
         //   m => new Date(m.CreatedDate) >= new Date(startDate) && new Date(m.CreatedDate) <= new Date(endDate)
         // );
-      }  
-  
+      }
+
 }
