@@ -13,7 +13,7 @@ export class UploadExcelService {
   constructor(private http: HttpClient) {
 
   }
-  
+
 async uploadFile(file: File, excelImportDto: any): Promise<any> {
   const formData: FormData = new FormData();
   formData.append('file', file);
