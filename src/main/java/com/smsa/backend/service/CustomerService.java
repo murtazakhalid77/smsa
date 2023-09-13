@@ -30,6 +30,10 @@ public class CustomerService {
 
     }
 
+    public List<Customer> getAllCustomer() {
+        return this.customerRepository.findAll();
+    }
+
     public CustomerDTO addCustomer(CustomerDTO customerDTO) {
 
         Optional<Customer> duplicateCustomer = customerRepository.findByAccountNumber(customerDTO.getAccountNumber());

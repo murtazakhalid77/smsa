@@ -77,11 +77,74 @@ public class ExcelController {
     @GetMapping("/export/excel")
     public ResponseEntity<Resource> exportToExcel(@RequestParam List<Long> salesReportIds) throws IOException {
 
-//        ExcelService excelExporter = new ExcelService(salesReports);
+             Resource file = excelService.salesReportExcel(salesReportIds);
 
-//            excelService.excelData(salesReports);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                .body(file);
+    }
 
-             Resource file = excelService.excelData(salesReportIds);
+
+    @GetMapping("/customer")
+    public ResponseEntity<Resource> customerExcelDownload() throws IOException {
+
+        Resource file = excelService.customerExcelDownload();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                .body(file);
+    }
+
+    @GetMapping("/currency")
+    public ResponseEntity<Resource> currencyExcelDownload() throws IOException {
+
+        Resource file = excelService.currencyExcelDownload();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                .body(file);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<Resource> userExcelDownload() throws IOException {
+
+        Resource file = excelService.userExcelDownload();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                .body(file);
+    }
+
+    @GetMapping("/custom")
+    public ResponseEntity<Resource> customExcelDownload() throws IOException {
+
+        Resource file = excelService.customExcelDownload();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                .body(file);
+    }
+
+    @GetMapping("/region")
+    public ResponseEntity<Resource> regionExcelDownload() throws IOException {
+
+        Resource file = excelService.regionExcelDownload();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                .body(file);
+    }
+
+    @GetMapping("/currency-audit/{id}")
+    public ResponseEntity<Resource> currencyAuditDownload(@PathVariable Long id) throws IOException {
+
+        Resource file = excelService.currencyAuditDownload(id);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")

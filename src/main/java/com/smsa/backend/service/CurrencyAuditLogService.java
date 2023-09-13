@@ -29,6 +29,13 @@ public class CurrencyAuditLogService {
 
     }
 
+    public List<CurrencyAuditLog> getCurrencyAuditLogById(Long currencyId) {
+        List<CurrencyAuditLog> currencyAuditLogs = this.currencyAuditLogRepository.findCurrencyAuditByCurrencyId(currencyId);
+        currencyAuditLogs.forEach(currencyAuditLog -> currencyAuditLog.setCurrency(null));
+        return currencyAuditLogs;
+
+    }
+
 
 
     public CurrencyAuditLog save(CurrencyAuditLog currencyAuditLog){

@@ -10,8 +10,11 @@
                 <input type="text" placeholder="Search Custom" class="order-search form-control"
                     >
                 <div>
-                    <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg" type="submit" (click)="addUser()">
+                    <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg custom-margin" type="submit" (click)="addUser()">
                         <span>Add User</span>
+                    </button>
+                    <button *ngIf="users!.length!=0 && users!=null" class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg" type="submit" (click)="downloadFile()">
+                        <span>Download Excel</span>
                     </button>
                 </div>
             </div>

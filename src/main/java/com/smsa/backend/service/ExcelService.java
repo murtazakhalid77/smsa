@@ -44,6 +44,22 @@ public class ExcelService {
     HashMapHelper hashMapHelper;
     @Autowired
     CurrencyService currencyService;
+
+    @Autowired
+    CustomerService customerService;
+
+    @Autowired
+    CustomService customService;
+
+    @Autowired
+    RegionService regionService;
+
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    CurrencyAuditLogService currencyAuditLogService;
+
     @Autowired
     SalesReportRepository salesReportRepository;
     @Value("${smsa.file.location}")
@@ -590,7 +606,7 @@ public class ExcelService {
 
 
 
-    public Resource excelData(List<Long> salesReportIds) throws IOException {
+    public Resource salesReportExcel(List<Long> salesReportIds) throws IOException {
 
         try{
             List<SalesReport> salesReports = this.salesReportRepository.findAllByIdIn(salesReportIds);
@@ -634,8 +650,276 @@ public class ExcelService {
         }
        catch (Exception e){
             e.printStackTrace();
-            throw new SalesReportException("There was an issue in making sales report");
+            throw new SalesReportException("There was an issue in making of sales report");
        }
+
+    }
+
+    public Resource customerExcelDownload() throws IOException {
+
+        try{
+            List<Customer> customers = this.customerService.getAllCustomer();
+            FileInputStream fileInputStream = new FileInputStream(sampleFileLocalLocation + "/customer.xlsx");
+            Workbook  newWorkBook = WorkbookFactory.create(fileInputStream);
+            Sheet summarySheet= newWorkBook.getSheetAt(0);
+            int rowCount = 1;
+
+            CellStyle rightAlignedStyle = newWorkBook.createCellStyle();
+            rightAlignedStyle.setAlignment(HorizontalAlignment.RIGHT);
+            CellStyle style = newWorkBook.createCellStyle();
+
+            for (Customer customer : customers) {
+                Row row = summarySheet.createRow(rowCount++);
+                int columnCount = 0;
+
+                createCell(row, columnCount++, customer.getAccountNumber() != null ? customer.getAccountNumber().toString() : " ", style);
+                createCell(row, columnCount++, customer.getInvoiceCurrency() != null ? customer.getInvoiceCurrency().toString(): " ", style);
+                createCell(row, columnCount++, customer.getRegion() != null ? customer.getRegion().getCustomerRegion().toString(): " ", style);
+                createCell(row, columnCount++, customer.getSmsaServiceFromSAR() != null ? customer.getSmsaServiceFromSAR().toString(): " ", rightAlignedStyle);
+                createCell(row, columnCount++, customer.getStatus() != null ? customer.getStatus().toString(): " ", style);
+                createCell(row, columnCount++, customer.getNameArabic() != null ? customer.getNameArabic().toString(): " ", style);
+                createCell(row, columnCount++, customer.getNameEnglish() != null ? customer.getNameEnglish().toString(): " ", style);
+                createCell(row, columnCount++, customer.getEmail() != null ? customer.getEmail().toString(): " ", style);
+                createCell(row, columnCount++, customer.getCcMail() != null ? customer.getCcMail().toString(): " ", style);
+                createCell(row, columnCount++, customer.getVatNumber() != null ? customer.getVatNumber().toString(): " ", rightAlignedStyle);
+                createCell(row, columnCount++, customer.getAddress() != null ? customer.getAddress().toString(): " ", style);
+                createCell(row, columnCount++, customer.getPoBox() != null ? customer.getPoBox().toString(): " ", style);
+                createCell(row, columnCount++, customer.getCountry() != null ? customer.getCountry().toString(): " ", style);
+            }
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            newWorkBook.write(byteArrayOutputStream);
+
+            byte[] workbookBytes = byteArrayOutputStream.toByteArray();
+
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(workbookBytes);
+
+            Resource resource = new InputStreamResource(byteArrayInputStream);
+            return resource;
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new SalesReportException("There was an issue in making of customer excel");
+        }
+
+    }
+
+    public Resource currencyExcelDownload() throws IOException {
+
+        try{
+            List<Currency> currencies = this.currencyService.getAllCurrency();
+            FileInputStream fileInputStream = new FileInputStream(sampleFileLocalLocation + "/currency.xlsx");
+            Workbook  newWorkBook = WorkbookFactory.create(fileInputStream);
+            Sheet summarySheet= newWorkBook.getSheetAt(0);
+            int rowCount = 1;
+
+            CellStyle rightAlignedStyle = newWorkBook.createCellStyle();
+            rightAlignedStyle.setAlignment(HorizontalAlignment.RIGHT);
+            CellStyle style = newWorkBook.createCellStyle();
+
+            for (Currency currency : currencies) {
+                Row row = summarySheet.createRow(rowCount++);
+                int columnCount = 0;
+
+                createCell(row, columnCount++, currency.getId() != null ? currency.getId().toString() : " ", style);
+                createCell(row, columnCount++, currency.getCurrencyFrom() != null ? currency.getCurrencyFrom().toString(): " ", style);
+                createCell(row, columnCount++, currency.getCurrencyTo() != null ? currency.getCurrencyTo().toString(): " ", style);
+                createCell(row, columnCount++, currency.getConversionRate() != null ? currency.getConversionRate().toString(): " ", rightAlignedStyle);
+                createCell(row, columnCount++, currency.getCreatedBy() != null ? currency.getCreatedBy().toString(): " ", style);
+                createCell(row, columnCount++, currency.getCreatedAt() != null ? currency.getCreatedAt().toString(): " ", style);
+                createCell(row, columnCount++, currency.getUpdatedBy() != null ? currency.getUpdatedBy().toString(): " ", style);
+                createCell(row, columnCount++, currency.getUpdatedAt() != null ? currency.getUpdatedAt().toString(): " ", style);
+                createCell(row, columnCount++, currency.getIsPresent() != null ? currency.getIsPresent().toString(): " ", style);
+            }
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            newWorkBook.write(byteArrayOutputStream);
+
+            byte[] workbookBytes = byteArrayOutputStream.toByteArray();
+
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(workbookBytes);
+
+            Resource resource = new InputStreamResource(byteArrayInputStream);
+            return resource;
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new SalesReportException("There was an issue in making of customer excel");
+        }
+
+    }
+
+    public Resource userExcelDownload() throws IOException {
+
+        try{
+            List<User> users = this.userService.getAllUsers();
+            FileInputStream fileInputStream = new FileInputStream(sampleFileLocalLocation + "/user.xlsx");
+            Workbook  newWorkBook = WorkbookFactory.create(fileInputStream);
+            Sheet summarySheet= newWorkBook.getSheetAt(0);
+            int rowCount = 1;
+
+            CellStyle rightAlignedStyle = newWorkBook.createCellStyle();
+            rightAlignedStyle.setAlignment(HorizontalAlignment.RIGHT);
+            CellStyle style = newWorkBook.createCellStyle();
+
+            for (User user : users) {
+                Row row = summarySheet.createRow(rowCount++);
+                int columnCount = 0;
+
+                createCell(row, columnCount++, user.getId() != null ? user.getId().toString() : " ", style);
+                createCell(row, columnCount++, user.getName() != null ? user.getName().toString(): " ", style);
+                createCell(row, columnCount++, user.getStatus(), style);
+            }
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            newWorkBook.write(byteArrayOutputStream);
+
+            byte[] workbookBytes = byteArrayOutputStream.toByteArray();
+
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(workbookBytes);
+
+            Resource resource = new InputStreamResource(byteArrayInputStream);
+            return resource;
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new SalesReportException("There was an issue in making of user excel");
+        }
+
+    }
+
+    public Resource customExcelDownload() throws IOException {
+
+        try{
+            List<Custom> customs = this.customService.getAllCustoms();
+            FileInputStream fileInputStream = new FileInputStream(sampleFileLocalLocation + "/custom.xlsx");
+            Workbook  newWorkBook = WorkbookFactory.create(fileInputStream);
+            Sheet summarySheet= newWorkBook.getSheetAt(0);
+            int rowCount = 1;
+
+            CellStyle rightAlignedStyle = newWorkBook.createCellStyle();
+            rightAlignedStyle.setAlignment(HorizontalAlignment.RIGHT);
+            CellStyle style = newWorkBook.createCellStyle();
+
+            for (Custom custom : customs) {
+                Row row = summarySheet.createRow(rowCount++);
+                int columnCount = 0;
+
+                createCell(row, columnCount++, custom.getId() != null ? custom.getId().toString() : " ", style);
+                createCell(row, columnCount++, custom.getCustom() != null ? custom.getCustom().toString(): " ", style);
+                createCell(row, columnCount++, custom.getCustomPort() != null ? custom.getCustomPort().toString(): " ", style);
+                createCell(row, columnCount++, custom.getSmsaFeeVat() != null ? custom.getSmsaFeeVat().toString(): " ", rightAlignedStyle);
+                createCell(row, columnCount++, custom.getCurrency() != null ? custom.getCurrency().toString(): " ", style);
+                createCell(row, columnCount++, custom.isPresent(), style);
+            }
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            newWorkBook.write(byteArrayOutputStream);
+
+            byte[] workbookBytes = byteArrayOutputStream.toByteArray();
+
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(workbookBytes);
+
+            Resource resource = new InputStreamResource(byteArrayInputStream);
+            return resource;
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new SalesReportException("There was an issue in making of custom excel");
+        }
+
+    }
+
+    public Resource regionExcelDownload() throws IOException {
+
+        try{
+            List<Region> regions = this.regionService.getAllRegions();
+            FileInputStream fileInputStream = new FileInputStream(sampleFileLocalLocation + "/region.xlsx");
+            Workbook  newWorkBook = WorkbookFactory.create(fileInputStream);
+            Sheet summarySheet= newWorkBook.getSheetAt(0);
+            int rowCount = 1;
+
+            CellStyle rightAlignedStyle = newWorkBook.createCellStyle();
+            rightAlignedStyle.setAlignment(HorizontalAlignment.RIGHT);
+            CellStyle style = newWorkBook.createCellStyle();
+
+            for (Region region : regions) {
+                Row row = summarySheet.createRow(rowCount++);
+                int columnCount = 0;
+                createCell(row, columnCount++, region.getId() != null ? region.getId().toString() : " ", style);
+                createCell(row, columnCount++, region.getCustomerRegion() != null ? region.getCustomerRegion().toString() : " ", style);
+                createCell(row, columnCount++, region.getDescription() != null ? region.getDescription().toString() : " ", style);
+                createCell(row, columnCount++, region.getHeaderName() != null ? region.getHeaderName().toString() : " ", style);
+                createCell(row, columnCount++, region.getStatus(), style);
+                createCell(row, columnCount++, region.getVat() != null ? region.getVat().toString() : " ", rightAlignedStyle);
+                createCell(row, columnCount++, region.getVatNumber() != null ? region.getVatNumber().toString() : " ", rightAlignedStyle);
+            }
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            newWorkBook.write(byteArrayOutputStream);
+
+            byte[] workbookBytes = byteArrayOutputStream.toByteArray();
+
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(workbookBytes);
+
+            Resource resource = new InputStreamResource(byteArrayInputStream);
+            return resource;
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new SalesReportException("There was an issue in making of custom excel");
+        }
+
+    }
+
+
+    public Resource currencyAuditDownload(Long id) throws IOException {
+
+        try{
+            List<CurrencyAuditLog> currencyAuditLogs = this.currencyAuditLogService.getCurrencyAuditLogById(id);
+            FileInputStream fileInputStream = new FileInputStream(sampleFileLocalLocation + "/currency_audit_logs.xlsx");
+            Workbook  newWorkBook = WorkbookFactory.create(fileInputStream);
+            Sheet summarySheet= newWorkBook.getSheetAt(0);
+            int rowCount = 1;
+
+            CellStyle rightAlignedStyle = newWorkBook.createCellStyle();
+            rightAlignedStyle.setAlignment(HorizontalAlignment.RIGHT);
+            CellStyle style = newWorkBook.createCellStyle();
+
+            for (CurrencyAuditLog currencyAuditLog : currencyAuditLogs) {
+                Row row = summarySheet.createRow(rowCount++);
+                int columnCount = 0;
+                createCell(row, columnCount++, currencyAuditLog.getId() != null ? currencyAuditLog.getId().toString() : " ", style);
+                createCell(row, columnCount++, currencyAuditLog.getCurrencyFrom() != null ? currencyAuditLog.getCurrencyFrom().toString() : " ", style);
+                createCell(row, columnCount++, currencyAuditLog.getCurrencyTo() != null ? currencyAuditLog.getCurrencyTo().toString() : " ", style);
+                createCell(row, columnCount++, currencyAuditLog.getConversionRate() != null ? currencyAuditLog.getConversionRate().toString() : " ", rightAlignedStyle);
+                createCell(row, columnCount++, currencyAuditLog.getCreatedBy() != null ? currencyAuditLog.getCreatedBy().toString() : " ", style);
+                createCell(row, columnCount++, currencyAuditLog.getCreatedAt() != null ? currencyAuditLog.getCreatedAt().toString() : " ", style);
+                createCell(row, columnCount++, currencyAuditLog.getUpdatedBy() != null ? currencyAuditLog.getUpdatedBy().toString() : " ", style);
+                createCell(row, columnCount++, currencyAuditLog.getCreatedAt() != null ? currencyAuditLog.getCreatedAt().toString() : " ", style);
+                createCell(row, columnCount++, currencyAuditLog.getIsPresent() != null ? currencyAuditLog.getIsPresent().toString() : " ", style);
+            }
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            newWorkBook.write(byteArrayOutputStream);
+
+            byte[] workbookBytes = byteArrayOutputStream.toByteArray();
+
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(workbookBytes);
+
+            Resource resource = new InputStreamResource(byteArrayInputStream);
+            return resource;
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new SalesReportException("There was an issue in making of custom excel");
+        }
 
     }
 

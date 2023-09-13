@@ -34,6 +34,11 @@ public class CustomService {
         return null;
     }
 
+    public List<Custom> getAllCustoms() {
+        return this.customRepository.findAll();
+    }
+
+
     public List<CustomDto> getAllCustomForImport() {
         try {
             List<CustomDto> customDtos = this.customRepository.findByIsPresent();
