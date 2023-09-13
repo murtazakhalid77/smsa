@@ -49,6 +49,10 @@ public class CurrencyService {
         return null;
     }
 
+    public List<Currency> getAllCurrency() {
+      return this.currencyRepository.findAll();
+    }
+
     public List<CurrencyDto> getAllCurrencyForImport() {
         try {
             List<CurrencyDto> currencyDtos = this.currencyRepository.findAllByIsPresent(Boolean.TRUE);

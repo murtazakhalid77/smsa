@@ -24,8 +24,11 @@
 
 
                 <div>
-                    <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg" type="submit"  (click)="addCustomer()">
+                    <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg custom-margin" type="submit"  (click)="addCustomer()">
                         <i class="fa-solid fa-pen"></i>&nbsp;Add customer
+                    </button>
+                    <button *ngIf="customers!.length!=0 && customers!=null" class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg" type="submit" (click)="downloadFile()">
+                        <span>Download Excel</span>
                     </button>
                 </div>
             </div>

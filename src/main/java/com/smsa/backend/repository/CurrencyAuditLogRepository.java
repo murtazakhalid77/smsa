@@ -13,4 +13,5 @@ import java.util.List;
 @Repository
 public interface CurrencyAuditLogRepository extends JpaRepository<CurrencyAuditLog,Long> {
     Page<CurrencyAuditLog> findCurrencyAuditByCurrencyId(Long currencyId, Pageable pageable);
+    List<CurrencyAuditLog> findCurrencyAuditByCurrencyId(Long currencyId);
 }

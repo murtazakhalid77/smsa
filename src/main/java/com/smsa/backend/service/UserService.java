@@ -53,6 +53,10 @@ public class UserService {
         throw new RecordNotFoundException(String.format("Users not found"));
     }
 
+    public List<User> getAllUsers() {
+        return this.userRepository.findAll();
+    }
+
     public User findUserById(Long id) {
         Optional<User> user = this.userRepository.findById(id);
         if(user.isPresent()){

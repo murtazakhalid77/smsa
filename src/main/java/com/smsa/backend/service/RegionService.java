@@ -39,6 +39,11 @@ public class RegionService {
         throw new RecordNotFoundException(String.format("Regions not found"));
     }
 
+    public List<Region> getAllRegions() {
+        return this.regionRepository.findAll();
+    }
+
+
     public RegionDto getRegionById(Long id) {
         Optional<Region> region = this.regionRepository.findById(id);
         if(region.isPresent()){
@@ -76,7 +81,7 @@ public class RegionService {
         List<Region> regions = this.regionRepository.findByStatus(status);
         if(regions != null && regions.size() > 0){
             List<RegionDto> regionDtos = regions.stream()
-                    .filter(region -> region.isStatus())
+                    .filter(region -> region.getStatus())
                     .map(region -> toDTo(region))
                     .collect(Collectors.toList());
             return regionDtos;

@@ -4,6 +4,8 @@ import { LoginService } from 'src/app/services/login.service';
 import { CustomService, EntityAllCustomsResponseType } from '../service/custom-port.service';
 import { ICustom } from '../custom.model';
 import {DashboardHeadComponent} from 'src/app/components/dashboard-head/dashboard-head.component'
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from 'src/Environments/environment';
 @Component({
   selector: 'app-custom-port',
   templateUrl: './custom-port.component.html',
@@ -15,10 +17,10 @@ export class CustomPortComponent implements OnInit {
   currentPage:number  = 0;
   itemsPerPage: number = 10;
   totalItems?: string;
+  _url = environment.backend;
 
 
-
-  constructor(private router: Router, private loginService: LoginService, private customService: CustomService) { }
+  constructor(private router: Router, private loginService: LoginService, private customService: CustomService, private http: HttpClient) { }
 
   ngOnInit(): void {
     this.getCustoms(this.currentPage, this.itemsPerPage);
@@ -50,6 +52,26 @@ export class CustomPortComponent implements OnInit {
 
   changePage(value: any){
     this.getCustoms(value.pageIndex, this.itemsPerPage);
+  }
+
+  downloadFile() {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    this.http
+      .get(`${this._url}/excel/custom`, {
+        responseType: 'blob', // Important: responseType should be 'blob'
+        headers,
+      })
+      .subscribe((response: any) => {
+        const blob = new Blob([response], { type: 'application/octet-stream' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'sales_report.xlsx'; // Set the desired filename here
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+      });
   }
 
 }

@@ -13,8 +13,11 @@
                 <input type="text" placeholder="Search Custom" class="order-search form-control"
                     >
                 <div>
-                    <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg" type="submit" (click)="addCurrency()">
+                    <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg custom-margin" type="submit" (click)="addCurrency()">
                         <span>Add Currency</span>
+                    </button>
+                    <button *ngIf="currency!.length!=0 && currency!=null" class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg" type="submit" (click)="downloadFile()">
+                        <span>Download Excel</span>
                     </button>
                 </div>
             </div>
