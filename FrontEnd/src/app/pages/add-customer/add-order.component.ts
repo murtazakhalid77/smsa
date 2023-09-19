@@ -296,7 +296,6 @@ export class AddOrderComponent implements OnInit {
       ) { }
 
   ngOnInit(): void {
-      debugger
     this.getAllRegions();
     this.countryCodes = this.countries.map(country => country.code);
   
@@ -328,7 +327,6 @@ export class AddOrderComponent implements OnInit {
   getAllRegions(){
     this.regionService.getRegions().subscribe(res =>{
       if(res && res.body){
-        debugger
         this.regions = res.body;
       }
     })
@@ -343,7 +341,6 @@ export class AddOrderComponent implements OnInit {
   // }
 
   updateForm(accountNumber?: number){
-debugger
     this.getCustomerByAccountNumber(accountNumber).subscribe((customer) => {
       if(customer){
     

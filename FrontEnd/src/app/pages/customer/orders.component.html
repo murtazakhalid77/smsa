@@ -13,8 +13,12 @@
         </div>
         <div class="order-body">
             <div class="order-search-panel">
-                <input type="text" placeholder="Search Account number" class="order-search form-control"
-                (input)="searchCustomer($event.target)">
+                <input 
+                type="text" 
+                placeholder="Search By Acc and Customer Name (E)" 
+                class="order-search form-control" 
+                [(ngModel)]="searchText"
+                (ngModelChange)="getCustomers(0, 10);">
 
                 <!-- <ng-container *ngIf="accountNumbers"> -->
                     <!-- <div *ngIf="accountNumbers" style="background-color: #400099;

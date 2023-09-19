@@ -16,23 +16,16 @@ export type EntityRegionResponseType = HttpResponse<IRegion>;
   
     constructor(private http: HttpClient) { }
 
-    getRegions(page?: any, size?: any): Observable<EntityRegionsResponseType> {
-      let url = `${this._url}/region`;
-    debugger
-      // Create an empty HttpParams object
-      let params = new HttpParams();
-    
-      // Conditionally add 'page' and 'size' parameters if they are defined
-      if (page !== undefined) {
-        params = params.set('page', page.toString());
-      }
-    
-      if (size !== undefined) {
-        params = params.set('size', size.toString());
-      }
+    getRegionsByPageination(params?: any): Observable<EntityRegionsResponseType> {
+      let url = `${this._url}/region/pagination`;
     
       // Make the HTTP GET request with the specified parameters
       return this.http.get<Region[]>(url, { params, observe: 'response' });
+    }
+
+    getRegions() {
+      let url = `${this._url}/region`;
+      return this.http.get<Region[]>(url, { observe: 'response' });
     }
     
 

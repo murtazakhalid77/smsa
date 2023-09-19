@@ -24,33 +24,11 @@ export class OrdersComponent implements OnInit {
   currentPage:number  = 0;
   itemsPerPage: number = 10;
   totalItems?: string;
+  searchText?: string
   _url = environment.backend;
 
 
   constructor(private customerService: CustomerService, private router: Router, private loginService: LoginService, private route: ActivatedRoute, private http: HttpClient) { 
-
-    // this.customerService.getCustomers(this.currentPage - 1, this.itemsPerPage).subscribe(
-    //   (res: EntityAllCustomersResponseType) => {
-    //     if(res && res.body){
-    //       this.customers = res.body;
-    //       this.originalCustomers = this.customers!;
-    //       debugger;
-    //       this.totalItems = res.headers.has('X-Total-Count')
-    //     ? res.headers.get('X-Total-Count')!
-    //     : '1'; // Set a default value if X-Total-Count is not present
-
-    //       this.pagingConfig = {
-    //         itemsPerPage: this.itemsPerPage,
-    //         currentPage: this.currentPage,
-    //         totalItems: Number(this.totalItems)
-    //       }
-    //     } 
-    //   },
-    //   (error) => {
-    //     // Handle the error if needed
-    //     console.error('Error fetching customers:', error);
-    //   }
-    // );
 
 
     this.getCustomers(this.currentPage, this.itemsPerPage);
@@ -70,7 +48,29 @@ export class OrdersComponent implements OnInit {
   }
 
   getCustomers(page: any, size: any) {
-    this.customerService.getCustomers(page, size).subscribe(
+
+    let search = {};
+  
+    const pageable = {
+      page: page,
+      size: size,
+    };
+  
+    if (this.searchText !== undefined && this.searchText !== '') {
+      search = {
+        mapper: 'CUSTOMER',
+        searchText: this.searchText,
+      };
+    }
+  
+    // Construct the query parameter for pageable
+    const queryParams = {
+      pageable: `page=${pageable.page}&size=${pageable.size}`,
+      search: JSON.stringify(search),
+    };
+
+
+    this.customerService.getCustomers(queryParams).subscribe(
       (res: EntityAllCustomersResponseType) => {
         if(res && res.body){
           this.customers = res.body;
@@ -79,7 +79,7 @@ export class OrdersComponent implements OnInit {
         } 
       },
       (error) => {
-        // Handle the error if needed
+        this.customers = []
         console.error('Error fetching customers:', error);
       }
     );

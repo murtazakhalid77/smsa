@@ -2,15 +2,19 @@ package com.smsa.backend.service;
 
 
 import com.smsa.backend.Exception.RecordNotFoundException;
+import com.smsa.backend.criteria.SearchCriteria;
 import com.smsa.backend.dto.UserDto;
 import com.smsa.backend.model.Roles;
+import com.smsa.backend.model.SalesReport;
 import com.smsa.backend.model.User;
 import com.smsa.backend.repository.RolesRepository;
 import com.smsa.backend.repository.UserRepository;
+import com.smsa.backend.specification.FilterSpecification;
 import org.modelmapper.Converters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +29,10 @@ public class UserService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     private RolesRepository rolesRepository;
+
+    @Autowired
+    FilterSpecification<User> userFilterSpecification;
+
 
     public User addUser(UserDto userDto) {
 
@@ -50,8 +58,14 @@ public class UserService {
         return rolesSet;
     }
 
-    public Page<User> getAllUsers(Pageable pageable) {
-        Page<User> users = this.userRepository.findAll(pageable);
+    public Page<User> getAllUsers(SearchCriteria searchCriteria, Pageable pageable) {
+        Page<User> users;
+        if(searchCriteria.getSearchText() == null){
+            users = this.userRepository.findAll(pageable);
+        }else{
+            Specification<User> userSpecification = userFilterSpecification.getSearchSpecification(searchCriteria);
+            users = this.userRepository.findAll(userSpecification, pageable);
+        }
         if(!users.isEmpty()){
             return users;
         }

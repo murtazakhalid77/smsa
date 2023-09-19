@@ -32,11 +32,8 @@ export class CustomService {
       .patch<ICustom>(url, custom, { observe: 'response' })
   }
 
-  getCustoms(page?: any, size?: any): Observable<EntityAllCustomsResponseType> {
+  getCustoms(params?: any): Observable<EntityAllCustomsResponseType> {
     let url = `${this._url}/custom`;
-    const params = new HttpParams()
-    .set('page', page.toString())
-    .set('size', size.toString());
     return this.http.get<Custom[]>(`${url}`, { params, observe: 'response' });
     // .pipe(map((res: EntityUserResponse) => res));
   }

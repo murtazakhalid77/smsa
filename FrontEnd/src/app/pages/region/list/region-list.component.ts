@@ -16,6 +16,7 @@ export class RegionListComponent {
   currentPage:number  = 0;
   itemsPerPage: number = 10;
   totalItems?: string;
+  searchText?: string;
   _url = environment.backend;
 
   constructor(private regionService: RegionService,
@@ -26,9 +27,33 @@ export class RegionListComponent {
     this.getAllRegions(this.currentPage, this.itemsPerPage);
   }
 
+
+
   
   getAllRegions(page?: any, size?: any){
-    this.regionService.getRegions(page, size).subscribe(res =>{
+
+    let search = {};
+  
+    const pageable = {
+      page: page,
+      size: size,
+    };
+  
+    if (this.searchText !== undefined && this.searchText !== '') {
+      search = {
+        mapper: 'REGION',
+        searchText: this.searchText,
+      };
+    }
+
+        // Construct the query parameter for pageable
+        const queryParams = {
+          pageable: `page=${pageable.page}&size=${pageable.size}`,
+          search: JSON.stringify(search),
+        };
+
+
+    this.regionService.getRegionsByPageination(queryParams).subscribe(res =>{
       if(res && res.body){
         this.regions = res.body;
         this.totalItems = res.headers.get('X-Total-Count') ?? '';

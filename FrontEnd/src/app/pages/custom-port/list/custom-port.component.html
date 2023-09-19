@@ -8,8 +8,12 @@
         </div>
         <div class="order-body">
             <div class="order-search-panel">
-                <input type="text" placeholder="Search Custom" class="order-search form-control"
-                    >
+                <input 
+                type="text" 
+                placeholder="Custom" 
+                class="order-search form-control" 
+                [(ngModel)]="searchText"
+                (ngModelChange)="getCustoms(0, 10);">
                 <div>
                     <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg custom-margin" type="submit" (click)="addCustom()">
                         <span>Add Custom</span>

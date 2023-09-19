@@ -16,6 +16,7 @@ export class UserComponent implements OnInit{
   currentPage:number  = 0;
   itemsPerPage: number = 10;
   totalItems?: string;
+  searchText?: string
   _url = environment.backend;
 
   constructor(private router: Router, private userService: UserService, private http: HttpClient) { }
@@ -24,20 +25,42 @@ export class UserComponent implements OnInit{
     this.getUsers(this.currentPage, this.itemsPerPage);
   }
 
-  getUsers(page?: any, size?: any) {
-    this.userService.getUsers(page, size).subscribe(
+  getUsers(page?: number, size?: number) {
+    let search = {};
+  
+    const pageable = {
+      page: page,
+      size: size,
+    };
+  
+    if (this.searchText !== undefined && this.searchText !== '') {
+      search = {
+        mapper: 'USER',
+        searchText: this.searchText,
+      };
+    }
+  
+    // Construct the query parameter for pageable
+    const queryParams = {
+      pageable: `page=${pageable.page}&size=${pageable.size}`,
+      search: JSON.stringify(search),
+    };
+  
+    this.userService.getUsers(queryParams).subscribe(
       (res: EntityUsersResponseType) => {
-        if(res && res.body){
+        if (res && res.body) {
           this.users = res.body;
-          this.totalItems = res.headers.get('X-Total-Count') ?? '';
-          console.log(this.users)
-        } 
+          this.totalItems = res.headers.get('X-Total-Count') || '';
+          console.log(this.users);
+        }
       },
       (error) => {
+        this.users = [];
         console.error('Error fetching customers:', error);
       }
     );
   }
+  
 
   addUser(){
     this.router.navigateByUrl('/user')

@@ -18,6 +18,7 @@ export class CurrencyListComponent {
   currentPage:number  = 0;
   itemsPerPage: number = 10;
   totalItems?: string;
+  searchText?: string
   _url = environment.backend;
 
   constructor(private router: Router, private loginService: LoginService, private currencyService: CurrencyService,  private http: HttpClient){}
@@ -27,7 +28,28 @@ export class CurrencyListComponent {
   }
 
   getCurrency(page?: any, size?: any){
-    this.currencyService.getCurrency(page, size).subscribe(
+
+    let search = {};
+  
+    const pageable = {
+      page: page,
+      size: size,
+    };
+  
+    if (this.searchText !== undefined && this.searchText !== '') {
+      search = {
+        mapper: 'CURRENCY',
+        searchText: this.searchText,
+      };
+    }
+
+        // Construct the query parameter for pageable
+        const queryParams = {
+          pageable: `page=${pageable.page}&size=${pageable.size}`,
+          search: JSON.stringify(search),
+        };
+
+    this.currencyService.getCurrency(queryParams).subscribe(
       (res: EntityAllCurrencyResponseType) => {
         if(res && res.body){
           this.currency = res.body;

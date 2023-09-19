@@ -1,15 +1,20 @@
 package com.smsa.backend.service;
 
 import com.smsa.backend.Exception.RecordNotFoundException;
+import com.smsa.backend.criteria.SearchCriteria;
 import com.smsa.backend.dto.CustomDto;
 import com.smsa.backend.model.Custom;
+import com.smsa.backend.model.Customer;
 import com.smsa.backend.repository.CustomRepository;
+import com.smsa.backend.specification.FilterSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,19 +24,26 @@ public class CustomService {
 
     @Autowired
     CustomRepository customRepository;
+    @Autowired
+    FilterSpecification<Custom> customFilterSpecification;
     public CustomDto addCustom(CustomDto customDto) {
         return toDto(this.customRepository.save(toDomain(customDto)));
     }
 
-    public Page<Custom> getAllCustoms(Pageable pageable) {
-        List<CustomDto> customDtos = new ArrayList<>();
+    public Page<Custom> getAllCustoms(SearchCriteria searchCriteria, Pageable pageable) {
+        Optional<Page<Custom>> customs;
 
-        Page<Custom> customs = this.customRepository.findAll(pageable);
-
-        if(!customs.isEmpty()){
-            return customs;
+        if(searchCriteria.getSearchText() == null){
+            customs = Optional.of(this.customRepository.findAll(pageable));
+        }else{
+            Specification<Custom> customSpecification = this.customFilterSpecification.getSearchSpecification(searchCriteria);
+            customs = Optional.of(this.customRepository.findAll(customSpecification, pageable));
         }
-        return null;
+        if(customs.isPresent()){
+            return customs.get();
+        }else{
+            return null;
+        }
     }
 
     public List<Custom> getAllCustoms() {
