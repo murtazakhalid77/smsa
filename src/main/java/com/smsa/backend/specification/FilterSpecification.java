@@ -37,6 +37,11 @@ public class FilterSpecification<T>{
             return (root, query, criteriaBuilder) -> criteriaBuilder.or(
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("customerRegion")), "%" + searchCriteria.getSearchText().toLowerCase() + "%")
             );
+        } else if (searchCriteria.getMapper().equalsIgnoreCase(Mapper.SALES_REPORT.toString())) {
+            return (root, query, criteriaBuilder) -> criteriaBuilder.or(
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("customerAccountNumber")), "%" + searchCriteria.getSearchText().toLowerCase() + "%"),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("invoiceNumber")), "%" + searchCriteria.getSearchText().toLowerCase() + "%")
+            );
         }
         return null;
     }

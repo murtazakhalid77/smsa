@@ -15,5 +15,8 @@ public class SearchSalesReportDto {
     String invoiceFrom;
     String startDate;
     String endDate;
-
+    Integer page;
+    Integer size;
+    String search;
+    String mapper;
 }
