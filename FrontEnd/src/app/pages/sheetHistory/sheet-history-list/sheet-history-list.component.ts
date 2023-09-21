@@ -37,4 +37,9 @@ export class SheetHistoryListComponent {
   changePage(value: any){
     this.getAllSSheetHistory(value.pageIndex, this.itemsPerPage);
   }
+  
+  gotoTransaction(id: any){
+    this.router.navigate(['/transactions'], { queryParams: { id: id } });
+
+  }
 }

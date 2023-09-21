@@ -48,7 +48,14 @@
                     <tbody>
                         <tr *ngFor="let sheetHistor of sheetHistory" class="order-table-row-hover">
                             <th scope="row" class="tracking-id text-center">{{sheetHistor.id}}</th>
-                            <td class="text-center w-auto col-md-2 col-lg-1">{{sheetHistor.isEmailSent}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">
+                                <ng-container *ngIf="sheetHistor.isEmailSent; else notSent">
+                                  <button type="button" class="btn btn-success" (click)="gotoTransaction(sheetHistor.uniqueUUid)">Sent To All</button>
+                                </ng-container>
+                                <ng-template #notSent>
+                                  <button type="button" class="btn btn-danger" (click)="gotoTransaction(sheetHistor.uniqueUUid)">Not Sent</button>
+                                </ng-template>
+                              </td> 
                             <td class="text-center w-auto col-md-2 col-lg-1">{{sheetHistor.name}}</td>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{sheetHistor.uniqueUUid}}</td>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{sheetHistor?.custom?.customPort}}</td>

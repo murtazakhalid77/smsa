@@ -3,10 +3,7 @@ package com.smsa.backend.scheduler;
 import com.smsa.backend.dto.SalesReportHelperDto;
 import com.smsa.backend.model.*;
 import com.smsa.backend.repository.*;
-import com.smsa.backend.service.EmailService;
-import com.smsa.backend.service.ExcelService;
-import com.smsa.backend.service.HelperService;
-import com.smsa.backend.service.PdfService;
+import com.smsa.backend.service.*;
 import org.slf4j.Logger;
 
 import org.slf4j.LoggerFactory;
@@ -36,27 +33,32 @@ public class EmailSchedular {
     @Autowired
     SalesReportRepository salesReportRepository;
     @Autowired
+    TransactionRepository transactionRepository;
+    @Autowired
     HelperService helperService;
+    @Autowired
+    private SchedularAssembler schedularAssembler;
+    @Autowired
+    StorageService storageService;
+
     private static final Logger logger = LoggerFactory.getLogger(EmailSchedular.class);
 
     @Scheduled(initialDelay = 5000, fixedDelay = 120000)
     public void markSentAndProcessInvoices()  {
-       try {
-           List<SheetHistory> sheetsToBeSent = sheetHistoryRepository.findAllByIsEmail(false);
-           if(!sheetsToBeSent.isEmpty()){
-               for (SheetHistory sheetHistory : sheetsToBeSent) {
-                   String sheetUniqueId = sheetHistory.getUniqueUUid();
-
-                   // Call a method to process invoices for this sheetUniqueId
-                   processInvoicesForSheet(sheetUniqueId);
-                   logger.info(String.format("work done sheet %S",sheetHistory.getName()));
-               }
-           }
-           logger.info("No work to do");
-       }catch (Exception e){
-           e.printStackTrace();
-       }
-       }
+        try {
+            List<SheetHistory> sheetsToBeSent = sheetHistoryRepository.findAllByIsEmail(false);
+            if (!sheetsToBeSent.isEmpty()) {
+                for (SheetHistory sheetHistory : sheetsToBeSent) {
+                    String sheetUniqueId = sheetHistory.getUniqueUUid();
+                    processInvoicesForSheet(sheetUniqueId);
+                    logger.info(String.format("work done sheet %S", sheetHistory.getName()));
+                }
+            }
+            logger.info("No work to do");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public void processInvoicesForSheet(String sheetUniqueId) throws Exception {
         Map<String, List<InvoiceDetails>> invoiceDetailsMap = new HashMap<>();
@@ -65,6 +67,7 @@ public class EmailSchedular {
 
         Long invoiceNumber = invoice.getNumber();
         boolean anyUnsentInvoice = false;
+        boolean documentsMade = false;
 
         List<InvoiceDetails> invoicesForSheet = invoiceDetailsRepository.findAllBySheetUniqueId(sheetUniqueId);
 
@@ -90,33 +93,43 @@ public class EmailSchedular {
                         invoiceNumber++; //
                         SalesReportHelperDto salesReportHelperDto = excelService.updateExcelFile(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
                         byte[] pdfFileData = pdfService.makePdf(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
+                        logger.info(String.format("Excel and pdf made for the account number %s",accountNumber));
+                        documentsMade=true;
+                        if(documentsMade){
+                            String excelFileName = accountNumber + "_excel.xlsx";
+                            storageService.uploadFile(salesReportHelperDto.getExcelFile(), excelFileName);
 
-                        if (emailService.sendMailWithAttachments(customer.get(), salesReportHelperDto.getExcelFile(), pdfFileData,sheetUniqueId)){
-                            logger.info(String.format("All the work done for account number %S with name %S",customer.get().getAccountNumber(),customer.get().getNameEnglish()));
-
-                            SalesReport salesReport =SalesReport.builder()
-                                    .invoiceNumber(String.valueOf(invoiceNumber))
-                                    .customerAccountNumber(customer.get().getAccountNumber())
-                                    .customerName(customer.get().getNameEnglish())
-                                    .customerRegion(customer.get().getRegion().getCustomerRegion())
-                                    .period(helperService.generateInvoiceDatePeriod(sheetUniqueId))
-                                    .totalChargesAsPerCustomerDeclarationForm(salesReportHelperDto.getTotalChargesAsPerCustomDeclarationForm())
-                                    .vatOnSmsaFees(salesReportHelperDto.getVatOnSmsaFees())
-                                    .totalAmount(salesReportHelperDto.getTotalAmount())
-                                    .smsaFeeCharges(salesReportHelperDto.getSmsaFeesCharges())
-                                    .invoiceCurrency(customer.get().getInvoiceCurrency())
-                                    .createdAt(LocalDate.now())
-                                    .build();
-                            salesReportRepository.save(salesReport);
+                            // Upload PDF file to S3
+                            String pdfFileName = accountNumber + "_invoice.pdf";
+                            storageService.uploadFile(pdfFileData, pdfFileName);
+                            logger.info("uploaded to amazon s3 bucket");
                         }
+                        if (emailService.sendMailWithAttachments(customer.get(), salesReportHelperDto.getExcelFile(), pdfFileData,sheetUniqueId)) {
+                            logger.info(String.format("All the work done for account number %s with name %s",
+                                    customer.get().getAccountNumber(),
+                                    customer.get().getNameEnglish()));
 
+                            SalesReport salesReport = schedularAssembler.createSalesReport(invoiceNumber, customer.get(), sheetUniqueId, salesReportHelperDto);
+                            salesReportRepository.save(salesReport);
 
+                            Transaction newTransaction = transactionRepository
+                                    .findByAccountNumberAndSheetId(accountNumber, sheetUniqueId)
+                                    .orElseGet(() -> schedularAssembler.transaction(accountNumber, sheetUniqueId, "Success", Boolean.TRUE));
+
+                            newTransaction.setCurrentStatus("Success");
+                            transactionRepository.save(newTransaction);
+                        }
                     } catch (Exception e) {
-                        logger.error(String.format("Error while creating Excel for Account Number %S: " , accountNumber));
+                        logger.error(String.format("Error while scheduling for  for Account Number %s: " , accountNumber));
                         anyUnsentInvoice = true;
+                        Transaction newTransaction = transactionRepository
+                                .findByAccountNumberAndSheetId(accountNumber, sheetUniqueId)
+                                .orElseGet(() -> schedularAssembler.transaction(accountNumber, sheetUniqueId, e.getMessage(), Boolean.FALSE));
+
+                        newTransaction.setCurrentStatus(e.getMessage());
+                        transactionRepository.save(newTransaction);
+
                         e.printStackTrace();
-                        throw new Exception(e);
-                        //continue
                     }
                 } else {
                     logger.warn("Kindly update customer's email and status: " + accountNumber);
@@ -144,9 +157,7 @@ public class EmailSchedular {
     private Map<String, List<InvoiceDetails>> groupInvoicesByAccountNumber(List<InvoiceDetails> invoicesForSheet, Map<String, List<InvoiceDetails>> invoiceDetailsMap){
         for (InvoiceDetails invoiceDetails : invoicesForSheet) {
             String accountNumber = invoiceDetails.getInvoiceDetailsId().getAccountNumber();
-            // If the account number is not already in the map, create a new list for it
             invoiceDetailsMap.putIfAbsent(accountNumber, new ArrayList<>());
-            // Add the InvoiceDetails object to the list associated with the account number in the map
             invoiceDetailsMap.get(accountNumber).add(invoiceDetails);
         }
         return invoiceDetailsMap;

@@ -300,66 +300,80 @@ public class ExcelService {
 
 
     public SalesReportHelperDto updateExcelFile(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId, Long invoiceNumber) throws Exception {
-        Double totalChargesAsPerCustomDeclarationForm=0.0;
-        Double smsaFeesCharges=0.0;
-        Double totalAmount=0.0;
-        Double vatOnsmsaFees=0.0;
         logger.info(String.format("Inside update excel method for account %s ", customer.getAccountNumber()));
 
-        Map<String, List<InvoiceDetails>> filteredRowsMap;
-        Custom custom = getSheetHistory(sheetUniqueId).getCustom();
+            Map<String, List<InvoiceDetails>> filteredRowsMap;
+            Custom custom = getSheetHistory(sheetUniqueId).getCustom();
 
-        FileInputStream fileInputStream = new FileInputStream(sampleFileLocalLocation + "/sample.xlsx");
-        Workbook newWorkBook = WorkbookFactory.create(fileInputStream);
+            FileInputStream fileInputStream = new FileInputStream(sampleFileLocalLocation + "/sample.xlsx");
+            Workbook newWorkBook = WorkbookFactory.create(fileInputStream);
 
-        setSheetDetails(newWorkBook, customer, sheetUniqueId);
+            setSheetDetails(newWorkBook, customer, sheetUniqueId);
 
-        Sheet invoiceDetailSheet = newWorkBook.getSheetAt(1);
-        setInvoiceDetailsCellValues(invoiceDetailSheet, invoiceDetailsList, custom, customer);
-
-
-        filteredRowsMap = hashMapHelper.filterRowsByMawbNumber(invoiceDetailsList);
-        List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap, customer, custom, invoiceNumber, sheetUniqueId);
-        Map<String, Double> sumMap = hashMapHelper.sumNumericColumns(calculatedValuesList);
+            Sheet invoiceDetailSheet = newWorkBook.getSheetAt(1);
+            setInvoiceDetailsCellValues(invoiceDetailSheet, invoiceDetailsList, custom, customer);
 
 
-        Sheet summarySheet = newWorkBook.getSheetAt(0);
-        populateCalculatedValues(summarySheet, calculatedValuesList, sheetUniqueId);
-        populateSumValues(summarySheet, sumMap, customer);
-
-        fileInputStream.close();
-
-        for (Map<String,Object> singleRecord: calculatedValuesList) {
-            totalChargesAsPerCustomDeclarationForm+=Double.parseDouble(singleRecord.get("VatAmountCustomDeclarationForm").toString());
-            smsaFeesCharges+=Double.parseDouble(singleRecord.get("SMSAFeeCharges").toString());
-            totalAmount+=Double.parseDouble(singleRecord.get("TotalAmount").toString());
-            vatOnsmsaFees+=Double.parseDouble(singleRecord.get("VatOnSmsaFees").toString());
+            filteredRowsMap = hashMapHelper.filterRowsByMawbNumber(invoiceDetailsList);
+            List<Map<String, Object>> calculatedValuesList = hashMapHelper.calculateValues(filteredRowsMap,
+                    customer,
+                    custom,
+                    invoiceNumber,
+                    sheetUniqueId);
+            Map<String, Double> sumMap = hashMapHelper.sumNumericColumns(calculatedValuesList);
 
 
+            Sheet summarySheet = newWorkBook.getSheetAt(0);
+            populateCalculatedValues(summarySheet, calculatedValuesList, sheetUniqueId);
+            populateSumValues(summarySheet, sumMap, customer);
+
+            fileInputStream.close();
+
+        SalesReportHelperDto salesReportHelperDto = calculateSalesReportHelperDto(calculatedValuesList);
+
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                newWorkBook.write(outputStream);
+                salesReportHelperDto.setExcelFile(outputStream.toByteArray());
+                return salesReportHelperDto;
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new IOException("Failed to create Excel file.");
+            }
+    }
+    public SalesReportHelperDto calculateSalesReportHelperDto(List<Map<String, Object>> calculatedValuesList) {
+        Double totalChargesAsPerCustomDeclarationForm = 0.0;
+        Double smsaFeesCharges = 0.0;
+        Double totalAmount = 0.0;
+        Double vatOnsmsaFees = 0.0;
+
+        for (Map<String, Object> singleRecord : calculatedValuesList) {
+            totalChargesAsPerCustomDeclarationForm += Double.parseDouble(singleRecord.get("VatAmountCustomDeclarationForm").toString());
+            smsaFeesCharges += Double.parseDouble(singleRecord.get("SMSAFeeCharges").toString());
+            totalAmount += Double.parseDouble(singleRecord.get("TotalAmount").toString());
+            vatOnsmsaFees += Double.parseDouble(singleRecord.get("VatOnSmsaFees").toString());
         }
 
-        SalesReportHelperDto salesReportHelperDto = new SalesReportHelperDto();
-        salesReportHelperDto.setTotalChargesAsPerCustomDeclarationForm(totalChargesAsPerCustomDeclarationForm);
-        salesReportHelperDto.setSmsaFeesCharges(smsaFeesCharges);
-        salesReportHelperDto.setVatOnSmsaFees(vatOnsmsaFees);
-        salesReportHelperDto.setTotalAmount(totalAmount);
-
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            newWorkBook.write(outputStream);
-            salesReportHelperDto.setExcelFile(outputStream.toByteArray());
-            return salesReportHelperDto;
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new Exception("Failed to create Excel file.");
-        }
+        return SalesReportHelperDto.builder()
+                .totalChargesAsPerCustomDeclarationForm(totalChargesAsPerCustomDeclarationForm)
+                .smsaFeesCharges(smsaFeesCharges)
+                .vatOnSmsaFees(vatOnsmsaFees)
+                .TotalAmount(totalAmount)
+                .build();
     }
 
-    private void setSheetDetails(Workbook workbook, Customer customer, String sheetUniqueId) {
-        Sheet sheet = workbook.getSheetAt(0);
-        setCommonSheetDetails(sheet, customer, sheetUniqueId);
 
-        Sheet sheet1 = workbook.getSheetAt(1);
-        setCommonSheetDetails(sheet1, customer, sheetUniqueId);
+    private void setSheetDetails(Workbook workbook, Customer customer, String sheetUniqueId) {
+        try{
+            Sheet sheet = workbook.getSheetAt(0);
+            setCommonSheetDetails(sheet, customer, sheetUniqueId);
+
+            Sheet sheet1 = workbook.getSheetAt(1);
+            setCommonSheetDetails(sheet1, customer, sheetUniqueId);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new ExcelMakingException("There is an issue with the sheets in the sample file");
+        }
+
     }
 
     private void setCommonSheetDetails(Sheet sheet, Customer customer, String sheetUniqueId) {
@@ -380,7 +394,7 @@ public class ExcelService {
         Cell currencyCell = sheet.getRow(8).getCell(1);
         setCellValue(currencyCell, customer.getInvoiceCurrency());
     }
-    public void populateSumValues(Sheet summarySheet, Map<String, Double> sumMap, Customer customer) {
+    public void populateSumValues(Sheet summarySheet, Map<String, Double> sumMap, Customer customer) throws Exception {
         CellStyle boldStyle = summarySheet.getWorkbook().createCellStyle();
         Font boldFont = summarySheet.getWorkbook().createFont();
         boldFont.setBold(true);
@@ -425,9 +439,9 @@ public class ExcelService {
                     columnIndex++; // Move to the next column
                 }
             }
-        } catch (ExcelMakingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("There was an issue in populating sum values in the summary file");
+            throw new ExcelMakingException("There was an issue in populating sum values in the summary file");
         }
     }
 
@@ -448,60 +462,63 @@ public class ExcelService {
     }
 
 
-    private void setInvoiceDetailsCellValues(Sheet invoiceDetailSheet, List<InvoiceDetails> invoiceDetailsList,Custom custom,Customer customer) {
+    private void setInvoiceDetailsCellValues(Sheet invoiceDetailSheet, List<InvoiceDetails> invoiceDetailsList,Custom custom,Customer customer) throws Exception {
         int rowCount = 11;
-        try {
+
+
             Currency currency = currencyService.findByCurrencyFromAndCurrencyTo(custom,customer);
             Double conversionRate = currency.getConversionRate();
 
-            CellStyle rightAlignedStyle = invoiceDetailSheet.getWorkbook().createCellStyle();
-            rightAlignedStyle.setAlignment(HorizontalAlignment.RIGHT);
+            try {
+                CellStyle rightAlignedStyle = invoiceDetailSheet.getWorkbook().createCellStyle();
+                rightAlignedStyle.setAlignment(HorizontalAlignment.RIGHT);
 
-            CellStyle centeredStyle = invoiceDetailSheet.getWorkbook().createCellStyle();
-            centeredStyle.setAlignment(HorizontalAlignment.CENTER);
-
-
-            for (InvoiceDetails invoiceDetails : invoiceDetailsList) {
-                Row row = invoiceDetailSheet.createRow(rowCount);
-                int columnCount = 0;
-
-                Double vatAmount = invoiceDetails.getVatAmount() * conversionRate;
-                Double customFormCharges = invoiceDetails.getCustomFormCharges() * conversionRate;
-                Double other = invoiceDetails.getOther() * conversionRate;
-                Double totalCharges = invoiceDetails.getTotalCharges() * conversionRate;
+                CellStyle centeredStyle = invoiceDetailSheet.getWorkbook().createCellStyle();
+                centeredStyle.setAlignment(HorizontalAlignment.CENTER);
 
 
-                setCellValue(row, columnCount, invoiceDetails.getInvoiceDetailsId().getMawb(),centeredStyle);
-                setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getManifestDate(),centeredStyle);
-                setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getAccountNumber(),centeredStyle);
-                setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getAwb(),centeredStyle);
-                setCellValue(row, ++columnCount, invoiceDetails.getOrderNumber(),centeredStyle);
-                setCellValue(row, ++columnCount, invoiceDetails.getOrigin(),centeredStyle);
-                setCellValue(row, ++columnCount, invoiceDetails.getDestination(),centeredStyle);
-                setCellValue(row, ++columnCount, invoiceDetails.getShippersName(),centeredStyle);
-                setCellValue(row, ++columnCount, invoiceDetails.getConsigneeName(),centeredStyle);
-                setCellValue(row, ++columnCount, invoiceDetails.getWeight(),centeredStyle);
-                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getDeclaredValue()),rightAlignedStyle);
-                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getValueCustom()),rightAlignedStyle);
-                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getVatAmount()),rightAlignedStyle);
-                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getCustomFormCharges()),rightAlignedStyle);
-                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getOther()),rightAlignedStyle);
-                setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getTotalCharges()),rightAlignedStyle);
-                setCellValue(row, ++columnCount,custom.getCurrency(),centeredStyle);
-                setCellValue(row, ++columnCount, formatCurrency(vatAmount),rightAlignedStyle);
-                setCellValue(row, ++columnCount, formatCurrency(customFormCharges),rightAlignedStyle);
-                setCellValue(row, ++columnCount, formatCurrency(other),rightAlignedStyle);
-                setCellValue(row, ++columnCount, formatCurrency(totalCharges),rightAlignedStyle);
-                setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationNumber(),centeredStyle);
-                setCellValue(row,++columnCount,invoiceDetails.getRef(),centeredStyle);
-                setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationDate(),centeredStyle);
+                for (InvoiceDetails invoiceDetails : invoiceDetailsList) {
+                    Row row = invoiceDetailSheet.createRow(rowCount);
+                    int columnCount = 0;
 
-                rowCount++;
+                    Double vatAmount = invoiceDetails.getVatAmount() * conversionRate;
+                    Double customFormCharges = invoiceDetails.getCustomFormCharges() * conversionRate;
+                    Double other = invoiceDetails.getOther() * conversionRate;
+                    Double totalCharges = invoiceDetails.getTotalCharges() * conversionRate;
+
+
+                    setCellValue(row, columnCount, invoiceDetails.getInvoiceDetailsId().getMawb(),centeredStyle);
+                    setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getManifestDate(),centeredStyle);
+                    setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getAccountNumber(),centeredStyle);
+                    setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getAwb(),centeredStyle);
+                    setCellValue(row, ++columnCount, invoiceDetails.getOrderNumber(),centeredStyle);
+                    setCellValue(row, ++columnCount, invoiceDetails.getOrigin(),centeredStyle);
+                    setCellValue(row, ++columnCount, invoiceDetails.getDestination(),centeredStyle);
+                    setCellValue(row, ++columnCount, invoiceDetails.getShippersName(),centeredStyle);
+                    setCellValue(row, ++columnCount, invoiceDetails.getConsigneeName(),centeredStyle);
+                    setCellValue(row, ++columnCount, invoiceDetails.getWeight(),centeredStyle);
+                    setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getDeclaredValue()),rightAlignedStyle);
+                    setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getValueCustom()),rightAlignedStyle);
+                    setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getVatAmount()),rightAlignedStyle);
+                    setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getCustomFormCharges()),rightAlignedStyle);
+                    setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getOther()),rightAlignedStyle);
+                    setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getTotalCharges()),rightAlignedStyle);
+                    setCellValue(row, ++columnCount,custom.getCurrency(),centeredStyle);
+                    setCellValue(row, ++columnCount, formatCurrency(vatAmount),rightAlignedStyle);
+                    setCellValue(row, ++columnCount, formatCurrency(customFormCharges),rightAlignedStyle);
+                    setCellValue(row, ++columnCount, formatCurrency(other),rightAlignedStyle);
+                    setCellValue(row, ++columnCount, formatCurrency(totalCharges),rightAlignedStyle);
+                    setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationNumber(),centeredStyle);
+                    setCellValue(row,++columnCount,invoiceDetails.getRef(),centeredStyle);
+                    setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationDate(),centeredStyle);
+
+                    rowCount++;
+                }
+
+            }catch (Exception e){
+                e.printStackTrace();
+                throw new ExcelMakingException("Issue in populating invoice details");
             }
-        }catch (Exception e){
-            e.printStackTrace();
-            throw new ExcelMakingException("There was an issue in invoice sheet");
-        }
 
     }
 
@@ -511,7 +528,7 @@ public class ExcelService {
         formatter.setMaximumFractionDigits(2);
         return formatter.format(value);
     }
-    private void populateCalculatedValues(Sheet summarySheet, List<Map<String, Object>> calculatedValuesList, String sheetUniqueId) {
+    private void populateCalculatedValues(Sheet summarySheet, List<Map<String, Object>> calculatedValuesList, String sheetUniqueId) throws Exception {
         try {
 
 
@@ -551,7 +568,7 @@ public class ExcelService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("There was an issue in populating calculated values in the summary file");
+            throw new ExcelMakingException("There was an issue in populating calculated values in the summary file");
         }
     }
 
@@ -971,6 +988,7 @@ public class ExcelService {
 
 
     public SheetHistory getSheetHistory(String sheetUniqueUUid) {
+
         return sheetHistoryRepository.findByUniqueUUid(sheetUniqueUUid);
     }
 }

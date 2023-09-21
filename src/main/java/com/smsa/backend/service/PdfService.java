@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Executable;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -43,7 +44,7 @@ public class PdfService {
         return  sheetHistoryRepository.findByUniqueUUid(sheetUniqueUUid);
     }
     private static final Logger logger = LoggerFactory.getLogger(PdfService.class);
-    public byte[] makePdf(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId,Long invoiceNumber){
+    public byte[] makePdf(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId,Long invoiceNumber) throws Exception {
         Resource resource =resourceLoader.getResource("classpath:afont.ttf");
 
         arabicFont  = FontFactory.getFont(resource.getFilename(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
@@ -337,9 +338,9 @@ public class PdfService {
         writer.close();
         logger.info("pdf created successfully");
             return outputStream.toByteArray();
-    } catch (DocumentException | IOException e) {
+    } catch (DocumentException | IOException e ) {
         e.printStackTrace();
-        throw new RuntimeException("There was an issue in making pdf");
+        throw new Exception("There was an issue in making pdf");
     }
 }
 

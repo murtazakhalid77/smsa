@@ -1,0 +1,73 @@
+<app-sidebar></app-sidebar>
+<div class="body-position">
+    <app-dashboard-head></app-dashboard-head>
+    <div class="main-container">
+        <div>
+            <h4>Regions</h4>
+            <p class="page-intro">Whole data about your business here</p>
+        </div>
+        <div class="order-body">
+            <div class="order-search-panel">
+                <input type="text" placeholder="Search Regions" class="order-search form-control">
+    
+            </div>
+            <div class="order-table table-container">
+                <table class="table table-striped">
+                    <thead style="
+                    background: #ffffff;
+                    position: sticky;">
+                    <tr class="header-fixed">
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Id</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Account Number</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Current Status</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Download Url</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Sheet Id</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Emailed</span>
+                        </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                         
+                        </th>
+                       
+                    </tr>
+                </thead>
+
+                    <tbody>
+                        <tr *ngFor="let tar of transaction" class="order-table-row-hover">
+                            <th scope="row" class="tracking-id text-center">{{tar?.id}}</th>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{tar?.accountNumber}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{tar?.currentStatus}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{tar?.downloadUrl}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{tar?.sheetId}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{tar?.mailSent}}</td>
+                            
+                            <td class="order-table-btns-container text-center w-auto col-md-2 col-lg-1">
+                               
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row mt-4" *ngIf="transaction!.length > 0">
+            <div class="col">
+              <!-- Your content here -->
+            </div>
+            <div class="col-auto">
+                <mat-paginator [pageSize]="itemsPerPage" [length]="totalItems" (page)="changePage($event)"> </mat-paginator>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -96,7 +96,7 @@ public class EmailService {
         } catch (Exception e) {
             e.printStackTrace();
             invoiceDetailsRepository.revertIsSentInMailByAccountNumberAndSheetUniqueId(customer.getAccountNumber(),sheetUniqueId);
-            throw new RuntimeException("Error while sending mail with attachments.");
+            throw new RuntimeException(e.getMessage());
 
         }
 

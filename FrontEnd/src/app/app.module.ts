@@ -36,7 +36,8 @@ import { CurrencyHistoryComponent } from './pages/currency/currency-history/curr
 import { NgxPaginationModule } from 'ngx-pagination';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { SheetHistoryListComponent } from './pages/sheetHistory/sheet-history-list/sheet-history-list.component';
-import {routes} from './app-routing.module'
+import {routes} from './app-routing.module';
+import { TransactionComponent } from './pages/tran/transaction/transaction.component'
 @NgModule({
   declarations: [
     AppComponent,
@@ -64,6 +65,7 @@ import {routes} from './app-routing.module'
     ReportComponent,
     CurrencyHistoryComponent,
     SheetHistoryListComponent,
+    TransactionComponent,
   ],
   imports: [
     NgxPaginationModule,

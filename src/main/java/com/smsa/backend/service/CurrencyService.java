@@ -109,7 +109,7 @@ public class CurrencyService {
         if (currency.isPresent()){
             return currency.get();
         }
-        throw new RecordNotFoundException("Conversion Rate not Found");
+        throw new RecordNotFoundException(String.format("Conversion Rate not Found of %s to %s of Customer %s",currencyFrom,currencyTo,customer.getAccountNumber()));
     }
 
     public List<String> getDistinctCurrencies() {

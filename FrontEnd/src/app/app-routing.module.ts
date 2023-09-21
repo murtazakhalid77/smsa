@@ -20,6 +20,7 @@ import { PermissionUpdateComponent } from './pages/permission/permission-update/
 import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.component';
 import { CurrencyHistoryComponent } from './pages/currency/currency-history/currency-history.component';
 import { SheetHistoryListComponent } from './pages/sheetHistory/sheet-history-list/sheet-history-list.component';
+import { TransactionComponent } from './pages/tran/transaction/transaction.component';
 
 export const routes: Routes = [
   {
@@ -124,6 +125,10 @@ export const routes: Routes = [
   {
     path: 'sheetHistory',
     component: SheetHistoryListComponent,
+  }
+  ,{
+    path: 'transactions',
+    component: TransactionComponent,
   }
 ];
 

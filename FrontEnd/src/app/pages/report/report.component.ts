@@ -22,7 +22,7 @@ export class ReportComponent {
   invoiceFrom?: any;
   invoiceInputsDisable: boolean = false;
   salesReport?: ISalesReport[];
-  selectedSearchOption: string = 'invoice'; 
+  selectedSearchOption: string = 'invoice';
   criteria: any;
   currentPage:number  = 0;
   itemsPerPage: number = 10;
@@ -60,7 +60,7 @@ export class ReportComponent {
       this.dateInputsDisabled = true;
     }else{
       this.dateInputsDisabled = false
-    } 
+    }
   }
 
       getSalesReport(){
@@ -73,11 +73,11 @@ export class ReportComponent {
           startDate: this.selectedSearchOption === 'date' ? this.startDate : null,
           endDate: this.selectedSearchOption === 'date' ? this.endDate : null
         };
-      
+
         // Check if any search criteria is provided
         if ((this.selectedSearchOption === 'invoice' && (this.invoiceTo || this.invoiceFrom)) ||
             (this.selectedSearchOption === 'date' && (this.startDate || this.endDate))) {
-      
+
           this.salesReportService.getSalesReport(searchSalesReport).subscribe(res => {
             if (res.body?.length !== 0 && res) {
               this.salesReport = res.body!;

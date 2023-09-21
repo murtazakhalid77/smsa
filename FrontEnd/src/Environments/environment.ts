@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   jsonUrl:"http://localhost:3000",
-   // backend:"http://apicdvbill.smsaexpress.com/api"
+  // backend:"http://apicdvbill.smsaexpress.com/api"
   backend:"http://localhost:8080/api"
 
 }
