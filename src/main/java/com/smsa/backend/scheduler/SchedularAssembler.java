@@ -32,11 +32,13 @@ public class SchedularAssembler {
                 .build();
     }
 
-    public Transaction transaction(String accountNumber,String sheetUniqueId,String message,Boolean mailSent){
+    public Transaction transaction(String accountNumber,String sheetUniqueId,String message,Boolean mailSent,
+                                   String excelDownload,String pdfDownload){
         return  Transaction.builder()
                 .accountNumber(accountNumber)
                 .sheetId(sheetUniqueId)
-                .downloadUrl("https/:s3buket")
+                .excelDownload(excelDownload)
+                .pdfDownload(pdfDownload)
                 .currentStatus(message)
                 .MailSent(mailSent)
                 .build();

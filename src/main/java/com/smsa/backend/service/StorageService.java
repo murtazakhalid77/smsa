@@ -29,8 +29,7 @@ public class StorageService {
     @Autowired
     private AmazonS3 s3Client;
 
-    public String uploadFile(byte[] fileData, String originalFileName) {
-        String fileName = DateTime.now()+ originalFileName;
+    public String uploadFile(byte[] fileData, String fileName) {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(fileData);
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(fileData.length);

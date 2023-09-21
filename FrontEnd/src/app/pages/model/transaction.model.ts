@@ -1,9 +1,10 @@
 export interface Itransaction{
       id:number
-     accountNumber :String
-      currentStatus:String;
+      accountNumber :String
+      currentStatus:String
+      excelDownload:String;
+      pdfDownload:String;
       mailSent:boolean;
-      downloadUrl:String;
       sheetId:String;
   }
   export class Transaction implements Itransaction {
@@ -11,8 +12,9 @@ export interface Itransaction{
        public id:number,
        public accountNumber :String,
        public currentStatus:String,
+       public excelDownload:String,
+       public pdfDownload:String,
        public mailSent:boolean,
-       public downloadUrl:String,
        public sheetId:String
     ) {}
      

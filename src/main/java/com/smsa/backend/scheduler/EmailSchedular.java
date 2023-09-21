@@ -4,6 +4,8 @@ import com.smsa.backend.dto.SalesReportHelperDto;
 import com.smsa.backend.model.*;
 import com.smsa.backend.repository.*;
 import com.smsa.backend.service.*;
+import com.sun.jmx.snmp.Timestamp;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 
 import org.slf4j.LoggerFactory;
@@ -68,6 +70,8 @@ public class EmailSchedular {
         Long invoiceNumber = invoice.getNumber();
         boolean anyUnsentInvoice = false;
         boolean documentsMade = false;
+        String excelFileName = null;
+        String pdfFileName = null;
 
         List<InvoiceDetails> invoicesForSheet = invoiceDetailsRepository.findAllBySheetUniqueId(sheetUniqueId);
 
@@ -88,6 +92,7 @@ public class EmailSchedular {
 
                 if (customer.isPresent() && customer.get().getEmail() != null && customer.get().getStatus().equals(true)) {
                     logger.info("Making excel for Account Number: " + accountNumber);
+
                     try {
                         Long invoiceNo = invoiceNumber; // Use the current invoiceNumber
                         invoiceNumber++; //
@@ -95,15 +100,19 @@ public class EmailSchedular {
                         byte[] pdfFileData = pdfService.makePdf(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
                         logger.info(String.format("Excel and pdf made for the account number %s",accountNumber));
                         documentsMade=true;
+
                         if(documentsMade){
-                            String excelFileName = accountNumber + "_excel.xlsx";
+                            String dateTime= String.valueOf(DateTime.now());
+                            excelFileName = dateTime+ accountNumber + "excel.xlsx";
                             storageService.uploadFile(salesReportHelperDto.getExcelFile(), excelFileName);
 
-                            // Upload PDF file to S3
-                            String pdfFileName = accountNumber + "_invoice.pdf";
+                            pdfFileName = dateTime + accountNumber + "invoice.pdf";
                             storageService.uploadFile(pdfFileData, pdfFileName);
                             logger.info("uploaded to amazon s3 bucket");
                         }
+                        final String finalExcelFileName = excelFileName;
+                        final String finalPdfFileName = pdfFileName;
+
                         if (emailService.sendMailWithAttachments(customer.get(), salesReportHelperDto.getExcelFile(), pdfFileData,sheetUniqueId)) {
                             logger.info(String.format("All the work done for account number %s with name %s",
                                     customer.get().getAccountNumber(),
@@ -114,17 +123,20 @@ public class EmailSchedular {
 
                             Transaction newTransaction = transactionRepository
                                     .findByAccountNumberAndSheetId(accountNumber, sheetUniqueId)
-                                    .orElseGet(() -> schedularAssembler.transaction(accountNumber, sheetUniqueId, "Success", Boolean.TRUE));
+                                    .orElseGet(() -> schedularAssembler.transaction(accountNumber, sheetUniqueId,
+                                            "Success", Boolean.TRUE, finalExcelFileName, finalPdfFileName));
 
                             newTransaction.setCurrentStatus("Success");
                             transactionRepository.save(newTransaction);
                         }
                     } catch (Exception e) {
+
                         logger.error(String.format("Error while scheduling for  for Account Number %s: " , accountNumber));
                         anyUnsentInvoice = true;
                         Transaction newTransaction = transactionRepository
                                 .findByAccountNumberAndSheetId(accountNumber, sheetUniqueId)
-                                .orElseGet(() -> schedularAssembler.transaction(accountNumber, sheetUniqueId, e.getMessage(), Boolean.FALSE));
+                                .orElseGet(() -> schedularAssembler.transaction(accountNumber, sheetUniqueId,
+                                        e.getMessage(), Boolean.FALSE,null,null));
 
                         newTransaction.setCurrentStatus(e.getMessage());
                         transactionRepository.save(newTransaction);

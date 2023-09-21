@@ -28,5 +28,13 @@ export class TransactionService {
   
     return this.http.get<Transaction[]>(url, { params, observe: 'response' });
   }
+
+  downloadFiles( params:any){
+    let url = `${this._url}/download/${ params}`;
+
+    return this.http.get(`${url}`, { params, observe: 'response' });
+    
+
+  }
   
 }

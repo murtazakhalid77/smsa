@@ -20,7 +20,7 @@ public class PermissionService {
     private PermissionRepository  permissionRepository;
 
 
-    public Permission addPermission(Permission permission) {
+    public Permission  addPermission(Permission permission) {
        return permissionRepository.save(permission);
     }
 

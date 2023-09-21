@@ -25,7 +25,10 @@ public class Transaction {
 
     private String sheetId;
 
-    private String downloadUrl;
+    private String excelDownload;
+
+    private String pdfDownload;
+
     private Boolean MailSent;
 
     private String currentStatus;
