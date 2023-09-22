@@ -42,6 +42,16 @@ export class TransactionComponent {
       if(res && res.body){
         this.transaction = res.body;
         this.totalItems = res.headers.get('X-Total-Count') ?? '';
+        // this.transaction = this.transaction.map(item => {
+        //   if (item.mailSent === false) {
+        //     item.excelDownload = "not found";
+        //     item.pdfDownload = "not found";
+        //   }
+        //   return item;
+        // });
+        
+        // console.log(this.transaction);
+        
       }
     })
   }

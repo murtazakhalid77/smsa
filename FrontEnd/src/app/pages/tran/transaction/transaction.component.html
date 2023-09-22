@@ -9,41 +9,41 @@
         <div class="order-body">
             <div class="order-search-panel">
                 <input type="text" placeholder="Search Regions" class="order-search form-control">
-    
+
             </div>
             <div class="order-table table-container">
                 <table class="table table-striped">
                     <thead style="
                     background: #ffffff;
                     position: sticky;">
-                    <tr class="header-fixed">
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
-                            <span class="font">Id</span>
-                        </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
-                            <span class="font">Account Number</span>
-                        </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
-                            <span class="font">Current Status</span>
-                        </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
-                            <span class="font">Excel Download</span>
-                        </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
-                            <span class="font">Pdf Download</span>
-                        </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
-                            <span class="font">Sheet Id</span>
-                        </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
-                            <span class="font">Emailed</span>
-                        </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
-                         
-                        </th>
-                       
-                    </tr>
-                </thead>
+                        <tr class="header-fixed">
+                            <th class="nowrap col-md-2 col-lg-1 text-center">
+                                <span class="font">Id</span>
+                            </th>
+                            <th class="nowrap col-md-2 col-lg-1 text-center">
+                                <span class="font">Account Number</span>
+                            </th>
+                            <th class="nowrap col-md-2 col-lg-1 text-center">
+                                <span class="font">Current Status</span>
+                            </th>
+                            <th class="nowrap col-md-2 col-lg-1 text-center">
+                                <span class="font">Excel Download</span>
+                            </th>
+                            <th class="nowrap col-md-2 col-lg-1 text-center">
+                                <span class="font">Pdf Download</span>
+                            </th>
+                            <th class="nowrap col-md-2 col-lg-1 text-center">
+                                <span class="font">Sheet Id</span>
+                            </th>
+                            <th class="nowrap col-md-2 col-lg-1 text-center">
+                                <span class="font">Emailed</span>
+                            </th>
+                            <th class="nowrap col-md-2 col-lg-1 text-center">
+
+                            </th>
+
+                        </tr>
+                    </thead>
 
                     <tbody>
                         <tr *ngFor="let tar of transaction" class="order-table-row-hover">
@@ -51,25 +51,43 @@
                             <td class="text-center w-auto col-md-2 col-lg-1">{{tar?.accountNumber}}</td>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{tar?.currentStatus}}</td>
 
-                            <!-- <td class="text-center w-auto col-md-2 col-lg-1">{{tar?.excelDownload}}</td> -->
-                            <td class="text-center w-auto col-md-2 col-lg-1" (click)="downloadExcel(tar)">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                            <ng-container *ngIf="tar?.mailSent; else notSent">
+                                <td class="text-center w-auto col-md-2 col-lg-1" (click)="downloadExcel(tar)">
+                                  <!-- Render download icon when mailSent is true -->
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
                                     <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
                                     <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
                                   </svg>
-                            </td>
-                             <!-- <td class="text-center w-auto col-md-2 col-lg-1">{{tar?.excelDownload}}</td> -->
-                             <td class="text-center w-auto col-md-2 col-lg-1" (click)="downloadPdf(tar)">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                                </td>
+                              </ng-container>
+
+                              <ng-template #notSent>
+                                <td class="text-center w-auto col-md-2 col-lg-1">Not Made</td>
+                              </ng-template>
+
+                                
+
+
+                              <ng-container *ngIf="tar?.mailSent; else notSentPdf">
+                                <td class="text-center w-auto col-md-2 col-lg-1" (click)="downloadPdf(tar)">
+                                  <!-- Render download icon when mailSent is true -->
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
                                     <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
                                     <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
                                   </svg>
-                            </td>
+                                </td>
+                              </ng-container>
+
+                              <ng-template #notSentPdf>
+                                <td class="text-center w-auto col-md-2 col-lg-1">Not Made</td>
+                              </ng-template>
+
+
                             <td class="text-center w-auto col-md-2 col-lg-1">{{tar?.sheetId}}</td>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{tar?.mailSent}}</td>
-                            
+
                             <td class="order-table-btns-container text-center w-auto col-md-2 col-lg-1">
-                               
+
                             </td>
                         </tr>
                     </tbody>
@@ -79,10 +97,11 @@
 
         <div class="row mt-4" *ngIf="transaction!.length > 0">
             <div class="col">
-              <!-- Your content here -->
+                <!-- Your content here -->
             </div>
             <div class="col-auto">
-                <mat-paginator [pageSize]="itemsPerPage" [length]="totalItems" (page)="changePage($event)"> </mat-paginator>
+                <mat-paginator [pageSize]="itemsPerPage" [length]="totalItems" (page)="changePage($event)">
+                </mat-paginator>
             </div>
         </div>
 

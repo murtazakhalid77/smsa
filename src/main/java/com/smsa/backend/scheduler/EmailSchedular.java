@@ -45,7 +45,7 @@ public class EmailSchedular {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailSchedular.class);
 
-    @Scheduled(initialDelay = 5000, fixedDelay = 120000)
+    @Scheduled(initialDelay = 5000, fixedDelay = 300000)
     public void markSentAndProcessInvoices()  {
         try {
             List<SheetHistory> sheetsToBeSent = sheetHistoryRepository.findAllByIsEmail(false);
@@ -94,8 +94,8 @@ public class EmailSchedular {
                     logger.info("Making excel for Account Number: " + accountNumber);
 
                     try {
-                        Long invoiceNo = invoiceNumber; // Use the current invoiceNumber
-                        invoiceNumber++; //
+                            Long invoiceNo = invoiceNumber;
+                        invoiceNumber++;
                         SalesReportHelperDto salesReportHelperDto = excelService.updateExcelFile(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
                         byte[] pdfFileData = pdfService.makePdf(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
                         logger.info(String.format("Excel and pdf made for the account number %s",accountNumber));
@@ -152,7 +152,8 @@ public class EmailSchedular {
 
         invoice.setNumber(invoiceNumber);
         invoiceRepository.save(invoice);
-//         Update sheet history status only if there were no exceptions during the process
+
+
         if (!anyUnsentInvoice) {
             updateSheetHistoryStatus(sheetUniqueId, anyUnsentInvoice);
         }

@@ -6,9 +6,9 @@
         <li>
             <span class="sidebar-list-hover" (click)="dashboard()">
                 <i class="fa fa-home fa-2x"></i>
-                <h6 class="nav-text">
+                <span class="nav-text">
                     Dashboard
-                </h6>
+                </span>
             </span>
         </li>
         <li *ngIf="sessionStorageService.hasPermission('USER_MANAGEMENT')">
