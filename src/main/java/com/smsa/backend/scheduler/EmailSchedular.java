@@ -4,7 +4,7 @@ import com.smsa.backend.dto.SalesReportHelperDto;
 import com.smsa.backend.model.*;
 import com.smsa.backend.repository.*;
 import com.smsa.backend.service.*;
-import com.sun.jmx.snmp.Timestamp;
+
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+
 import java.util.*;
 
 @Service
@@ -94,7 +94,7 @@ public class EmailSchedular {
                     logger.info("Making excel for Account Number: " + accountNumber);
 
                     try {
-                            Long invoiceNo = invoiceNumber;
+                        Long invoiceNo = invoiceNumber;
                         invoiceNumber++;
                         SalesReportHelperDto salesReportHelperDto = excelService.updateExcelFile(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
                         byte[] pdfFileData = pdfService.makePdf(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
@@ -108,8 +108,10 @@ public class EmailSchedular {
 
                             pdfFileName = dateTime + accountNumber + "invoice.pdf";
                             storageService.uploadFile(pdfFileData, pdfFileName);
+
                             logger.info("uploaded to amazon s3 bucket");
                         }
+
                         final String finalExcelFileName = excelFileName;
                         final String finalPdfFileName = pdfFileName;
 

@@ -24,8 +24,6 @@ public class StorageService {
 
     @Value("${application.bucket.name}")
     private String bucketName;
-    @Value("${spring.cloud.aws.credentials.accessKey}")
-    private String key;
     @Autowired
     private AmazonS3 s3Client;
 
