@@ -23,7 +23,7 @@ import java.io.IOException;
 public class StorageService {
 
 
-    private static final String BUCKET_NAME="cdvinv";
+    public static final String BUCKET_NAME="cdvinv";
     @Autowired
     private AmazonS3 s3Client;
 

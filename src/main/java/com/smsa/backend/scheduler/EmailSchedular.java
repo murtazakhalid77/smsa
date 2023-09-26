@@ -134,6 +134,7 @@ public class EmailSchedular {
                     } catch (Exception e) {
 
                         logger.error(String.format("Error while scheduling for  for Account Number %s: " , accountNumber));
+                        logger.warn(e.toString());
                         anyUnsentInvoice = true;
                         Transaction newTransaction = transactionRepository
                                 .findByAccountNumberAndSheetId(accountNumber, sheetUniqueId)
