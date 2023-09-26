@@ -3,6 +3,7 @@ package com.smsa.backend.configuration;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 
 import com.amazonaws.services.s3.AmazonS3;
@@ -35,7 +36,7 @@ public class AwsConfig {
         logger.info(awsRegion);
         return AmazonS3ClientBuilder.standard()
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                .withRegion(awsRegion)
+                .withRegion(Regions.ME_CENTRAL_1)
                 .build();
 
     }
