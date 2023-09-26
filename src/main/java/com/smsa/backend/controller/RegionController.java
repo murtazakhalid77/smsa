@@ -1,11 +1,16 @@
 package com.smsa.backend.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smsa.backend.criteria.SearchCriteria;
 import com.smsa.backend.dto.RegionDto;
 import com.smsa.backend.model.Region;
 import com.smsa.backend.service.RegionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,9 +32,12 @@ public class RegionController {
         return ResponseEntity.ok(this.regionService.addRegion(regionDto));
     }
 
-    @GetMapping("/region")
-    ResponseEntity<List<RegionDto>> getAllRegions(Pageable pageable){
-        Page<Region> regions = this.regionService.getAllRegions(pageable);
+    @GetMapping("/region/pagination")
+    ResponseEntity<List<RegionDto>> getAllRegions(@RequestParam("search") String search, @RequestParam(value = "page", defaultValue = "0") int page,
+                                                  @RequestParam(value = "size", defaultValue = "10") int size,
+                                                  @RequestParam(value = "sort", defaultValue = "id") String sort) throws JsonProcessingException {
+        SearchCriteria searchCriteria = new ObjectMapper().readValue(search, SearchCriteria.class);
+        Page<Region> regions = this.regionService.getAllRegions(searchCriteria,  PageRequest.of(page, size,  Sort.by(sort).descending()));
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(regions.getTotalElements()));
         return ResponseEntity.ok()
@@ -42,6 +50,11 @@ public class RegionController {
     @GetMapping("/region/{id}")
     ResponseEntity<RegionDto> getRegionById(@PathVariable Long id){
         return ResponseEntity.ok(this.regionService.getRegionById(id));
+    }
+
+    @GetMapping("/region")
+    ResponseEntity<List<Region>> getRegions(){
+        return ResponseEntity.ok(this.regionService.getRegions());
     }
 
     @PutMapping("/region/{id}")

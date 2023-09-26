@@ -11,13 +11,18 @@ import com.smsa.backend.repository.SalesReportRepository;
 import com.smsa.backend.specification.FilterSpecification;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 @Service
 public class SalesReportService {
 
@@ -27,32 +32,38 @@ public class SalesReportService {
     FilterSpecification<SalesReport> salesReportFilterSpecification;
     @Autowired
     ModelMapper modelMapper;
-
     @Autowired
     HelperService helperService;
 
+    public List<SalesReportDto> getSalesReport(SearchSalesReportDto searchSalesReportDto, Pageable pageable) {
+        SearchCriteria searchCriteria = new SearchCriteria();
+        searchCriteria.setMapper(searchSalesReportDto.getMapper());
+        searchCriteria.setSearchText(searchCriteria.getSearchText());
 
-    public List<SalesReportDto> getSalesReport(SearchSalesReportDto searchSalesReportDto) {
-        List<SalesReport> salesReports = null;
+        Optional<Page<SalesReport>> salesReports = null;
         List<SalesReportDto> salesReportDtos = new ArrayList<>();
 
-        if(searchSalesReportDto.getInvoiceTo()!=null || searchSalesReportDto.getInvoiceFrom()!=null){
-            if(searchSalesReportDto.getInvoiceTo().length()<5 || searchSalesReportDto.getInvoiceFrom().length()<5){
-                throw new RecordNotFoundException(String.format("Invalid format"));
+        if(searchCriteria.getSearchText() == null){
+            if(searchSalesReportDto.getInvoiceTo()!=null || searchSalesReportDto.getInvoiceFrom()!=null){
+                if(searchSalesReportDto.getInvoiceTo().length()<5 || searchSalesReportDto.getInvoiceFrom().length()<5){
+                    throw new RecordNotFoundException(String.format("Invalid format"));
+                }else{
+                    salesReports = Optional.of(this.salesReportRepository.findByInvoiceNumberBetween(searchSalesReportDto.getInvoiceTo().substring(5),
+                            searchSalesReportDto.getInvoiceFrom().substring(5), pageable));
+                }
+            } else{
+                salesReports = Optional.of(this.salesReportRepository.findAllByCreatedAtBetween(
+                        this.helperService.convertStringInToLocalDate(searchSalesReportDto.getStartDate()),
+                        this.helperService.convertStringInToLocalDate(searchSalesReportDto.getEndDate()), pageable));
             }
+        }else{
+            Specification<SalesReport> regionSpecification = salesReportFilterSpecification.getSearchSpecification(searchCriteria);
+            salesReports = Optional.of(this.salesReportRepository.findAll(regionSpecification, pageable));
         }
 
-        if(searchSalesReportDto.getInvoiceTo()!=null || searchSalesReportDto.getInvoiceFrom()!=null){
-            salesReports = this.salesReportRepository.findByInvoiceNumberBetween(searchSalesReportDto.getInvoiceTo().substring(5),
-                    searchSalesReportDto.getInvoiceFrom().substring(5));
-        }
-        else{
-            salesReports = this.salesReportRepository.findAllByCreatedAtBetween(
-                    this.helperService.convertStringInToLocalDate(searchSalesReportDto.getStartDate()),
-                    this.helperService.convertStringInToLocalDate(searchSalesReportDto.getEndDate()));
-        }
+
         DecimalFormat decimalFormat = new DecimalFormat("#0.00");
-        for (SalesReport salesReport : salesReports) {
+        for (SalesReport salesReport : salesReports.get()) {
             String totalChargesString = String.valueOf(salesReport.getTotalChargesAsPerCustomerDeclarationForm());
             totalChargesString = totalChargesString.replace(",", "").trim();
             double totalCharges = Double.parseDouble(totalChargesString);

@@ -10,7 +10,6 @@ import lombok.*;
 @ToString
 @Builder
 public class SearchCriteria {
-    String column;
-    String value;
-    String operator;
+    String mapper;
+    String searchText;
 }

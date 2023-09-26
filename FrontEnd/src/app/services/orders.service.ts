@@ -28,11 +28,8 @@ export class CustomerService {
   //   return this.http.get(url);
   // }
 
-  getCustomers(page?: any, size?: any): Observable<EntityAllCustomersResponseType> {
+  getCustomers(params?: any): Observable<EntityAllCustomersResponseType> {
     let url = `${this._url}/customer`;
-    const params = new HttpParams()
-    .set('page', page.toString())
-    .set('size', size.toString());
     return this.http.get<Customer[]>(`${url}`, {params, observe: 'response' });
     // .pipe(map((res: EntityUserResponse) => res));
   }

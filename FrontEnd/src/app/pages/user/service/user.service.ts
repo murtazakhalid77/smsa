@@ -18,11 +18,8 @@ export type EntityUserResponseType = HttpResponse<IUser>;
   
     constructor(private http: HttpClient) { }
 
-    getUsers(page?: any, size?: any): Observable<EntityUsersResponseType> {
+    getUsers(params?: any): Observable<EntityUsersResponseType> {
         let url = `${this._url}/user`;
-        const params = new HttpParams()
-        .set('page', page.toString())
-        .set('size', size.toString());
         return this.http.get<User[]>(`${url}`, { params, observe: 'response' });
     }
 

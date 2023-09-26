@@ -21,7 +21,6 @@ ngOnInit(): void {
   // constructor(private formbuilder: FormBuilder, private route: ActivatedRoute, private service: CustomerService, private router: Router) { }
 
   // ngOnInit(): void {
-  //   debugger
   //   this.editOrderForm = this.formbuilder.group({
   //     account: ['', [Validators.required]],
   //     invoice: ['', [Validators.required]],
@@ -42,7 +41,6 @@ ngOnInit(): void {
   // }
 
   // getById(id: any) {
-  //   debugger
   //   this.service.getOrderById(id).subscribe(res => {
   //     this.orderArray.push(res)
   //     this.editOrderForm.patchValue({

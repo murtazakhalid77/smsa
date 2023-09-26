@@ -2,13 +2,17 @@ package com.smsa.backend.service;
 
 import com.smsa.backend.Exception.RecordAlreadyExistException;
 import com.smsa.backend.Exception.RecordNotFoundException;
+import com.smsa.backend.criteria.SearchCriteria;
 import com.smsa.backend.dto.RegionDto;
+import com.smsa.backend.model.Customer;
 import com.smsa.backend.model.Region;
 import com.smsa.backend.repository.RegionRepository;
+import com.smsa.backend.specification.FilterSpecification;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +26,8 @@ public class RegionService {
     RegionRepository regionRepository;
     @Autowired
     ModelMapper modelMapper;
+    @Autowired
+    FilterSpecification<Region> regionFilterSpecification;
 
     public RegionDto addRegion(RegionDto regionDto) {
         Optional<Region> region = this.regionRepository.findByCustomerRegion(regionDto.getCustomerRegion());
@@ -31,12 +37,16 @@ public class RegionService {
         throw new RecordAlreadyExistException(String.format("Region already exist"));
     }
 
-    public Page<Region> getAllRegions(Pageable pageable) {
-        Page<Region> regions = this.regionRepository.findAll(pageable);
-        if(!regions.isEmpty()){
-            return regions;
+    public Page<Region> getAllRegions(SearchCriteria searchCriteria, Pageable pageable) {
+        Optional<Page<Region>> regions;
+        if(searchCriteria.getSearchText() == null){
+            regions = Optional.of(this.regionRepository.findAll(pageable));
+        }else{
+            Specification<Region> regionSpecification = regionFilterSpecification.getSearchSpecification(searchCriteria);
+            regions = Optional.of(this.regionRepository.findAll(regionSpecification, pageable));
         }
-        throw new RecordNotFoundException(String.format("Regions not found"));
+
+        return regions.isPresent() ? regions.get() : null;
     }
 
     public List<Region> getAllRegions() {
@@ -87,5 +97,10 @@ public class RegionService {
             return regionDtos;
         }
         throw new RecordNotFoundException(String.format("Regions not found"));
+    }
+
+    public List<Region> getRegions() {
+        Optional<List<Region>> regions = Optional.of(this.regionRepository.findAll());
+        return regions.isPresent() ? regions.get() : null;
     }
 }

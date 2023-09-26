@@ -2,6 +2,7 @@ package com.smsa.backend.service;
 
 import com.smsa.backend.Exception.RecordAlreadyExistException;
 import com.smsa.backend.Exception.RecordNotFoundException;
+import com.smsa.backend.criteria.SearchCriteria;
 import com.smsa.backend.dto.CurrencyDto;
 import com.smsa.backend.dto.CustomerDTO;
 import com.smsa.backend.model.Currency;
@@ -9,9 +10,11 @@ import com.smsa.backend.model.CurrencyAuditLog;
 import com.smsa.backend.model.Custom;
 import com.smsa.backend.model.Customer;
 import com.smsa.backend.repository.CurrencyRepository;
+import com.smsa.backend.specification.FilterSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -28,6 +31,8 @@ public class CurrencyService {
     CustomService customService;
     @Autowired
     CurrencyAuditLogService currencyAuditLogService;
+    @Autowired
+    FilterSpecification<Currency> currencyFilterSpecification;
     public CurrencyDto addCurrency(CurrencyDto currencyDto) {
         Currency currency = this.currencyRepository.findCurrencyBYCurrencyToFrom(currencyDto.getCurrencyTo(), currencyDto.getCurrencyFrom());
         if(currency == null){
@@ -39,12 +44,17 @@ public class CurrencyService {
         }
     }
 
-    public Page<Currency> getAllCurrency(Pageable pageable) {
-        List<CurrencyDto> currencyDtos = new ArrayList<>();
+    public Page<Currency> getAllCurrency(SearchCriteria searchCriteria, Pageable pageable) {
+        Optional<Page<Currency>> currencies;
 
-        Page<Currency> currencies = this.currencyRepository.findAll(pageable);
-        if(!currencies.isEmpty()){
-            return currencies;
+        if(searchCriteria.getSearchText() == null){
+            currencies = Optional.of(this.currencyRepository.findAll(pageable));
+        }else{
+            Specification<Currency> currencySpecification = currencyFilterSpecification.getSearchSpecification(searchCriteria);
+            currencies = Optional.of(this.currencyRepository.findAll(currencySpecification, pageable));
+        }
+        if(currencies.isPresent()){
+            return currencies.get();
         }
         return null;
     }

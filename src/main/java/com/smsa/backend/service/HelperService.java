@@ -56,9 +56,12 @@ public class HelperService {
     }
 
     public LocalDate convertStringInToLocalDate(String date){
-        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate localDate = LocalDate.parse(date, inputFormatter);
-        return localDate;
+        if(date.length() > 0){
+            DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate localDate = LocalDate.parse(date, inputFormatter);
+            return localDate;
+        }
+        return null;
     }
 
     public String generateInvoiceDatePeriod(String sheetUniqueId) {

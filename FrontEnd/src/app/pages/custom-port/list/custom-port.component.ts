@@ -17,18 +17,41 @@ export class CustomPortComponent implements OnInit {
   currentPage:number  = 0;
   itemsPerPage: number = 10;
   totalItems?: string;
+  searchText?: string;
   _url = environment.backend;
 
 
   constructor(private router: Router, private loginService: LoginService, private customService: CustomService, private http: HttpClient) { }
 
   ngOnInit(): void {
-    debugger
     this.getCustoms(this.currentPage, this.itemsPerPage);
   }
 
   getCustoms(page?: any, size?: any) {
-    this.customService.getCustoms(page, size).subscribe(
+
+
+    let search = {};
+  
+    const pageable = {
+      page: page,
+      size: size,
+    };
+  
+    if (this.searchText !== undefined && this.searchText !== '') {
+      search = {
+        mapper: 'CUSTOM_PORT',
+        searchText: this.searchText,
+      };
+    }
+
+        // Construct the query parameter for pageable
+        const queryParams = {
+          pageable: `page=${pageable.page}&size=${pageable.size}`,
+          search: JSON.stringify(search),
+        };
+
+
+    this.customService.getCustoms(queryParams).subscribe(
       (res: EntityAllCustomsResponseType) => {
         if(res && res.body){
           this.customs = res.body;

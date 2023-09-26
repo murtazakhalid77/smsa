@@ -24,7 +24,6 @@ import { UserService } from './pages/user/service/user.service';
     constructor(private authService: AuthguardService, private router: Router,userService:UserService) { }
 
     canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-      debugger
       const jwtToken = sessionStorage.getItem('jwtToken');
       if (jwtToken) {
         const decodedToken = this.getDecodedAccessToken(jwtToken);

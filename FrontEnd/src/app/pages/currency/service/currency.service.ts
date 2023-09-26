@@ -38,11 +38,8 @@ export class CurrencyService {
   }
 
   
-  getCurrency(page?: any, size?: any): Observable<EntityAllCurrencyResponseType> {
+  getCurrency(params?: any): Observable<EntityAllCurrencyResponseType> {
     let url = `${this._url}/currency`;
-    const params = new HttpParams()
-    .set('page', page.toString())
-    .set('size', size.toString());
     return this.http.get<Currency[]>(`${url}`, { params, observe: 'response' });
     // .pipe(map((res: EntityUserResponse) => res));
   }

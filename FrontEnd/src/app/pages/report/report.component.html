@@ -7,7 +7,15 @@
             <p class="page-intro">Whole data about your business here</p>
         </div>
         <div class="order-body">
-            <div class="container-fluid mt-2">
+            <input 
+            style="margin-left: 1.5%;"
+            type="text" 
+            placeholder="Search by Invoice/Account Number" 
+            class="order-search form-control" 
+            [(ngModel)]="searchText"
+            (ngModelChange)="getSalesReport(0, 10);">
+
+            <div class="container-fluid mt-4">
                 <div class="search-option">
                     <input type="radio" name="searchOption" value="invoice" [(ngModel)]="selectedSearchOption" (change)="onSearchOptionChange('invoice')">
                     <label for="invoice" class="font-size14px mr-2">Invoice</label>
@@ -28,7 +36,7 @@
                 
 
                     <div class="col-md-4 d-flex justify-content-end">
-                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3 custom-margin" type="submit" (click)="getSalesReport()">
+                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3 custom-margin" type="submit" (click)="getSalesReport(0, 10)">
                             <span>Search</span>
                         </button>
                         <button *ngIf="salesReport!.length!=0 && salesReport!=null" class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" (click)="downloadFile()">
@@ -48,7 +56,7 @@
                     <div class="col-md-4">
                     </div>
                     <div class="col-md-4 d-flex justify-content-end">
-                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3 custom-margin" type="submit" (click)="getSalesReport()">
+                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3 custom-margin" type="submit" (click)="getSalesReport(0, 10)">
                             <span>Search</span>
                         </button>
                         <button *ngIf="salesReport!.length != 0 && salesReport != null" class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" (click)="downloadFile()">
@@ -127,6 +135,14 @@
                     </tbody>
                 </table>
 
+            </div>
+        </div>
+        <div class="row mt-4" *ngIf="salesReport!.length > 0">
+            <div class="col">
+              <!-- Your content here -->
+            </div>
+            <div class="col-auto">
+                <mat-paginator [pageSize]="itemsPerPage" [length]="totalItems" (page)="changePage($event)"> </mat-paginator>
             </div>
         </div>
     </div>

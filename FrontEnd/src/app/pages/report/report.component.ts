@@ -27,6 +27,7 @@ export class ReportComponent {
   currentPage:number  = 0;
   itemsPerPage: number = 10;
   totalItems?: string;
+  searchText?: string
   _url = environment.backend;
 
   constructor(private salesReportService: SaleReportService, private excelService: ExcelService, private http: HttpClient,
@@ -63,15 +64,20 @@ export class ReportComponent {
     }
   }
 
-      getSalesReport(){
+      getSalesReport(page?: any, size?: any){
 
         this.salesReport = [];
+        debugger;
 
         const searchSalesReport = {
           invoiceTo: this.selectedSearchOption === 'invoice' ? this.invoiceTo : null,
           invoiceFrom: this.selectedSearchOption === 'invoice' ? this.invoiceFrom : null,
           startDate: this.selectedSearchOption === 'date' ? this.startDate : null,
-          endDate: this.selectedSearchOption === 'date' ? this.endDate : null
+          endDate: this.selectedSearchOption === 'date' ? this.endDate : null,
+          mapper: 'SALES_REPORT',
+          page: page,
+          size: size,
+          searchText: this.searchText
         };
 
         // Check if any search criteria is provided
@@ -80,6 +86,7 @@ export class ReportComponent {
 
           this.salesReportService.getSalesReport(searchSalesReport).subscribe(res => {
             if (res.body?.length !== 0 && res) {
+              this.totalItems = res.headers.get('X-Total-Count') ?? '';
               this.salesReport = res.body!;
             } else {
               this.toastr.error("No Data Found");
@@ -93,6 +100,12 @@ export class ReportComponent {
           this.toastr.error("Please provide valid search criteria");
         }
   }
+
+  changePage(value: any){
+    this.getSalesReport(value.pageIndex, this.itemsPerPage);
+  }
+
+
   downloadFile() {
     const salesReportIds = this.salesReport?.map(report => report.id); // Replace with your desired salesReportIds
     const params = new HttpParams().set('salesReportIds', salesReportIds!.join(','));

@@ -2,11 +2,15 @@ package com.smsa.backend.service;
 
 import com.smsa.backend.Exception.RecordAlreadyExistException;
 import com.smsa.backend.Exception.RecordNotFoundException;
+import com.smsa.backend.criteria.SearchCriteria;
 import com.smsa.backend.dto.CustomerDTO;
 import com.smsa.backend.model.Customer;
+import com.smsa.backend.model.User;
+import com.smsa.backend.specification.FilterSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import com.smsa.backend.repository.CustomerRepository;
 
@@ -20,9 +24,17 @@ import java.util.stream.Collectors;
 public class CustomerService {
     @Autowired
     CustomerRepository customerRepository;
+    @Autowired
+    FilterSpecification<Customer> customerFilterSpecification;
 
-    public Page<Customer> getAllCustomer(Pageable pageable) {
-        Page<Customer> customer =this.customerRepository.findAll(pageable);
+    public Page<Customer> getAllCustomer(SearchCriteria searchCriteria, Pageable pageable) {
+        Page<Customer> customer;
+        if(searchCriteria.getSearchText() == null){
+            customer = this.customerRepository.findAll(pageable);
+        }else{
+            Specification<Customer> customerSpecification = customerFilterSpecification.getSearchSpecification(searchCriteria);
+            customer = this.customerRepository.findAll(customerSpecification, pageable);
+        }
         if(!customer.isEmpty()){
             return customer;
         }
