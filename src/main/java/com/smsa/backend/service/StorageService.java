@@ -22,8 +22,8 @@ import java.io.IOException;
 @Slf4j
 public class StorageService {
 
-    @Value("${application.bucket.name}")
-    private String bucketName;
+
+    private static final String BUCKET_NAME="cdvinv";
     @Autowired
     private AmazonS3 s3Client;
 
@@ -31,7 +31,7 @@ public class StorageService {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(fileData);
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(fileData.length);
-        s3Client.putObject(new PutObjectRequest(bucketName, fileName, inputStream, metadata));
+        s3Client.putObject(new PutObjectRequest(BUCKET_NAME, fileName, inputStream, metadata));
         return "File uploaded: " + fileName;
     }
 
@@ -39,7 +39,7 @@ public class StorageService {
 
     public byte[] downloadFile(String fileName) {
         try {
-            S3Object s3Object = s3Client.getObject(bucketName, fileName);
+            S3Object s3Object = s3Client.getObject(BUCKET_NAME, fileName);
             S3ObjectInputStream inputStream = s3Object.getObjectContent();
 
             try {
@@ -57,7 +57,7 @@ public class StorageService {
 
 
     public String deleteFile(String fileName) {
-        s3Client.deleteObject(bucketName, fileName);
+        s3Client.deleteObject(BUCKET_NAME, fileName);
         return fileName + " removed ...";
     }
 
