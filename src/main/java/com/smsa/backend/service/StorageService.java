@@ -8,6 +8,8 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.IOUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,10 +29,13 @@ public class StorageService {
     @Autowired
     private AmazonS3 s3Client;
 
+    private static final Logger logger = LoggerFactory.getLogger(StorageService.class);
+
     public String uploadFile(byte[] fileData, String fileName) {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(fileData);
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(fileData.length);
+        logger.info(BUCKET_NAME);
         s3Client.putObject(new PutObjectRequest(BUCKET_NAME, fileName, inputStream, metadata));
         return "File uploaded: " + fileName;
     }

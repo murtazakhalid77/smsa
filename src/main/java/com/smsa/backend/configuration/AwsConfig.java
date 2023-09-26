@@ -8,6 +8,9 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.smsa.backend.service.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,11 +26,13 @@ public class AwsConfig {
 
     @Value("${spring.cloud.aws.region.static}")
     String awsRegion;
-
+    private static final Logger logger = LoggerFactory.getLogger(AwsConfig.class);
     @Bean
     public AmazonS3 s3Client() {
         AWSCredentials credentials = new BasicAWSCredentials(awsBucketAccessKey, awsBucketSecretKey);
-
+        logger.info(awsBucketAccessKey);
+        logger.info(awsBucketSecretKey);
+        logger.info(awsRegion);
         return AmazonS3ClientBuilder.standard()
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
                 .withRegion(awsRegion)
