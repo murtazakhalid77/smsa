@@ -11,7 +11,7 @@ import { SheetHistoryService } from '../sheet-history.service';
 export class SheetHistoryListComponent {
 
   
-  sheetHistory?: IsheetHistory[];
+  sheetHistory?: IsheetHistory[]=[];
   currentPage:number  = 0;
   itemsPerPage: number = 10;
   totalItems?: string;

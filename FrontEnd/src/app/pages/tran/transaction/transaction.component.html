@@ -95,9 +95,9 @@
             </div>
         </div>
 
-        <div class="row mt-4" *ngIf="transaction!.length > 0">
+        <div class="row mt-4" *ngIf="transaction.length > 0">
             <div class="col">
-                <!-- Your content here -->
+                
             </div>
             <div class="col-auto">
                 <mat-paginator [pageSize]="itemsPerPage" [length]="totalItems" (page)="changePage($event)">

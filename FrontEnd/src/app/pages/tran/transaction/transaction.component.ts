@@ -14,7 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class TransactionComponent {
 
   id?:any
-  transaction?: Itransaction[];
+  transaction: Itransaction[]=[];
   currentPage:number  = 0;
   itemsPerPage: number = 10;
   totalItems?: string;
@@ -73,7 +73,7 @@ export class TransactionComponent {
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
-        a.download = 'sales_report.xlsx'; // Set the desired filename here
+        a.download = obj.accountNumber +'_sales_report.xlsx'; // Set the desired filename here
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -91,8 +91,8 @@ export class TransactionComponent {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.style.display = 'none';
-        a.href = url;
-        a.download = 'sales_report.xlsx'; // Set the desired filename here
+        a.href = url; 
+        a.download = obj.accountNumber +'_invoice.pdf'; // Set the desired filename here
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
