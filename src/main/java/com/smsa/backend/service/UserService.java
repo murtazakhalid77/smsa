@@ -39,6 +39,7 @@ public class UserService {
         try{
             User user= User.builder()
                     .name(userDto.getName())
+                    .status(true)
                     .password(bCryptPasswordEncoder.encode(userDto.getPassword()))
                     .roles(assignRolesToUser(userDto))
                     .build();

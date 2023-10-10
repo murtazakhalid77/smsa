@@ -5,8 +5,6 @@ package com.smsa.backend.model;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDate;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -24,6 +22,7 @@ public class SheetHistory {
     private String name;
     private String uniqueUUid;
     private Boolean isEmailSent;
+    private String excelDownload;
     private String startDate;
     private String endDate;
     // Use @OneToMany with mappedBy to specify the relationship field in the Custom entity

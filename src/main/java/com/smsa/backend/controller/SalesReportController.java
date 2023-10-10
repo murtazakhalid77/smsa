@@ -4,10 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smsa.backend.criteria.SearchCriteria;
 import com.smsa.backend.dto.SalesReportDto;
 import com.smsa.backend.dto.SearchSalesReportDto;
+import com.smsa.backend.model.SalesReport;
 import com.smsa.backend.service.SalesReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +25,18 @@ public class SalesReportController {
     SalesReportService salesReportService;
 
     @PostMapping("/sales-report")
-    ResponseEntity<List<SalesReportDto>> getSalesReport(@RequestBody SearchSalesReportDto searchSalesReportDto){
-        return ResponseEntity.ok(this.salesReportService.getSalesReport(searchSalesReportDto,  PageRequest.of(searchSalesReportDto.getPage(), searchSalesReportDto.getSize())));
+    ResponseEntity<List<SalesReport>> getSalesReport(@RequestBody SearchSalesReportDto searchSalesReportDto){
+        Page<SalesReport> salesReports = this.salesReportService.getSalesReport(searchSalesReportDto,  PageRequest.of(searchSalesReportDto.getPage(), searchSalesReportDto.getSize(),  Sort.by("id").descending()));
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(salesReports.getTotalElements()));
+        return ResponseEntity.ok()
+                .headers(headers)// Set the headers
+                .body(salesReports.getContent());
     }
+
+//    @GetMapping("/sales-report-awb")
+//    ResponseEntity<List<SalesReport>> getSalesReportByAwbs(@RequestParam List<String> awbs){
+//        return ResponseEntity.ok(this.salesReportService.getSalesReportByAwbs(awbs));
+//    }
+
 }

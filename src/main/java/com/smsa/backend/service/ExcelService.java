@@ -10,6 +10,7 @@ import com.smsa.backend.repository.*;
 import com.smsa.backend.security.util.ExcelImportHelper;
 import com.smsa.backend.security.util.HashMapHelper;
 import org.apache.poi.ss.usermodel.*;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,8 @@ public class ExcelService {
 
     @Autowired
     SalesReportRepository salesReportRepository;
+    @Autowired
+    StorageService storageService;
     @Value("${smsa.file.location}")
     String sampleFileLocalLocation;
 
@@ -70,6 +73,11 @@ public class ExcelService {
     private static final Logger logger = LoggerFactory.getLogger(ExcelService.class);
 
     public HashMap<String,List<InvoiceDetails>> saveInvoicesToDatabase(MultipartFile file, ExcelImportDto excelImportDto) throws Exception {
+
+        if(!this.helperService.checkExcelSize(file)){
+            throw new ExcelImportException("File size should not be greater then 2MB");
+        }
+
         HashMap<String,List<InvoiceDetails>> invoicesHashmap = new HashMap<>();
 
         List<InvoiceDetails> invoicesWithAccount = new ArrayList<>();
@@ -144,11 +152,23 @@ public class ExcelService {
         }
 
         SheetHistory sheetHistory = createSheetHistory(originalFilename, excelImportDto, sheetId);
-        sheetHistoryRepository.save(sheetHistory);
+        String excelFileName = multipartFile.getOriginalFilename();
+        sheetHistory.setExcelDownload(excelFileName);
+
+        SheetHistory sheetHistorySaved = sheetHistoryRepository.save(sheetHistory);
+        if(sheetHistorySaved!=null){
+            try {
+                storageService.uploadFile(multipartFile.getBytes(), excelFileName);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
 
         return mappedRowsMap;
 
     }
+
+
 
     private String getAccountNumber(InvoiceDetails invoiceDetails) {
         if (invoiceDetails!=null && invoiceDetails.getInvoiceDetailsId()!=null){

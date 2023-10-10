@@ -34,7 +34,7 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String sender;
     @Async
-    public boolean sendMailWithAttachments(Customer customer, byte[] excelFileData, byte[] pdfFileData,String sheetUniqueId) {
+    public boolean sendMailWithAttachments(Customer customer, byte[] excelFileData, byte[] pdfFileData,String sheetUniqueId, Long invoiceNumber) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -62,7 +62,7 @@ public class EmailService {
             }
 
 
-            helper.setSubject("SMSA Express Invoice for Custom Duty & Taxes for Inbound Shipments");
+            helper.setSubject("SMSA Express Invoice for Custom Duty & Taxes for Inbound Shipments (ECDV-"+invoiceNumber.toString() + ")");
 
             // Attach the Excel file
             helper.addAttachment("invoice.xlsx", new ByteArrayDataSource(excelFileData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));

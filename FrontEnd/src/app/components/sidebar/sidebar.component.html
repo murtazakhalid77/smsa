@@ -20,6 +20,16 @@
             </span>
 
         </li>
+
+        <li *ngIf="sessionStorageService.hasPermission('PERMISSIONS_MANAGEMENT')">
+            <span  class="sidebar-list-hover" (click)="permissions()">
+              <i class="fa fa-add fa-2x"></i>
+              <span class="nav-text">
+                Permissions
+              </span>
+            </span>
+          </li>
+
         <li *ngIf="sessionStorageService.hasPermission('CUSTOMER_MANAGEMENT')">
             <span class="sidebar-list-hover" (click)="customer()">
                 <i class="fa fa-shopping-cart fa-2x"></i>
@@ -56,14 +66,6 @@
                 </span>
             </span>
         </li>
-        <li *ngIf="sessionStorageService.hasPermission('IMPORT_EXCEL_MANAGEMENT')">
-            <span class="sidebar-list-hover" (click)="import()">
-                <i class="fa fa-download fa-2x"></i>
-                <span class="nav-text">
-                    Import Excel
-                </span>
-            </span>
-        </li>
         <li *ngIf="sessionStorageService.hasPermission('SALES_REPORT_MANAGEMENT')">
             <span class="sidebar-list-hover " (click)="salesReports()">
                 <i class="fa fa-add fa-2x"></i>
@@ -73,22 +75,22 @@
             </span>
         </li>
 
-        <li *ngIf="sessionStorageService.hasPermission('PERMISSIONS_MANAGEMENT')">
-            <span  class="sidebar-list-hover" (click)="permissions()">
-              <i class="fa fa-add fa-2x"></i>
-              <span class="nav-text">
-                Permissions
-              </span>
-            </span>
-          </li>
 
           <li *ngIf="sessionStorageService.hasPermission('SHEET_HISTORY_MANAGEMENT')">
             <span  class="sidebar-list-hover" (click)="sheetHistory()">
               <i class="fa fa-add fa-2x"></i>
               <span class="nav-text">
-                Sheet History
+                Loading History
               </span>
             </span>
           </li>
+        <li *ngIf="sessionStorageService.hasPermission('IMPORT_EXCEL_MANAGEMENT')">
+            <span class="sidebar-list-hover" (click)="import()">
+                <i class="fa fa-download fa-2x"></i>
+                <span class="nav-text">
+                    Import Excel
+                </span>
+            </span>
+        </li>
     </ul>
 </nav>

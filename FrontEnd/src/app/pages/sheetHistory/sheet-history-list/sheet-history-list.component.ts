@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+
 import { IsheetHistory } from '../../model/sheetHistory.model';
 import { Router } from '@angular/router';
 import { SheetHistoryService } from '../sheet-history.service';
+import { Component } from '@angular/core';
+import { FileService } from 'src/app/services/file-service.service';
 
 @Component({
   selector: 'app-sheet-history-list',
@@ -18,7 +20,8 @@ export class SheetHistoryListComponent {
 
 
   constructor(private sheetHistoryService: SheetHistoryService,
-              private router: Router){}
+              private router: Router,
+              private fileService: FileService){}
 
   ngOnInit(){
     this.getAllSSheetHistory(this.currentPage, this.itemsPerPage);
@@ -41,5 +44,9 @@ export class SheetHistoryListComponent {
   gotoTransaction(id: any){
     this.router.navigate(['/transactions'], { queryParams: { id: id } });
 
+  }
+
+  downloadExcel(saleReport: any){
+    this.fileService.downloadExcel(saleReport, 'sheet.xlsx');
   }
 }

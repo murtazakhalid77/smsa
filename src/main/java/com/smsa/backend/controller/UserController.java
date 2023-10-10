@@ -36,8 +36,9 @@ public class UserController {
         }
     }
     @GetMapping("/user")
-    ResponseEntity<List<User>> users(@RequestParam("search") String search, @RequestParam(value = "page", defaultValue = "0") int page,
-                                     @RequestParam(value = "size", defaultValue = "10") int size,
+    ResponseEntity<List<User>> users(@RequestParam("search") String search,
+                                     @RequestParam(value = "page") int page,
+                                     @RequestParam(value = "size") int size,
                                      @RequestParam(value = "sort", defaultValue = "id") String sort) throws JsonProcessingException {
         SearchCriteria searchCriteria = new ObjectMapper().readValue(search, SearchCriteria.class);
         Page<User> users = this.userService.getAllUsers(searchCriteria, PageRequest.of(page, size,  Sort.by(sort).descending()));

@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -20,4 +22,9 @@ public interface SalesReportRepository extends JpaRepository<SalesReport,Long>, 
     Page<SalesReport> findAllByCreatedAtBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
 
     List<SalesReport> findAllByIdIn(List<Long> salesReportIds);
+    @Query(value = "SELECT sr.* " +
+            "FROM sales_report sr " +
+            "INNER JOIN sales_report_awb sra ON sr.id = sra.sales_report_id " +
+            "WHERE sra.awb IN :awbs", nativeQuery = true)
+    Page<SalesReport> getSalesReportByAwbs(@Param("awbs") List<String> awbs, Pageable pageable);
 }

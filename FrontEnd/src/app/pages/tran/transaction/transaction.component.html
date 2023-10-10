@@ -2,15 +2,15 @@
 <div class="body-position">
     <app-dashboard-head></app-dashboard-head>
     <div class="main-container">
-        <div>
+        <!-- <div>
             <h4>Regions</h4>
             <p class="page-intro">Whole data about your business here</p>
-        </div>
+        </div> -->
         <div class="order-body">
-            <div class="order-search-panel">
+            <!-- <div class="order-search-panel">
                 <input type="text" placeholder="Search Regions" class="order-search form-control">
 
-            </div>
+            </div> -->
             <div class="order-table table-container">
                 <table class="table table-striped">
                     <thead style="
@@ -22,6 +22,9 @@
                             </th>
                             <th class="nowrap col-md-2 col-lg-1 text-center">
                                 <span class="font">Account Number</span>
+                            </th>
+                            <th class="nowrap col-md-2 col-lg-1 text-center">
+                                <span class="font">Invoice Number</span>
                             </th>
                             <th class="nowrap col-md-2 col-lg-1 text-center">
                                 <span class="font">Current Status</span>
@@ -49,6 +52,7 @@
                         <tr *ngFor="let tar of transaction" class="order-table-row-hover">
                             <th scope="row" class="tracking-id text-center">{{tar?.id}}</th>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{tar?.accountNumber}}</td>
+                            <td class="text-center w-auto col-md-2 col-lg-1">{{tar?.invoiceNumber}}</td>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{tar?.currentStatus}}</td>
 
                             <ng-container *ngIf="tar?.mailSent; else notSent">

@@ -17,6 +17,20 @@ public class GlobalExceptionHandler {
         return new ResponseEntity(errorMessage, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(value =ExcelImportException.class)
+    public ResponseEntity<ErrorMessage> excelImportException(ExcelImportException ex){
+        ErrorMessage errorMessage = ErrorMessage.builder()
+                .body(ex.getMessage()).build();
+        return new ResponseEntity(errorMessage, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value =RecordNotSaveException.class)
+    public ResponseEntity<ErrorMessage> recordNotSaveException(RecordNotSaveException ex){
+        ErrorMessage errorMessage = ErrorMessage.builder()
+                .body(ex.getMessage()).build();
+        return new ResponseEntity(errorMessage, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(value =RecordAlreadyExistException.class)
     public ResponseEntity<ErrorMessage> resourceRecordalreadyExistException(RecordAlreadyExistException ex){
         ErrorMessage errorMessage = ErrorMessage.builder()

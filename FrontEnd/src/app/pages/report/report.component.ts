@@ -7,6 +7,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/Environments/environment';
+import { FileService } from 'src/app/services/file-service.service';
 
 @Component({
   selector: 'app-report',
@@ -17,22 +18,28 @@ export class ReportComponent {
 
   startDate?: any;
   endDate?: any;
-  dateInputsDisabled: boolean = true;
+  dateInputs: boolean = false;
   invoiceTo?: any;
   invoiceFrom?: any;
-  invoiceInputsDisable: boolean = false;
+  invoiceInputs: boolean = true;
+  awb: boolean = false;
+  awbs: any;
   salesReport?: ISalesReport[];
   selectedSearchOption: string = 'invoice';
   criteria: any;
-  currentPage:number  = 0;
+  currentPage:number = 0;
   itemsPerPage: number = 10;
   totalItems?: string;
-  searchText?: string
+  searchText?: string;
+
   _url = environment.backend;
 
-  constructor(private salesReportService: SaleReportService, private excelService: ExcelService, private http: HttpClient,
+  constructor(private salesReportService: SaleReportService, 
+    private excelService: ExcelService, 
+    private http: HttpClient,
     private router:Router,
-    private toastr: ToastrService){}
+    private toastr: ToastrService,
+    private fileService: FileService,){}
 
     ngOnInit(){
       this.onSearchOptionChange('invoice');
@@ -46,34 +53,40 @@ export class ReportComponent {
     if (selectedOption === 'invoice') {
       this.startDate = '';
       this.endDate = '';
-      this.invoiceInputsDisable = false;
-      this.dateInputsDisabled = true;
+      this.dateInputs = false;
+      this.awb
+       = false;
+      this.invoiceInputs = true;
     } else if (selectedOption === 'date') {
       this.invoiceTo = '';
       this.invoiceFrom = ''
-      this.invoiceInputsDisable = true;
-      this.dateInputsDisabled = false;
+      this.invoiceInputs = false;
+      this.awb = false;
+      this.dateInputs = true;
+    }else if(selectedOption === 'awbs'){
+      this.invoiceInputs = false;
+      this.dateInputs = false;
+      this.awb = true;
     }
   }
 
   disableDateInputs() {
     if(this.invoiceTo!='' || this.invoiceFrom!=''){
-      this.dateInputsDisabled = true;
+      this.dateInputs = true;
     }else{
-      this.dateInputsDisabled = false
+      this.dateInputs = false
     }
   }
 
       getSalesReport(page?: any, size?: any){
-
         this.salesReport = [];
-        debugger;
 
         const searchSalesReport = {
           invoiceTo: this.selectedSearchOption === 'invoice' ? this.invoiceTo : null,
           invoiceFrom: this.selectedSearchOption === 'invoice' ? this.invoiceFrom : null,
           startDate: this.selectedSearchOption === 'date' ? this.startDate : null,
           endDate: this.selectedSearchOption === 'date' ? this.endDate : null,
+          awbs: this.selectedSearchOption === 'awbs' ? this.awbs : null,
           mapper: 'SALES_REPORT',
           page: page,
           size: size,
@@ -82,12 +95,18 @@ export class ReportComponent {
 
         // Check if any search criteria is provided
         if ((this.selectedSearchOption === 'invoice' && (this.invoiceTo || this.invoiceFrom)) ||
-            (this.selectedSearchOption === 'date' && (this.startDate || this.endDate))) {
+            (this.selectedSearchOption === 'date' && (this.startDate || this.endDate)) ||
+            (this.selectedSearchOption === 'awbs' && (this.awbs))) {
 
           this.salesReportService.getSalesReport(searchSalesReport).subscribe(res => {
             if (res.body?.length !== 0 && res) {
               this.totalItems = res.headers.get('X-Total-Count') ?? '';
               this.salesReport = res.body!;
+              // this.salesReport.forEach((salesReport: any) => {
+              //   salesReport.smsaFeeCharges = parseFloat(this.roundAndFormat(salesReport.smsaFeeCharges));
+              //   salesReport.totalAmount = parseFloat(this.roundAndFormat(salesReport.totalAmount));
+              //   // Repeat the above lines for other numeric properties that need formatting
+              // });
             } else {
               this.toastr.error("No Data Found");
             }
@@ -100,6 +119,7 @@ export class ReportComponent {
           this.toastr.error("Please provide valid search criteria");
         }
   }
+
 
   changePage(value: any){
     this.getSalesReport(value.pageIndex, this.itemsPerPage);
@@ -128,5 +148,14 @@ export class ReportComponent {
         window.URL.revokeObjectURL(url);
       });
   }
+
+  downloadExcel(saleReport: any){
+    this.fileService.downloadExcel(saleReport, '_sales_report.xlsx');
+  }
+
+  downloadPdf(saleReport: any){
+    this.fileService.downloadPdf(saleReport);
+  }
+  
 
 }

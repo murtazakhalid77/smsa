@@ -22,8 +22,8 @@ export class SheetHistoryService {
         let url = `${this._url}/sheetHistory`;
         const params = new HttpParams()
         .set('page', page.toString())
-        .set('size', size.toString());
+        .set('size', size.toString())
         return this.http.get<sheetHistory[]>(`${url}`, { params, observe: 'response' });
     }
-
+    
 }

@@ -37,7 +37,7 @@ public class InvoiceDetails {
     private Double valueCustom;
     private Double vatAmount;
     private Double customFormCharges;
-    private Double   other;
+    private Double other;
     private Double totalCharges;
     private String customDeclarationNumber;
     private String customDeclarationDate;

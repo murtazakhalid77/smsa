@@ -1,6 +1,7 @@
 package com.smsa.backend.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smsa.backend.Exception.ExcelImportException;
 import com.smsa.backend.dto.ExcelImportDto;
 import com.smsa.backend.model.SheetHistory;
 import com.smsa.backend.repository.SheetHistoryRepository;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -118,6 +120,13 @@ public class HelperService {
             }
         }
         return true; // Return true if all emails are valid
+    }
+
+    public Boolean checkExcelSize(MultipartFile file){
+        if (file.getSize() > 2 * 1024 * 1024) { // 2MB
+            return false;
+        }
+        return true;
     }
 
 }

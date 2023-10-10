@@ -2,6 +2,8 @@ package com.smsa.backend.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,6 +19,7 @@ public class SearchSalesReportDto {
     String endDate;
     Integer page;
     Integer size;
+    String awbs;
     String search;
     String mapper;
 }

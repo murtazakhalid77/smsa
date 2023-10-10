@@ -101,7 +101,7 @@ export class ImportComponent {
   }
 
   async importExcel() {
-
+  this.toastr.clear();
 
     let flag = true;
     for(let i = 0; i< this.dataArray.length; i++){
@@ -134,8 +134,8 @@ export class ImportComponent {
               if (this.accountNumbers.length > 0) {
                 this.isModalOpen = true;
               }
-            } catch (error) {
-            console.log(error);
+            } catch (error: any) {
+              this.toastr.error(error.error.body);
             
               // if (error.error.body.includes(this.duplicateExceptionMessage)) {
               //   this.duplicateAwbsMessage = error.error.body;

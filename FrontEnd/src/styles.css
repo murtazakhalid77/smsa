@@ -14705,4 +14705,11 @@ mat-paginator {
     background-color: #400099 !important;
     border-radius: 3px !important;
 }
+
+
   
+textarea.form-control.report-order-search {
+    resize: vertical; /* Allow vertical resizing */
+    max-height: 50px; /* Set the maximum height to 50px */
+    overflow-y: auto; /* Add a vertical scrollbar when content exceeds max height */
+  }

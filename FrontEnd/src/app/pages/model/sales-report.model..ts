@@ -12,6 +12,8 @@ export interface ISalesReport {
     vatOnSmsaFees?: number;
     totalAmount?: number;
     invoiceCurrency?: number;
+    excelDownload?:String;
+    pdfDownload?:String;
     createdAt?: Date;   
   }
 
@@ -27,6 +29,8 @@ export interface ISalesReport {
         public vatOnSmsaFees?: number,
         public totalAmount?: number,
         public invoiceCurrency?: number,
+        public excelDownload?:String,
+        public pdfDownload?:String,
         public createdAt?: Date,
     ) {}
   }

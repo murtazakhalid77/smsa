@@ -42,6 +42,8 @@ public class EmailSchedular {
     private SchedularAssembler schedularAssembler;
     @Autowired
     StorageService storageService;
+    @Autowired
+    SalesReportAwbService salesReportAwbService;
 
     private static final Logger logger = LoggerFactory.getLogger(EmailSchedular.class);
 
@@ -64,6 +66,7 @@ public class EmailSchedular {
 
     public void processInvoicesForSheet(String sheetUniqueId) throws Exception {
         Map<String, List<InvoiceDetails>> invoiceDetailsMap = new HashMap<>();
+        List<SalesReportAwb> salesReportAwbs = new ArrayList<>();
 
         Invoice invoice =invoiceRepository.findById(1L).get();
 
@@ -115,13 +118,25 @@ public class EmailSchedular {
                         final String finalExcelFileName = excelFileName;
                         final String finalPdfFileName = pdfFileName;
 
-                        if (emailService.sendMailWithAttachments(customer.get(), salesReportHelperDto.getExcelFile(), pdfFileData,sheetUniqueId)) {
+                        if (emailService.sendMailWithAttachments(customer.get(), salesReportHelperDto.getExcelFile(), pdfFileData,sheetUniqueId, invoiceNo)) {
                             logger.info(String.format("All the work done for account number %s with name %s",
                                     customer.get().getAccountNumber(),
                                     customer.get().getNameEnglish()));
 
                             SalesReport salesReport = schedularAssembler.createSalesReport(invoiceNumber, customer.get(), sheetUniqueId, salesReportHelperDto);
-                            salesReportRepository.save(salesReport);
+                            salesReport.setExcelDownload(finalExcelFileName);
+                            salesReport.setPdfDownload(finalPdfFileName);
+                            SalesReport salesReport1 = salesReportRepository.save(salesReport);
+                            for(InvoiceDetails invoiceDetails: invoiceDetailsList){
+                                salesReportAwbs.add(new SalesReportAwb().builder()
+                                        .awb(invoiceDetails.getInvoiceDetailsId().getAwb())
+                                        .salesReport(salesReport1).build());
+                            }
+
+                            if(salesReportAwbs.size() > 0){
+                                this.salesReportAwbService.save(salesReportAwbs);
+                            }
+
 
                             Transaction newTransaction = transactionRepository
                                     .findByAccountNumberAndSheetId(accountNumber, sheetUniqueId)
@@ -129,6 +144,7 @@ public class EmailSchedular {
                                             "Success", Boolean.TRUE, finalExcelFileName, finalPdfFileName));
 
                             newTransaction.setCurrentStatus("Success");
+                            newTransaction.setInvoiceNumber(salesReport.getInvoiceNumber());
                             transactionRepository.save(newTransaction);
                         }
                     } catch (Exception e) {

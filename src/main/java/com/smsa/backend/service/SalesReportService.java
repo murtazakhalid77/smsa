@@ -7,6 +7,7 @@ import com.smsa.backend.dto.SalesReportDto;
 import com.smsa.backend.dto.SearchSalesReportDto;
 import com.smsa.backend.model.Region;
 import com.smsa.backend.model.SalesReport;
+import com.smsa.backend.model.SalesReportAwb;
 import com.smsa.backend.repository.SalesReportRepository;
 import com.smsa.backend.specification.FilterSpecification;
 import org.modelmapper.ModelMapper;
@@ -20,13 +21,16 @@ import javax.swing.text.html.Option;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SalesReportService {
 
     @Autowired
+
     SalesReportRepository salesReportRepository;
     @Autowired
     FilterSpecification<SalesReport> salesReportFilterSpecification;
@@ -35,7 +39,7 @@ public class SalesReportService {
     @Autowired
     HelperService helperService;
 
-    public List<SalesReportDto> getSalesReport(SearchSalesReportDto searchSalesReportDto, Pageable pageable) {
+    public Page<SalesReport> getSalesReport(SearchSalesReportDto searchSalesReportDto, Pageable pageable) {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setMapper(searchSalesReportDto.getMapper());
         searchCriteria.setSearchText(searchCriteria.getSearchText());
@@ -51,7 +55,10 @@ public class SalesReportService {
                     salesReports = Optional.of(this.salesReportRepository.findByInvoiceNumberBetween(searchSalesReportDto.getInvoiceTo().substring(5),
                             searchSalesReportDto.getInvoiceFrom().substring(5), pageable));
                 }
-            } else{
+            }else if(searchSalesReportDto.getAwbs()!=null){
+                salesReports = this.getSalesReportByAwbs(searchSalesReportDto.getAwbs(), pageable);
+            }
+            else{
                 salesReports = Optional.of(this.salesReportRepository.findAllByCreatedAtBetween(
                         this.helperService.convertStringInToLocalDate(searchSalesReportDto.getStartDate()),
                         this.helperService.convertStringInToLocalDate(searchSalesReportDto.getEndDate()), pageable));
@@ -62,25 +69,37 @@ public class SalesReportService {
         }
 
 
-        DecimalFormat decimalFormat = new DecimalFormat("#0.00");
         for (SalesReport salesReport : salesReports.get()) {
-            String totalChargesString = String.valueOf(salesReport.getTotalChargesAsPerCustomerDeclarationForm());
-            totalChargesString = totalChargesString.replace(",", "").trim();
-            double totalCharges = Double.parseDouble(totalChargesString);
-
-            // Format the double value with exactly two decimal places
-            String formattedTotalCharges = decimalFormat.format(totalCharges);
-
-            // Parse the formatted string back to double
-            totalCharges = Double.parseDouble(formattedTotalCharges);
-
-            // Set the parsed double value back to the sales report
-            salesReport.setTotalChargesAsPerCustomerDeclarationForm(totalCharges);
-
-            salesReportDtos.add(this.toDTo(salesReport));
+            salesReport.setTotalChargesAsPerCustomerDeclarationForm(decimalFormat(String.valueOf(salesReport.getTotalChargesAsPerCustomerDeclarationForm())));
+            salesReport.setSmsaFeeCharges(decimalFormat(String.valueOf(salesReport.getSmsaFeeCharges())));
+            salesReport.setVatOnSmsaFees(decimalFormat(String.valueOf(salesReport.getVatOnSmsaFees())));
+            salesReport.setTotalAmount(decimalFormat(String.valueOf(salesReport.getTotalAmount())));
         }
 
-        return salesReportDtos;
+        return salesReports.get();
+    }
+
+    public Double decimalFormat(String value){
+        DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+        String formattedValue = value.replace(",", "").trim();
+        double convertInToDouble = Double.parseDouble(formattedValue);
+
+        // Format the double value with exactly two decimal places
+        String requiredValue = decimalFormat.format(convertInToDouble);
+
+        // Parse the formatted string back to double
+        return Double.parseDouble(requiredValue);
+    }
+
+    public Optional<Page<SalesReport>> getSalesReportByAwbs(String awbs, Pageable pageable){
+        List<String> awbList = Arrays.stream(awbs.split(","))
+                .map(String::trim)
+                .collect(Collectors.toList());
+        Optional<Page<SalesReport>> salesReport = Optional.of(this.salesReportRepository.getSalesReportByAwbs(awbList, pageable));
+        if(salesReport.isPresent()){
+            return salesReport;
+        }
+        throw new RecordNotFoundException("Couldn't find data");
     }
 
     public SalesReport toDomain(SalesReportDto salesReportDto){

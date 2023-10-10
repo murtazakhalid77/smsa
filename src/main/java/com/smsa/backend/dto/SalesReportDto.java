@@ -24,6 +24,8 @@ public class SalesReportDto {
     Double totalChargesAsPerCustomerDeclarationForm;
     Double smsaFeeCharges;
     Double vatOnSmsaFees;
+    String excelDownload;
+    String pdfDownload;
     Double totalAmount;
     String invoiceCurrency;
     LocalDate createdAt;

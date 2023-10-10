@@ -65,7 +65,8 @@ export class OrdersComponent implements OnInit {
   
     // Construct the query parameter for pageable
     const queryParams = {
-      pageable: `page=${pageable.page}&size=${pageable.size}`,
+      page: page,
+      size: size,
       search: JSON.stringify(search),
     };
 

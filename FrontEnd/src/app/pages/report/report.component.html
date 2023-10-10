@@ -22,13 +22,16 @@
                 
                     <input type="radio" name="searchOption" value="date" [(ngModel)]="selectedSearchOption" (change)="onSearchOptionChange('date')" class="ml-2">
                     <label for="date" class="font-size14px">Date</label>
+
+                    <input type="radio" name="searchOption" value="awbs" [(ngModel)]="selectedSearchOption" (change)="onSearchOptionChange('awbs')" class="ml-2">
+                    <label for="date" class="font-size14px">AWB's</label>
                 </div>
                 
                 
-                <div class="row w-100" *ngIf="!invoiceInputsDisable">
+                <div class="row w-100" *ngIf="invoiceInputs">
                     <div class="col-md-4 d-flex">
-                        <input type="text" id="accountTo" class="form-control report-order-search" placeholder="Invoice To" [(ngModel)]="invoiceTo" [disabled]="invoiceInputsDisable">
-                        <input type="text" id="accountFrom" class="form-control report-order-search" placeholder="Invoice From"[(ngModel)]="invoiceFrom" [disabled]="invoiceInputsDisable">
+                        <input type="text" id="accountTo" class="form-control report-order-search" placeholder="Invoice To" [(ngModel)]="invoiceTo" >
+                        <input type="text" id="accountFrom" class="form-control report-order-search" placeholder="Invoice From"[(ngModel)]="invoiceFrom">
                     </div>
 
                     <div class="col-md-4">
@@ -45,12 +48,12 @@
                     </div>
                 </div>  
                 
-                <div class="row w-100 mt-2" *ngIf="invoiceInputsDisable">
+                <div class="row w-100 mt-2" *ngIf="dateInputs">
                     <div class="col-md-4 d-flex">
                         <input type="date" class="form-control report-order-search" [(ngModel)]="startDate"
-                        [disabled]="dateInputsDisabled">
+                        >
                     <input type="date" class="form-control report-order-search" [(ngModel)]="endDate"
-                        [disabled]="dateInputsDisabled">
+                       >
                     </div>
                     
                     <div class="col-md-4">
@@ -65,6 +68,30 @@
                     </div>
                     
                 </div>
+
+                <div class="row w-100 mt-2" *ngIf="awb">
+                    <div class="col-md-8">
+                        <div class="col-md-6 d-flex">
+                            <textarea style="width: 300px; max-height: 150px;" class="form-control report-order-search" placeholder="AWB's" [(ngModel)]="awbs"></textarea>
+                          </div>
+                          
+    
+                        <div class="col-md-6">
+                        </div>
+                    </div>
+                
+
+                    <div class="col-md-4 d-flex justify-content-end">
+                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3 custom-margin" type="submit" (click)="getSalesReport(0, 10)">
+                            <span>Search</span>
+                        </button>
+                        <button *ngIf="salesReport!.length!=0 && salesReport!=null" class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" (click)="downloadFile()">
+                            <span>Download Excel</span>
+                        </button>
+                    </div>
+                    
+                </div>
+
             </div>
             
             
@@ -75,41 +102,46 @@
                     background: #ffffff;
                     position: sticky;">
                     <tr class="header-fixed">
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
-                            <span class="font">Sale Id</span>
+                        <th class="nowrap   text-center">
+                            <span class="font">Id</span>
                         </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                        <th class="nowrap   text-center">
                             <span class="font">Invoice Number</span>
                         </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                        <th class="nowrap   text-center">
                             <span class="font">Account Number</span>
                         </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                        <th class="nowrap   text-center">
                             <span class="font">Customer Name</span>
                         </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                        <th class="nowrap   text-center">
                             <span class="font">Customer Region</span>
                         </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
-                            <span class="font">Period</span>
+                        <th class="nowrap   text-center">
+                            <span class="font" style="width: 50px;">Period</span>
                         </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                        <th class="nowrap   text-center">
                             <span class="font">Total Charges</span>
                         </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                        <th class="nowrap   text-center">
                             <span class="font">SMSA Fee</span>
                         </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                        <th class="nowrap   text-center">
                             <span class="font">VAT on Smsa</span>
                         </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                        <th class="nowrap   text-center">
                             <span class="font">Total Amount</span>
                         </th>
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                        <th class="nowrap   text-center">
                             <span class="font">Invoice Currency</span>
                         </th>
-
-                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                        <th class="nowrap   text-center">
+                            <span class="font">Excel Download</span>
+                        </th>
+                        <th class="nowrap   text-center">
+                            <span class="font">Pdf Download</span>
+                        </th>
+                        <th class="nowrap   text-center">
                             <span class="font">Created At</span>
                         </th>
 
@@ -119,18 +151,33 @@
 
                     <tbody>
                         <tr *ngFor="let saleReport of salesReport" class="order-table-row-hover">
-                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.id}}</td>
-                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.invoiceNumber}}</td>
-                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.customerAccountNumber}}</td>
-                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.customerName}}</td>
-                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.customerRegion}}</td>
-                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.period}}</td>
-                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.totalChargesAsPerCustomerDeclarationForm}}</td>
-                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.smsaFeeCharges}}</td>
-                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.vatOnSmsaFees}}</td>
-                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.totalAmount}}</td>
-                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.invoiceCurrency}}</td>
-                            <td class="text-center w-auto col-md-2 col-lg-1">{{saleReport?.createdAt}}</td>
+                            <td class="text-center w-auto">{{saleReport?.id}}</td>
+                            <td class="text-center w-auto">{{saleReport?.invoiceNumber}}</td>
+                            <td class="text-center w-auto">{{saleReport?.customerAccountNumber}}</td>
+                            <td class="text-center w-auto">{{saleReport?.customerName}}</td>
+                            <td class="text-center w-auto">{{saleReport?.customerRegion}}</td>
+                            <td class="text-center w-auto" style="width: 50px;white-space: nowrap;">{{saleReport?.period}}</td>
+                            <td class="text-center w-auto">{{saleReport?.   totalChargesAsPerCustomerDeclarationForm}}</td>
+                            <td class="text-center w-auto">{{saleReport?.smsaFeeCharges}}</td>
+                            <td class="text-center w-auto">{{saleReport?.vatOnSmsaFees}}</td>
+                            <td class="text-center w-auto">{{saleReport?.totalAmount}}</td>
+                            <td class="text-center w-auto">{{saleReport?.invoiceCurrency}}</td>
+                            <td class="text-center w-auto" (click)="downloadExcel(saleReport)">
+                                <!-- Render download icon when mailSent is true -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                                  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                  <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                                </svg>
+                              </td>
+
+                              <td class="text-center w-auto" (click)="downloadPdf(saleReport)">
+                                <!-- Render download icon when mailSent is true -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                                  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                  <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                                </svg>
+                              </td>
+                            <td class="text-center w-auto">{{saleReport?.createdAt}}</td>
                         </tr>
                     </tbody>
                 </table>

@@ -29,6 +29,8 @@ public class Transaction {
 
     private String pdfDownload;
 
+    private String invoiceNumber;
+
     private Boolean MailSent;
 
     private String currentStatus;

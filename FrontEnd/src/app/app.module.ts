@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { provideRouter, withHashLocation } from '@angular/router';
@@ -37,7 +37,12 @@ import { NgxPaginationModule } from 'ngx-pagination';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { SheetHistoryListComponent } from './pages/sheetHistory/sheet-history-list/sheet-history-list.component';
 import {routes} from './app-routing.module';
-import { TransactionComponent } from './pages/tran/transaction/transaction.component'
+import { TransactionComponent } from './pages/tran/transaction/transaction.component';
+import { DashboardCardsComponent } from './pages/dashboard-cards/dashboard-cards.component';
+import { PieChartComponent } from './pages/pie-chart/pie-chart.component';
+import { StackedBarChartComponent } from './pages/stacked-bar-chart/stacked-bar-chart.component'
+import { NgModule } from '@angular/core';
+import { AutoGrowDirective } from './directives/auto-grow-directive.directive';
 @NgModule({
   declarations: [
     AppComponent,
@@ -66,6 +71,10 @@ import { TransactionComponent } from './pages/tran/transaction/transaction.compo
     CurrencyHistoryComponent,
     SheetHistoryListComponent,
     TransactionComponent,
+    DashboardCardsComponent,
+    PieChartComponent,
+    StackedBarChartComponent,
+    AutoGrowDirective
   ],
   imports: [
     NgxPaginationModule,
