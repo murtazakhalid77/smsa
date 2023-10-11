@@ -39,7 +39,7 @@ public class UserService {
         try{
             User user= User.builder()
                     .name(userDto.getName())
-                    .status(true)
+                    .status(userDto.isStatus())
                     .password(bCryptPasswordEncoder.encode(userDto.getPassword()))
                     .roles(assignRolesToUser(userDto))
                     .build();
@@ -91,6 +91,7 @@ public class UserService {
         if (userExist.isPresent()) {
             User user = userExist.get(); // Get the existing user from Optional
             user.setName(userDto.getName());
+            user.setStatus(userDto.isStatus());
 
             // Check if the password needs to be updated and encode it
             if (!userDto.getPassword().startsWith("$")) {

@@ -42,7 +42,7 @@ public class SalesReportService {
     public Page<SalesReport> getSalesReport(SearchSalesReportDto searchSalesReportDto, Pageable pageable) {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setMapper(searchSalesReportDto.getMapper());
-        searchCriteria.setSearchText(searchCriteria.getSearchText());
+        searchCriteria.setSearchText(searchSalesReportDto.getSearch());
 
         Optional<Page<SalesReport>> salesReports = null;
         List<SalesReportDto> salesReportDtos = new ArrayList<>();

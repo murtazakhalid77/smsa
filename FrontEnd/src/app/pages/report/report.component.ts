@@ -52,18 +52,20 @@ export class ReportComponent {
     this.salesReport = [];
     if (selectedOption === 'invoice') {
       this.startDate = '';
+      this.searchText = '';
       this.endDate = '';
       this.dateInputs = false;
-      this.awb
-       = false;
+      this.awb = false;
       this.invoiceInputs = true;
     } else if (selectedOption === 'date') {
       this.invoiceTo = '';
       this.invoiceFrom = ''
+      this.searchText = '';
       this.invoiceInputs = false;
       this.awb = false;
       this.dateInputs = true;
     }else if(selectedOption === 'awbs'){
+      this.searchText = '';
       this.invoiceInputs = false;
       this.dateInputs = false;
       this.awb = true;
@@ -79,6 +81,7 @@ export class ReportComponent {
   }
 
       getSalesReport(page?: any, size?: any){
+        debugger;
         this.salesReport = [];
 
         const searchSalesReport = {
@@ -90,7 +93,7 @@ export class ReportComponent {
           mapper: 'SALES_REPORT',
           page: page,
           size: size,
-          searchText: this.searchText
+          search: this.searchText
         };
 
         // Check if any search criteria is provided
@@ -102,11 +105,6 @@ export class ReportComponent {
             if (res.body?.length !== 0 && res) {
               this.totalItems = res.headers.get('X-Total-Count') ?? '';
               this.salesReport = res.body!;
-              // this.salesReport.forEach((salesReport: any) => {
-              //   salesReport.smsaFeeCharges = parseFloat(this.roundAndFormat(salesReport.smsaFeeCharges));
-              //   salesReport.totalAmount = parseFloat(this.roundAndFormat(salesReport.totalAmount));
-              //   // Repeat the above lines for other numeric properties that need formatting
-              // });
             } else {
               this.toastr.error("No Data Found");
             }
