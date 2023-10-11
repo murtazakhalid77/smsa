@@ -47,7 +47,7 @@ public class SalesReportService {
         Optional<Page<SalesReport>> salesReports = null;
         List<SalesReportDto> salesReportDtos = new ArrayList<>();
 
-        if(searchCriteria.getSearchText() == null){
+        if(searchCriteria.getSearchText().length() == 0){
             if(searchSalesReportDto.getInvoiceTo()!=null || searchSalesReportDto.getInvoiceFrom()!=null){
                 if(searchSalesReportDto.getInvoiceTo().length()<5 || searchSalesReportDto.getInvoiceFrom().length()<5){
                     throw new RecordNotFoundException(String.format("Invalid format"));
