@@ -189,7 +189,7 @@
               <!-- Your content here -->
             </div>
             <div class="col-auto">
-                <mat-paginator [pageSize]="itemsPerPage" [length]="totalItems" (page)="changePage($event)"> </mat-paginator>
+                <mat-paginator [pageSize]="itemsPerPage" [pageIndex]="pageIndex" [length]="totalItems" (page)="changePage($event)"> </mat-paginator>
             </div>
         </div>
     </div>

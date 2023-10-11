@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/Environments/environment';
 import { FileService } from 'src/app/services/file-service.service';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-report',
@@ -27,17 +28,17 @@ export class ReportComponent {
   salesReport?: ISalesReport[];
   selectedSearchOption: string = 'invoice';
   criteria: any;
-  currentPage:number = 0;
   itemsPerPage: number = 10;
   totalItems?: string;
   searchText?: string;
 
   _url = environment.backend;
+  pageIndex: any;
 
   constructor(private salesReportService: SaleReportService, 
     private excelService: ExcelService, 
     private http: HttpClient,
-    private router:Router,
+    private router:Router,  
     private toastr: ToastrService,
     private fileService: FileService,){}
 
@@ -81,9 +82,7 @@ export class ReportComponent {
   }
 
       getSalesReport(page?: any, size?: any){
-        debugger;
         this.salesReport = [];
-
         const searchSalesReport = {
           invoiceTo: this.selectedSearchOption === 'invoice' ? this.invoiceTo : null,
           invoiceFrom: this.selectedSearchOption === 'invoice' ? this.invoiceFrom : null,
@@ -101,10 +100,14 @@ export class ReportComponent {
             (this.selectedSearchOption === 'date' && (this.startDate || this.endDate)) ||
             (this.selectedSearchOption === 'awbs' && (this.awbs))) {
 
-          this.salesReportService.getSalesReport(searchSalesReport).subscribe(res => {
+          this.salesReportService.getSalesReport(searchSalesReport).subscribe((res:any) => {
             if (res.body?.length !== 0 && res) {
-              this.totalItems = res.headers.get('X-Total-Count') ?? '';
+              debugger
               this.salesReport = res.body!;
+              // this.itemsPerPage = res.body.numberOfElements 
+              this.totalItems = res.headers.get('X-Total-Count') ?? '';
+              // this.pageIndex = page;
+        
             } else {
               this.toastr.error("No Data Found");
             }
@@ -119,9 +122,12 @@ export class ReportComponent {
   }
 
 
-  changePage(value: any){
-    this.getSalesReport(value.pageIndex, this.itemsPerPage);
+  changePage(event: any) {
+    debugger
+    this.pageIndex = event.pageIndex;
+    this.getSalesReport(this.pageIndex, this.itemsPerPage);
   }
+  
 
 
   downloadFile() {

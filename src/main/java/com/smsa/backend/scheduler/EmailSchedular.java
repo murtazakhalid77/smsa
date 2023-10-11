@@ -123,6 +123,9 @@ public class EmailSchedular {
                                     customer.get().getAccountNumber(),
                                     customer.get().getNameEnglish()));
 
+                            invoice.setNumber(invoiceNumber);
+                            invoiceRepository.save(invoice);
+
                             SalesReport salesReport = schedularAssembler.createSalesReport(invoiceNumber, customer.get(), sheetUniqueId, salesReportHelperDto);
                             salesReport.setExcelDownload(finalExcelFileName);
                             salesReport.setPdfDownload(finalPdfFileName);
@@ -169,8 +172,7 @@ public class EmailSchedular {
             }
         }
 
-        invoice.setNumber(invoiceNumber);
-        invoiceRepository.save(invoice);
+
 
 
         if (!anyUnsentInvoice) {
