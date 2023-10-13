@@ -20,7 +20,7 @@ export class TransactionComponent {
   totalItems?: string;
   _url = environment.backend;
 
-
+  
 
   constructor(private transactionServer: TransactionService,
               private router: Router,   private route: ActivatedRoute
@@ -55,9 +55,10 @@ export class TransactionComponent {
       }
     })
   }
-
+ 
   changePage(value: any){
-    this.getAllTransaction(value.pageIndex, this.itemsPerPage);
+    this.currentPage = value.currentPage;
+    this.getAllTransaction(value.pageIndex, this.itemsPerPage,this.id);
   }
 
   downloadExcel(obj:any){
@@ -97,6 +98,23 @@ export class TransactionComponent {
         a.click();
         window.URL.revokeObjectURL(url);
       });
+  }
+
+  deleteData(accountNumber?: any, sheetId?: any) {
+    debugger
+    let url = `${this._url}/transaction/delete/invoiceDetails/${accountNumber}/${sheetId}`;
+    return this.http.delete<void>(url).subscribe(
+      () => {
+        
+          this.getAllTransaction(this.currentPage,this.itemsPerPage,this.id);
+      },
+      (error) => {
+        // Handle errors here, if needed
+        console.error("An error occurred:", error);
+     
+      }
+    );
+
   }
   
   }

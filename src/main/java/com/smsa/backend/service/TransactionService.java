@@ -1,8 +1,10 @@
 package com.smsa.backend.service;
 
 import com.smsa.backend.Exception.RecordNotFoundException;
+import com.smsa.backend.model.InvoiceDetails;
 import com.smsa.backend.model.SheetHistory;
 import com.smsa.backend.model.Transaction;
+import com.smsa.backend.repository.InvoiceDetailsRepository;
 import com.smsa.backend.repository.SheetHistoryRepository;
 import com.smsa.backend.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,9 @@ public class TransactionService {
     @Autowired
     TransactionRepository transactionRepository;
 
+    @Autowired
+    InvoiceDetailsRepository invoiceDetailsRepository;
+
     public Page<Transaction> getAllTransaction(Pageable pageable,String id){
         Page<Transaction> transactions= transactionRepository.findAllBySheetId(pageable,id);
         if (!transactions.isEmpty()) {
@@ -22,4 +27,11 @@ public class TransactionService {
         }
         throw new RecordNotFoundException(String.format("transaction not found"));
     }
+
+    public void deleteInvoiceData(String accountNumber,String sheetId){
+       invoiceDetailsRepository.deleteInvoiceData(accountNumber,sheetId);
+       transactionRepository.deleteByAccountNumberAndSheetId(accountNumber,sheetId);
+
+    }
+
 }

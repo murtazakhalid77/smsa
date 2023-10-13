@@ -18,6 +18,9 @@ public class InvoiceDetailsId implements Serializable {
     private String accountNumber;
     private String awb;
 
+
+
+
     public static InvoiceDetailsIdBuilder builder() {
         return new InvoiceDetailsIdBuilder();
     }

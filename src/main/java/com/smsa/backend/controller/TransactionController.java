@@ -45,4 +45,14 @@ public class TransactionController {
                 .header("Content-disposition", "attachment; filename=\"" + fileName + "\"")
                 .body(resource);
     }
+
+    @DeleteMapping("/transaction/delete/invoiceDetails/{accountNumber}/{sheetId}")
+    public ResponseEntity<Void> deleteInvoiceDetails(
+            @PathVariable String accountNumber,
+            @PathVariable String sheetId
+    ) {
+        transactionService.deleteInvoiceData(accountNumber, sheetId);
+        return ResponseEntity.accepted().build();
+    }
+
 }

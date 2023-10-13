@@ -13,6 +13,7 @@ export class TransactionService {
 
   constructor(private http:HttpClient) { }
   _url = environment.backend;
+  pageIndex: any;
 
   
   getTransaction(page?: any, size?: any, id?: any): Observable<EntityTransactionsResponseType> {
@@ -36,5 +37,9 @@ export class TransactionService {
     
 
   }
-  
-}
+
+  deleteData(page?: any, size?: any, accountNumber?: any,sheetId?:any) {
+    let url = `${this._url}/transaction/delete/invoiceDetails/${accountNumber}/${sheetId}`;
+     this.http.delete<Transaction[]>(`${url}`);  
+  }
+} 

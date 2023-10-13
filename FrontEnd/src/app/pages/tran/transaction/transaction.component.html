@@ -42,7 +42,7 @@
                                 <span class="font">Emailed</span>
                             </th>
                             <th class="nowrap col-md-2 col-lg-1 text-center">
-
+                                <span class="font">Delete Content</span>
                             </th>
 
                         </tr>
@@ -89,22 +89,24 @@
 
                             <td class="text-center w-auto col-md-2 col-lg-1">{{tar?.sheetId}}</td>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{tar?.mailSent}}</td>
+                                <td class="order-table-btns-container text-center w-auto col-md-2 col-lg-1">
+                                    <button *ngIf="!tar.mailSent" type="button" class="btn btn-danger" (click)="deleteData(tar.accountNumber, tar.sheetId)">Delete Content</button>
+                                </td>
 
-                            <td class="order-table-btns-container text-center w-auto col-md-2 col-lg-1">
-
-                            </td>
+                                  
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
+-->
 
         <div class="row mt-4" *ngIf="transaction.length > 0">
             <div class="col">
                 
             </div>
             <div class="col-auto">
-                <mat-paginator [pageSize]="itemsPerPage" [length]="totalItems" (page)="changePage($event)">
+                <mat-paginator [pageSize]="itemsPerPage" [pageIndex]="currentPage" [length]="totalItems" (page)="changePage($event)">
                 </mat-paginator>
             </div>
         </div>
