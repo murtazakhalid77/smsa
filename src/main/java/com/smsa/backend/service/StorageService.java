@@ -29,12 +29,18 @@ public class StorageService {
     private static final Logger logger = LoggerFactory.getLogger(StorageService.class);
 
     public String uploadFile(byte[] fileData, String fileName) {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(fileData);
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(fileData.length);
-        logger.info(BUCKET_NAME);
-        s3Client.putObject(new PutObjectRequest(BUCKET_NAME, fileName, inputStream, metadata));
-        return "File uploaded: " + fileName;
+        try{
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(fileData);
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(fileData.length);
+            logger.info(BUCKET_NAME);
+            s3Client.putObject(new PutObjectRequest(BUCKET_NAME, fileName, inputStream, metadata));
+            return "File uploaded: " + fileName;
+        }catch (Exception e){
+            logger.error("file not uplaoded to s3 bucket",fileName);
+            throw new RuntimeException(e.getMessage());
+        }
+
     }
 
 
@@ -51,26 +57,9 @@ public class StorageService {
                 inputStream.close();
             }
         } catch (IOException e) {
+            logger.error("cannot download file from s3 bucket");
             e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
-
-        return null;
-    }
-
-
-    public String deleteFile(String fileName) {
-        s3Client.deleteObject(BUCKET_NAME, fileName);
-        return fileName + " removed ...";
-    }
-
-
-    private File convertMultiPartFileToFile(MultipartFile file) {
-        File convertedFile = new File(file.getOriginalFilename());
-        try (FileOutputStream fos = new FileOutputStream(convertedFile)) {
-            fos.write(file.getBytes());
-        } catch (IOException e) {
-            log.error("Error converting multipartFile to file", e);
-        }
-        return convertedFile;
     }
 }

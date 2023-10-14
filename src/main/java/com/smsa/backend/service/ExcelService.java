@@ -357,7 +357,7 @@ public class ExcelService {
                 return salesReportHelperDto;
             } catch (IOException e) {
                 e.printStackTrace();
-                throw new IOException("Failed to create Excel file.");
+                throw new IOException(e.getMessage());
             }
     }
     public SalesReportHelperDto calculateSalesReportHelperDto(List<Map<String, Object>> calculatedValuesList) {
@@ -391,7 +391,7 @@ public class ExcelService {
             setCommonSheetDetails(sheet1, customer, sheetUniqueId);
         }catch (Exception e){
             e.printStackTrace();
-            throw new ExcelMakingException("There is an issue with the sheets in the sample file");
+            throw new ExcelMakingException(e.getMessage());
         }
 
     }
@@ -461,7 +461,7 @@ public class ExcelService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ExcelMakingException("There was an issue in populating sum values in the summary file");
+            throw new ExcelMakingException(e.getMessage());
         }
     }
 
@@ -537,7 +537,7 @@ public class ExcelService {
 
             }catch (Exception e){
                 e.printStackTrace();
-                throw new ExcelMakingException("Issue in populating invoice details");
+                throw new ExcelMakingException(e.getMessage());
             }
 
     }
@@ -588,7 +588,7 @@ public class ExcelService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ExcelMakingException("There was an issue in populating calculated values in the summary file");
+            throw new ExcelMakingException(e.getMessage());
         }
     }
 
@@ -687,7 +687,7 @@ public class ExcelService {
         }
        catch (Exception e){
             e.printStackTrace();
-            throw new SalesReportException("There was an issue in making of sales report");
+            throw new SalesReportException(e.getMessage());
        }
 
     }
@@ -737,7 +737,7 @@ public class ExcelService {
         }
         catch (Exception e){
             e.printStackTrace();
-            throw new SalesReportException("There was an issue in making of customer excel");
+            throw new SalesReportException(e.getMessage());
         }
 
     }
@@ -783,7 +783,7 @@ public class ExcelService {
         }
         catch (Exception e){
             e.printStackTrace();
-            throw new SalesReportException("There was an issue in making of customer excel");
+            throw new SalesReportException(e.getMessage());
         }
 
     }
@@ -823,7 +823,7 @@ public class ExcelService {
         }
         catch (Exception e){
             e.printStackTrace();
-            throw new SalesReportException("There was an issue in making of user excel");
+            throw new SalesReportException(e.getMessage());
         }
 
     }
@@ -866,7 +866,7 @@ public class ExcelService {
         }
         catch (Exception e){
             e.printStackTrace();
-            throw new SalesReportException("There was an issue in making of custom excel");
+            throw new SalesReportException(e.getMessage());
         }
 
     }
@@ -909,7 +909,7 @@ public class ExcelService {
         }
         catch (Exception e){
             e.printStackTrace();
-            throw new SalesReportException("There was an issue in making of custom excel");
+            throw new SalesReportException(e.getMessage());
         }
 
     }
@@ -955,7 +955,7 @@ public class ExcelService {
         }
         catch (Exception e){
             e.printStackTrace();
-            throw new SalesReportException("There was an issue in making of custom excel");
+            throw new SalesReportException(e.getMessage());
         }
 
     }
@@ -1002,6 +1002,7 @@ public class ExcelService {
             return Double.parseDouble(value);
         } catch (NumberFormatException e) {
             e.printStackTrace();
+
             return defaultValue;
         }
     }

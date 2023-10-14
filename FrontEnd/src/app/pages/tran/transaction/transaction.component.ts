@@ -37,24 +37,30 @@ export class TransactionComponent {
   }
 
   
-  getAllTransaction(page?: any, size?: any,id?:any){
-    this.transactionServer.getTransaction(page, size,id).subscribe(res =>{
-      if(res && res.body){
-        this.transaction = res.body;
-        this.totalItems = res.headers.get('X-Total-Count') ?? '';
-        // this.transaction = this.transaction.map(item => {
-        //   if (item.mailSent === false) {
-        //     item.excelDownload = "not found";
-        //     item.pdfDownload = "not found";
-        //   }
-        //   return item;
-        // });
-        
-        // console.log(this.transaction);
-        
+  getAllTransaction(page?: any, size?: any, id?: any) {
+    this.transactionServer.getTransaction(page, size, id).subscribe(
+      (res) => {
+        if (res && res.body) {
+          this.transaction = res.body;
+          this.totalItems = res.headers.get('X-Total-Count') ?? '';
+  
+          // Process the transactions
+          this.transaction = this.transaction.map((item) => {
+            if (item.mailSent === false) {
+              console.error('Error loading transactions:');
+            }
+            return item;
+          });
+        }
+      },
+      (error) => {
+        // Handle the error here, e.g., display an error message in the UI
+      
+        this.transaction = []; // Clear the transactions or handle it as needed
       }
-    })
+    );
   }
+  
  
   changePage(value: any){
     this.currentPage = value.currentPage;
