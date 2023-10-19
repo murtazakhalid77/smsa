@@ -95,10 +95,9 @@ public class EmailSchedular {
 
                 if (customer.isPresent() && customer.get().getEmail() != null && customer.get().getStatus().equals(true)) {
                     logger.info("Making excel for Account Number: " + accountNumber);
-
+                    Long invoiceNo = invoiceNumber;
+                    invoiceNumber+=1;
                     try {
-                        Long invoiceNo = invoiceNumber;
-                        invoiceNumber++;
                         SalesReportHelperDto salesReportHelperDto = excelService.updateExcelFile(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
                         byte[] pdfFileData = pdfService.makePdf(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
                         logger.info(String.format("Excel and pdf made for the account number %s",accountNumber));
@@ -151,7 +150,7 @@ public class EmailSchedular {
                             transactionRepository.save(newTransaction);
                         }
                     } catch (Exception e) {
-
+                        invoiceNumber-=1;
                         logger.error(String.format("Error while scheduling for  for Account Number %s: " , accountNumber));
                         logger.warn(e.toString());
                         anyUnsentInvoice = true;
@@ -162,7 +161,6 @@ public class EmailSchedular {
 
                         newTransaction.setCurrentStatus(e.getMessage());
                         transactionRepository.save(newTransaction);
-
                         e.printStackTrace();
                     }
                 } else {

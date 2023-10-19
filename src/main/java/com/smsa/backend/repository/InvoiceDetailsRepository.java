@@ -34,6 +34,8 @@ public interface InvoiceDetailsRepository extends JpaRepository<InvoiceDetails, 
     @Query("DELETE FROM InvoiceDetails i WHERE i.invoiceDetailsId.accountNumber = ?1 AND i.sheetUniqueId = ?2")
     void deleteInvoiceData(String accountNumber, String sheetUniqueId);
     ;
-
+    @Transactional
+    @Modifying
+    void deleteBySheetUniqueId(String uniqueId);
 
 }

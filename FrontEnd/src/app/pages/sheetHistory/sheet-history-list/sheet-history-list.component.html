@@ -41,6 +41,9 @@
                         <th class="nowrap col-md-2 col-lg-1 text-center">
                             <span class="font">End Date</span>
                         </th>
+                        <th class="nowrap col-md-2 col-lg-1 text-center">
+                            <span class="font">Delete Sheet</span>
+                        </th>
                     </tr>
                 </thead>
 
@@ -68,7 +71,10 @@
                             <td class="text-center w-auto col-md-2 col-lg-1">{{sheetHistor.invoiceDate}}</td>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{sheetHistor.startDate}}</td>
                             <td class="text-center w-auto col-md-2 col-lg-1">{{sheetHistor.endDate}}</td>
-                           
+                            <td class="text-center w-auto col-md-2 col-lg-1">
+                                <button *ngIf="!sheetHistor.isEmailSent" type="button" class="btn btn-danger" (click)="deleteData(sheetHistor.uniqueUUid)">Delete</button>
+                            </td>
+
                           
                         </tr>
                       

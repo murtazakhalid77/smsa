@@ -1,9 +1,11 @@
 
-import { IsheetHistory } from '../../model/sheetHistory.model';
+import { IsheetHistory, sheetHistory } from '../../model/sheetHistory.model';
 import { Router } from '@angular/router';
 import { SheetHistoryService } from '../sheet-history.service';
 import { Component } from '@angular/core';
 import { FileService } from 'src/app/services/file-service.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/Environments/environment';
 
 @Component({
   selector: 'app-sheet-history-list',
@@ -17,11 +19,11 @@ export class SheetHistoryListComponent {
   currentPage:number  = 0;
   itemsPerPage: number = 10;
   totalItems?: string;
-
+  _url = environment.backend;
 
   constructor(private sheetHistoryService: SheetHistoryService,
               private router: Router,
-              private fileService: FileService){}
+              private fileService: FileService,private http: HttpClient){}
 
   ngOnInit(){
     this.getAllSSheetHistory(this.currentPage, this.itemsPerPage);
@@ -45,8 +47,26 @@ export class SheetHistoryListComponent {
     this.router.navigate(['/transactions'], { queryParams: { id: id } });
 
   }
+  
 
   downloadExcel(saleReport: any){
     this.fileService.downloadExcel(saleReport, 'sheet.xlsx');
   }
+
+  deleteData(sheetId?: any) {
+    let url = `${this._url}/delete/invoiceDetails/${sheetId}`;
+    debugger
+    return this.http.delete(url).subscribe(
+      (success) => {  
+          this.getAllSSheetHistory(this.currentPage,this.itemsPerPage);
+      },
+      (error) => {
+        // Handle errors here, if needed
+        console.error("An error occurred:", error);
+     
+      }
+    );
+
+  }
+  
 }

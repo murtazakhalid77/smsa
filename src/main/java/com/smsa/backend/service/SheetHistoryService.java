@@ -3,6 +3,7 @@ package com.smsa.backend.service;
 import com.smsa.backend.Exception.RecordNotFoundException;
 import com.smsa.backend.model.Region;
 import com.smsa.backend.model.SheetHistory;
+import com.smsa.backend.repository.InvoiceDetailsRepository;
 import com.smsa.backend.repository.SheetHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -17,12 +18,16 @@ public class SheetHistoryService {
     @Autowired
     SheetHistoryRepository sheetHistoryRespository;
 
+    @Autowired
+    InvoiceDetailsRepository invoiceDetailsRepository;
+
     public Page<SheetHistory> getAllSheetHistory(Pageable pageable){
         Page<SheetHistory> sheetHistory= sheetHistoryRespository.findAll(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),  Sort.by("id").descending()));
-        if (!sheetHistory.isEmpty()) {
-            return  sheetHistory;
-        }
-        throw new RecordNotFoundException(String.format("sheetHistory not found"));
+     return sheetHistory;
+    }
+    public  void deleteSheetHistory(String sheetId){
+        sheetHistoryRespository.deleteByUniqueUUid(sheetId);
+        invoiceDetailsRepository.deleteBySheetUniqueId(sheetId);
     }
 
 

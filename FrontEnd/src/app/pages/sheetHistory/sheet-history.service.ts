@@ -26,4 +26,9 @@ export class SheetHistoryService {
         return this.http.get<sheetHistory[]>(`${url}`, { params, observe: 'response' });
     }
     
+
+    deleteData(page?: any, size?: any, accountNumber?: any,sheetId?:any) {
+      let url = `${this._url}/sheetHistory/delete/invoiceDetails/${sheetId}`;
+       this.http.delete<void>(`${url}`);  
+    }
 }
