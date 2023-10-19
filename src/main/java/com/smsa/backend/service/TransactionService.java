@@ -29,8 +29,13 @@ public class TransactionService {
     }
 
     public void deleteInvoiceData(String accountNumber,String sheetId){
-       invoiceDetailsRepository.deleteInvoiceData(accountNumber,sheetId);
-       transactionRepository.deleteByAccountNumberAndSheetId(accountNumber,sheetId);
+        try{
+            invoiceDetailsRepository.deleteInvoiceData(accountNumber,sheetId);
+            transactionRepository.deleteByAccountNumberAndSheetId(accountNumber,sheetId);
+        }
+      catch (RuntimeException ex){
+            ex.printStackTrace();
+      }
 
     }
 

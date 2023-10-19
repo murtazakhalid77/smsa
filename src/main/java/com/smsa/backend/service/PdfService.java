@@ -340,7 +340,7 @@ public class PdfService {
             return outputStream.toByteArray();
     } catch (DocumentException | IOException e ) {
         e.printStackTrace();
-        throw new Exception("There was an issue in making pdf");
+        throw new Exception(e.getMessage());
     }
 }
 
