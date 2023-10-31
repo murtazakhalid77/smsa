@@ -95,8 +95,9 @@ public class EmailSchedular {
 
                 if (customer.isPresent() && customer.get().getEmail() != null && customer.get().getStatus().equals(true)) {
                     logger.info("Making excel for Account Number: " + accountNumber);
-                    Long invoiceNo = invoiceNumber;
                     invoiceNumber+=1;
+                    Long invoiceNo = invoiceNumber;
+
                     try {
                         SalesReportHelperDto salesReportHelperDto = excelService.updateExcelFile(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
                         byte[] pdfFileData = pdfService.makePdf(invoiceDetailsList, customer.get(), sheetUniqueId,invoiceNo);
@@ -104,11 +105,11 @@ public class EmailSchedular {
                         documentsMade=true;
 
                         if(documentsMade){
-                            String dateTime= String.valueOf(DateTime.now());
-                            excelFileName = dateTime+ accountNumber + "excel.xlsx";
+
+                            excelFileName = invoiceNo +"-"+ accountNumber + "excel.xlsx";
                             storageService.uploadFile(salesReportHelperDto.getExcelFile(), excelFileName);
 
-                            pdfFileName = dateTime + accountNumber + "invoice.pdf";
+                            pdfFileName = invoiceNo +"-"+   accountNumber + "invoice.pdf";
                             storageService.uploadFile(pdfFileData, pdfFileName);
 
                             logger.info("uploaded to amazon s3 bucket");
@@ -122,10 +123,10 @@ public class EmailSchedular {
                                     customer.get().getAccountNumber(),
                                     customer.get().getNameEnglish()));
 
-                            invoice.setNumber(invoiceNumber);
+                            invoice.setNumber(invoiceNo);
                             invoiceRepository.save(invoice);
 
-                            SalesReport salesReport = schedularAssembler.createSalesReport(invoiceNumber, customer.get(), sheetUniqueId, salesReportHelperDto);
+                            SalesReport salesReport = schedularAssembler.createSalesReport(invoiceNo, customer.get(), sheetUniqueId, salesReportHelperDto);
                             salesReport.setExcelDownload(finalExcelFileName);
                             salesReport.setPdfDownload(finalPdfFileName);
                             SalesReport salesReport1 = salesReportRepository.save(salesReport);
@@ -147,10 +148,12 @@ public class EmailSchedular {
 
                             newTransaction.setCurrentStatus("Success");
                             newTransaction.setInvoiceNumber(salesReport.getInvoiceNumber());
+                            newTransaction.setExcelDownload(finalExcelFileName);
+                            newTransaction.setPdfDownload(finalPdfFileName);
                             transactionRepository.save(newTransaction);
                         }
                     } catch (Exception e) {
-                        invoiceNumber-=1;
+
                         logger.error(String.format("Error while scheduling for  for Account Number %s: " , accountNumber));
                         logger.warn(e.toString());
                         anyUnsentInvoice = true;
@@ -160,6 +163,8 @@ public class EmailSchedular {
                                         e.getMessage(), Boolean.FALSE,null,null));
 
                         newTransaction.setCurrentStatus(e.getMessage());
+                        newTransaction.setPdfDownload(pdfFileName);
+                        newTransaction.setExcelDownload(excelFileName);
                         transactionRepository.save(newTransaction);
                         e.printStackTrace();
                     }

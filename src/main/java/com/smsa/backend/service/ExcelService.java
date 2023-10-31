@@ -322,6 +322,7 @@ public class ExcelService {
     public SalesReportHelperDto updateExcelFile(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId, Long invoiceNumber) throws Exception {
         logger.info(String.format("Inside update excel method for account %s ", customer.getAccountNumber()));
 
+        try{
             Map<String, List<InvoiceDetails>> filteredRowsMap;
             Custom custom = getSheetHistory(sheetUniqueId).getCustom();
 
@@ -349,7 +350,7 @@ public class ExcelService {
 
             fileInputStream.close();
 
-        SalesReportHelperDto salesReportHelperDto = calculateSalesReportHelperDto(calculatedValuesList);
+            SalesReportHelperDto salesReportHelperDto = calculateSalesReportHelperDto(calculatedValuesList);
 
             try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
                 newWorkBook.write(outputStream);
@@ -359,6 +360,10 @@ public class ExcelService {
                 e.printStackTrace();
                 throw new IOException(e.getMessage());
             }
+        }
+           catch (Exception e){
+            throw new ExcelMakingException(e.getMessage());
+           }
     }
     public SalesReportHelperDto calculateSalesReportHelperDto(List<Map<String, Object>> calculatedValuesList) {
         Double totalChargesAsPerCustomDeclarationForm = 0.0;

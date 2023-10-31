@@ -121,7 +121,7 @@ public class HashMapHelper {
                 resultList.add(calculatedValuesMap);
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new ExcelMakingException("Issue in calculating values for invoice");
+                throw new RuntimeException(e.getMessage());
             }
         }
 
@@ -173,13 +173,20 @@ public class HashMapHelper {
             return sumMap;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Issue in calculating sum values");
+            throw new RuntimeException
+                    (e.getMessage());
         }
 
     }
 
     public Double calculateVatOnSmsaFees(Double smsaFeesCharges, Double smsaFeeVat) {
-        return (smsaFeesCharges * smsaFeeVat) / 100;
+        try{
+            return (smsaFeesCharges * smsaFeeVat) / 100;
+        }
+        catch (Exception e){
+            throw new RuntimeException(e);
+        }
+
     }
 
     private Double calculateTotalAmount(String totalChargesCustomerCurrency, String smsaFeesCharges, String vatOnSmsaFees) {
@@ -222,15 +229,17 @@ public class HashMapHelper {
     public Map<String, List<InvoiceDetails>> filterRowsByMawbNumber(List<InvoiceDetails> invoiceDetailsList) throws RuntimeException {
         Map<String, List<InvoiceDetails>> filteredRowsMap = new HashMap<>();
 
-        for (InvoiceDetails invoiceDetails : invoiceDetailsList) {
-            String mawbNumber = invoiceDetails.getInvoiceDetailsId().getMawb();
+        try {
+            for (InvoiceDetails invoiceDetails : invoiceDetailsList) {
+                String mawbNumber = invoiceDetails.getInvoiceDetailsId().getMawb();
 
-            if (!mawbNumber.isEmpty()) {
-                filteredRowsMap.putIfAbsent(mawbNumber, new ArrayList<>());
-                filteredRowsMap.get(mawbNumber).add(invoiceDetails);
-            } else {
-                throw new RuntimeException("There is an empty mawb number in the sheet");
+                if (!mawbNumber.isEmpty()) {
+                    filteredRowsMap.putIfAbsent(mawbNumber, new ArrayList<>());
+                    filteredRowsMap.get(mawbNumber).add(invoiceDetails);
+                }
             }
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
         }
         return filteredRowsMap;
     }
