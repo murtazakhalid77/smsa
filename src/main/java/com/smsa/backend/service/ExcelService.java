@@ -372,7 +372,7 @@ public class ExcelService {
         Double vatOnsmsaFees = 0.0;
 
         for (Map<String, Object> singleRecord : calculatedValuesList) {
-            totalChargesAsPerCustomDeclarationForm += Double.parseDouble(singleRecord.get("VatAmountCustomDeclarationForm").toString());
+                totalChargesAsPerCustomDeclarationForm += Double.parseDouble(singleRecord.get("TotalCharges").toString());
             smsaFeesCharges += Double.parseDouble(singleRecord.get("SMSAFeeCharges").toString());
             totalAmount += Double.parseDouble(singleRecord.get("TotalAmount").toString());
             vatOnsmsaFees += Double.parseDouble(singleRecord.get("VatOnSmsaFees").toString());
