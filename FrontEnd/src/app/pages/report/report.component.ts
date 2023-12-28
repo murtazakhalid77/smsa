@@ -25,15 +25,17 @@ export class ReportComponent {
   invoiceInputs: boolean = true;
   awb: boolean = false;
   awbs: any;
-  salesReport?: ISalesReport[];
+  salesReport?: ISalesReport[]=[];
+  AllsalesReport: ISalesReport[]=[];
   selectedSearchOption: string = 'invoice';
   criteria: any;
   itemsPerPage: number = 10;
-  totalItems?: string;
+  totalItems: number=0;
   searchText?: string;
+  pageIndex: number = 0; // Initial page index
 
   _url = environment.backend;
-  pageIndex: any;
+  
 
   constructor(private salesReportService: SaleReportService, 
     private excelService: ExcelService, 
@@ -81,55 +83,63 @@ export class ReportComponent {
     }
   }
 
-      getSalesReport(page?: any, size?: any){
-        this.salesReport = [];
-        const searchSalesReport = {
-          invoiceTo: this.selectedSearchOption === 'invoice' ? this.invoiceTo : null,
-          invoiceFrom: this.selectedSearchOption === 'invoice' ? this.invoiceFrom : null,
-          startDate: this.selectedSearchOption === 'date' ? this.startDate : null,
-          endDate: this.selectedSearchOption === 'date' ? this.endDate : null,
-          awbs: this.selectedSearchOption === 'awbs' ? this.awbs : null,
-          mapper: 'SALES_REPORT',
-          page: page,
-          size: size,
-          search: this.searchText
-        };
+getSalesReport() {
+  const searchSalesReport = {
+    invoiceTo: this.selectedSearchOption === 'invoice' ? this.invoiceTo : null,
+    invoiceFrom: this.selectedSearchOption === 'invoice' ? this.invoiceFrom : null,
+    startDate: this.selectedSearchOption === 'date' ? this.startDate : null,
+    endDate: this.selectedSearchOption === 'date' ? this.endDate : null,
+    awbs: this.selectedSearchOption === 'awbs' ? this.awbs : null,
+    mapper: 'SALES_REPORT', 
+    search: this.searchText
+  };
 
-        // Check if any search criteria is provided
-        if ((this.selectedSearchOption === 'invoice' && (this.invoiceTo || this.invoiceFrom)) ||
-            (this.selectedSearchOption === 'date' && (this.startDate || this.endDate)) ||
-            (this.selectedSearchOption === 'awbs' && (this.awbs))) {
-
-          this.salesReportService.getSalesReport(searchSalesReport).subscribe((res:any) => {
-            if (res.body?.length !== 0 && res) {
-              this.salesReport = res.body!;
-              // this.itemsPerPage = res.body.numberOfElements 
-              this.totalItems = res.headers.get('X-Total-Count') ?? '';
-              // this.pageIndex = page;
-        
-            } else {
-              this.toastr.error("No Data Found");
-            }
-          },
-          error =>{
-            this.toastr.error(error.error.body);
-          }
-          );
+  if (
+    (this.selectedSearchOption === 'invoice' && (this.invoiceTo || this.invoiceFrom)) ||
+    (this.selectedSearchOption === 'date' && (this.startDate || this.endDate)) ||
+    (this.selectedSearchOption === 'awbs' && this.awbs)
+  ) {
+    this.salesReportService.getSalesReport(searchSalesReport).subscribe(
+      (res: any) => {
+        if (res && res.body && res.body.length > 0) {
+          this.AllsalesReport = res.body;
+          this.totalItems=this.AllsalesReport.length;
+          debugger // Save all sales reports
+          this.paginateSalesReports(); // Paginate the retrieved data initially
         } else {
-          this.toastr.error("Please provide valid search criteria");
+          this.toastr.error('No Data Found');
         }
+      },
+      (error) => {
+        this.toastr.error(error.error.body);
+      }
+    );
+  } else {
+    this.toastr.error('Please provide valid search criteria');
   }
+}
+
+// Modify the changePage method to handle pagination from the retrieved data
+changePage(event: any) {
+  this.pageIndex = event.pageIndex;
+  this.paginateSalesReports(); // Update salesReport based on the pageIndex
+}
+
+// Paginate sales reports based on pageIndex and itemsPerPage
+paginateSalesReports() {
+  debugger
+  const startIndex = this.pageIndex * this.itemsPerPage;
+  const endIndex = startIndex + this.itemsPerPage;
+  this.salesReport = this.AllsalesReport.slice(startIndex, endIndex);
+}
 
 
-  changePage(event: any) {
-    this.pageIndex = event.pageIndex;
-    this.getSalesReport(this.pageIndex, this.itemsPerPage);
-  }
+
   
 
 
   downloadFile() {
-    const salesReportIds = this.salesReport?.map(report => report.id); // Replace with your desired salesReportIds
+    const salesReportIds = this.AllsalesReport?.map(report => report.id); // Replace with your desired salesReportIds
     const params = new HttpParams().set('salesReportIds', salesReportIds!.join(','));
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     this.http

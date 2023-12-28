@@ -17,14 +17,14 @@ import java.util.List;
 public interface SalesReportRepository extends JpaRepository<SalesReport,Long>, JpaSpecificationExecutor<SalesReport> {
 
     List<SalesReport> findByIdBetween(Long saleIdStart, Long saleIdEnd);
-    Page<SalesReport> findByInvoiceNumberBetween(String invoiceTo, String invoiceFrom, Pageable pageable);
+    List<SalesReport> findByInvoiceNumberBetween(String invoiceTo, String invoiceFrom);
 
-    Page<SalesReport> findAllByCreatedAtBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
+    List<SalesReport> findAllByCreatedAtBetween(LocalDate startDate, LocalDate endDate);
 
     List<SalesReport> findAllByIdIn(List<Long> salesReportIds);
     @Query(value = "SELECT sr.* " +
             "FROM sales_report sr " +
             "INNER JOIN sales_report_awb sra ON sr.id = sra.sales_report_id " +
             "WHERE sra.awb IN :awbs", nativeQuery = true)
-    Page<SalesReport> getSalesReportByAwbs(@Param("awbs") List<String> awbs, Pageable pageable);
+    List<SalesReport> getSalesReportByAwbs(@Param("awbs") List<String> awbs);
 }

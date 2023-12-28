@@ -39,12 +39,12 @@ public class SalesReportService {
     @Autowired
     HelperService helperService;
 
-    public Page<SalesReport> getSalesReport(SearchSalesReportDto searchSalesReportDto, Pageable pageable) {
+    public List<SalesReport> getSalesReport(SearchSalesReportDto searchSalesReportDto) {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setMapper(searchSalesReportDto.getMapper());
         searchCriteria.setSearchText(searchSalesReportDto.getSearch());
 
-        Optional<Page<SalesReport>> salesReports = null;
+        Optional<List<SalesReport>> salesReports = null;
         List<SalesReportDto> salesReportDtos = new ArrayList<>();
 
         if(searchCriteria.getSearchText().length() == 0){
@@ -53,19 +53,19 @@ public class SalesReportService {
                     throw new RecordNotFoundException(String.format("Invalid format"));
                 }else{
                     salesReports = Optional.of(this.salesReportRepository.findByInvoiceNumberBetween(searchSalesReportDto.getInvoiceTo().substring(5),
-                            searchSalesReportDto.getInvoiceFrom().substring(5), pageable));
+                            searchSalesReportDto.getInvoiceFrom().substring(5)));
                 }
             }else if(searchSalesReportDto.getAwbs()!=null){
-                salesReports = this.getSalesReportByAwbs(searchSalesReportDto.getAwbs(), pageable);
+                salesReports = this.getSalesReportByAwbs(searchSalesReportDto.getAwbs());
             }
             else{
                 salesReports = Optional.of(this.salesReportRepository.findAllByCreatedAtBetween(
                         this.helperService.convertStringInToLocalDate(searchSalesReportDto.getStartDate()),
-                        this.helperService.convertStringInToLocalDate(searchSalesReportDto.getEndDate()), pageable));
+                        this.helperService.convertStringInToLocalDate(searchSalesReportDto.getEndDate())));
             }
         }else{
             Specification<SalesReport> regionSpecification = salesReportFilterSpecification.getSearchSpecification(searchCriteria);
-            salesReports = Optional.of(this.salesReportRepository.findAll(regionSpecification, pageable));
+            salesReports = Optional.of(this.salesReportRepository.findAll(regionSpecification));
         }
 
 
@@ -91,11 +91,11 @@ public class SalesReportService {
         return Double.parseDouble(requiredValue);
     }
 
-    public Optional<Page<SalesReport>> getSalesReportByAwbs(String awbs, Pageable pageable){
+    public Optional<List<SalesReport>> getSalesReportByAwbs(String awbs){
         List<String> awbList = Arrays.stream(awbs.split(","))
                 .map(String::trim)
                 .collect(Collectors.toList());
-        Optional<Page<SalesReport>> salesReport = Optional.of(this.salesReportRepository.getSalesReportByAwbs(awbList, pageable));
+        Optional<List<SalesReport>> salesReport = Optional.of(this.salesReportRepository.getSalesReportByAwbs(awbList));
         if(salesReport.isPresent()){
             return salesReport;
         }

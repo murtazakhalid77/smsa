@@ -13,7 +13,7 @@
             placeholder="Search by Invoice/Account Number" 
             class="order-search form-control" 
             [(ngModel)]="searchText"
-            (ngModelChange)="getSalesReport(0, 10);">
+            (ngModelChange)="getSalesReport();">
 
             <div class="container-fluid mt-4">
                 <div class="search-option">
@@ -39,7 +39,7 @@
                 
 
                     <div class="col-md-4 d-flex justify-content-end">
-                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3 custom-margin" type="submit" (click)="getSalesReport(0, 10)">
+                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3 custom-margin" type="submit" (click)="getSalesReport()">
                             <span>Search</span>
                         </button>
                         <button *ngIf="salesReport!.length!=0 && salesReport!=null" class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" (click)="downloadFile()">
@@ -59,7 +59,8 @@
                     <div class="col-md-4">
                     </div>
                     <div class="col-md-4 d-flex justify-content-end">
-                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3 custom-margin" type="submit" (click)="getSalesReport(0, 10)">
+                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3 custom-margin" type="submit" (click)="getSalesReport()">
+                        >
                             <span>Search</span>
                         </button>
                         <button *ngIf="salesReport!.length != 0 && salesReport != null" class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" (click)="downloadFile()">
@@ -82,7 +83,7 @@
                 
 
                     <div class="col-md-4 d-flex justify-content-end">
-                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3 custom-margin" type="submit" (click)="getSalesReport(0, 10)">
+                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3 custom-margin" type="submit" (click)="getSalesReport()">
                             <span>Search</span>
                         </button>
                         <button *ngIf="salesReport!.length!=0 && salesReport!=null" class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" (click)="downloadFile()">

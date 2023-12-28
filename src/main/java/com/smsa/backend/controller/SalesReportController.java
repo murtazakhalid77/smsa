@@ -26,12 +26,12 @@ public class SalesReportController {
 
     @PostMapping("/sales-report")
     ResponseEntity<List<SalesReport>> getSalesReport(@RequestBody SearchSalesReportDto searchSalesReportDto){
-        Page<SalesReport> salesReports = this.salesReportService.getSalesReport(searchSalesReportDto,  PageRequest.of(searchSalesReportDto.getPage(), searchSalesReportDto.getSize(),  Sort.by("id").descending()));
+        List<SalesReport> salesReports = this.salesReportService.getSalesReport(searchSalesReportDto);
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(salesReports.getTotalElements()));
+
         return ResponseEntity.ok()
                 .headers(headers)// Set the headers
-                .body(salesReports.getContent());
+                .body(salesReports);
     }
 
 //    @GetMapping("/sales-report-awb")
