@@ -57,7 +57,8 @@ public class ExcelController {
 
 
         if (ExcelImportHelper.hasExcelFormat(file)) {
-              HashMap<String,List<InvoiceDetails>> invoices= excelService.saveInvoicesToDatabase(file,excelImportDto1);
+            if(!excelImportDto1.isCustomPlusExcel()){
+                HashMap<String,List<InvoiceDetails>> invoices= excelService.saveInvoicesToDatabase(file,excelImportDto1);
 
                 for (InvoiceDetails invoiceDetails : invoices.get("invoicesWithoutAccount")) {
                     accountNumbers.add(invoiceDetails.getInvoiceDetailsId().getAccountNumber());
@@ -69,6 +70,21 @@ public class ExcelController {
                 response.put("accountNumbers", accountNumbers);
 
                 return ResponseEntity.ok(response);
+            }
+
+            HashMap<String,List<InvoiceDetails>> invoices= excelService.saveInvoicesToDatabase(file,excelImportDto1);
+
+            for (InvoiceDetails invoiceDetails : invoices.get("invoicesWithoutAccount")) {
+                accountNumbers.add(invoiceDetails.getInvoiceDetailsId().getAccountNumber());
+            }
+
+
+            message = "Uploaded the file successfully: " + file.getOriginalFilename();
+            response.put("message", message);
+            response.put("accountNumbers", accountNumbers);
+
+            return ResponseEntity.ok(response);
+
 
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);

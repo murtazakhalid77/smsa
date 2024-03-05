@@ -126,8 +126,15 @@ public class ExcelService {
                         mappedRowsMap.put(commonKey, new ArrayList<>());
                     }
                     try {
+                        InvoiceDetails invoiceDetails;
+
+                        if(!excelImportDto.isCustomPlusExcel()){
+                             invoiceDetails = mapToDomain(row);
+                        }else {
+                             invoiceDetails = mapToDomainForCustomPlus(row,excelImportDto.getVatAmountPercentage(),excelImportDto.getCustomFormValue(),rowsToBeFiltered.size());
+                        }
                         // Map the fields from the row list to the InvoiceDetails object
-                        InvoiceDetails invoiceDetails = mapToDomain(row);
+
 
                         mapHelperFields(invoiceDetails, sheetId, currentDate);
 
@@ -319,6 +326,42 @@ public class ExcelService {
     }
 
 
+    private InvoiceDetails mapToDomainForCustomPlus(List<String> row,String vatAmountPercentage,String customFormValue,Integer totalRows) {
+
+        InvoiceDetailsId invoiceDetailsId = InvoiceDetailsId.builder()
+                .mawb(row.get(0))
+                .manifestDate(row.get(1))
+                .accountNumber(row.get(2))
+                .awb(row.get(3))
+                .build();
+
+        double valueCustom = parseDoubleOrDefault(row.get(11), 0.0);
+
+        double vatAmountPercentageValue = parseDoubleOrDefault(vatAmountPercentage, 0.0);
+        double vatAmount = (vatAmountPercentageValue / 100) * valueCustom;
+
+        double customFormValueCalculated=parseDoubleOrDefault(customFormValue,0.0)/totalRows;
+        double total=vatAmount+customFormValueCalculated+0.0;
+
+        return InvoiceDetails.builder()
+                .invoiceDetailsId(invoiceDetailsId)
+                .orderNumber(row.get(4))
+                .origin(row.get(5))
+                .destination(row.get(6))
+                .shippersName(row.get(7))
+                .consigneeName(row.get(8))
+                .weight(parseDoubleOrDefault(row.get(9), 0.0))
+                .declaredValue(parseDoubleOrDefault(row.get(10), 0.0))
+                .valueCustom(parseDoubleOrDefault(row.get(11), 0.0))
+                .vatAmount(vatAmount)
+                .customFormCharges(customFormValueCalculated)
+                .other(0.0)
+                .totalCharges(total)
+                .customDeclarationNumber(row.get(12))
+                .ref(row.get(13))
+                .customDeclarationDate(row.get(14))
+                .build();
+    }
     public SalesReportHelperDto updateExcelFile(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId, Long invoiceNumber) throws Exception {
         logger.info(String.format("Inside update excel method for account %s ", customer.getAccountNumber()));
 

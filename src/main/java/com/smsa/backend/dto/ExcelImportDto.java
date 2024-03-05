@@ -1,5 +1,6 @@
 package com.smsa.backend.dto;
 
+import com.amazonaws.services.dynamodbv2.xspec.S;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -24,4 +25,9 @@ public class ExcelImportDto {
     private String formattedEndDate;
     private String invoiceDate;
     private byte[] excel;
+
+
+    private boolean customPlusExcel;
+    private String   vatAmountPercentage;
+    private String customFormValue;
 }
