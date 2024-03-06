@@ -102,7 +102,7 @@ getPermissionsObj():any{
    }
    
    
-   return  [customerObj,userObj,currencyObj,customObj,regionObj,importObj,salesReportObj,permissionsObj,dashboardObj,sheetHistoryObj]
+   return  [customerObj,userObj,currencyObj,customObj,regionObj,salesReportObj,permissionsObj,dashboardObj,sheetHistoryObj]
 }
 private urlMatches(pattern: string, url: string): boolean {
   const patternSegments = pattern.split('?')[0].split('/'); // Get URL segments without query parameters

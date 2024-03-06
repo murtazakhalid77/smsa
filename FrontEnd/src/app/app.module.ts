@@ -43,6 +43,7 @@ import { PieChartComponent } from './pages/pie-chart/pie-chart.component';
 import { StackedBarChartComponent } from './pages/stacked-bar-chart/stacked-bar-chart.component'
 import { NgModule } from '@angular/core';
 import { AutoGrowDirective } from './directives/auto-grow-directive.directive';
+import { ExcelComponent } from './pages/importCustom/excel/excel.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -74,7 +75,8 @@ import { AutoGrowDirective } from './directives/auto-grow-directive.directive';
     DashboardCardsComponent,
     PieChartComponent,
     StackedBarChartComponent,
-    AutoGrowDirective
+    AutoGrowDirective,
+    ExcelComponent,
   ],
   imports: [
     NgxPaginationModule,

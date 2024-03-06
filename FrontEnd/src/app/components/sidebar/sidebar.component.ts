@@ -33,6 +33,9 @@ export class SidebarComponent implements OnInit{
   import() {
     this.router.navigateByUrl('/import');
   }
+  importCustomExcel() {
+    this.router.navigateByUrl('/importCustomExcel');
+  }
   customPort(){
     this.router.navigateByUrl('/custom/view');
   }

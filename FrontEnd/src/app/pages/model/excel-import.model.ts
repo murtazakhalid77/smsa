@@ -7,6 +7,10 @@ export interface IExcelImportDto {
     date1?: Date,
     date2?: Date,
     date3?: Date
+      customPlusExcel?:boolean,
+    vatAmountPercentage ?: string,
+    customFormValue ?: string,
+
   }
 
   export class Custom implements IExcelImportDto {
@@ -20,4 +24,7 @@ export interface IExcelImportDto {
         public date2?: Date | undefined,
         public date3?: Date | undefined
     ) {}
+    customPlusExcel ?: boolean ;
+    vatAmountPercentage ?: string ;
+    customFormValue ?: string ;
   }
