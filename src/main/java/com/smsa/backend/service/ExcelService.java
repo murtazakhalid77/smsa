@@ -651,7 +651,7 @@ public class ExcelService {
         columnMapping.put("Custom Declartion Currency", "CustomDeclarationCurrency");
         columnMapping.put("Custom Declartion#", "CustomDeclarationNumber");
         columnMapping.put("Total AWB Count", "TotalAwbCount");
-        columnMapping.put("Total Value", "TotalValue");
+        columnMapping.put("Total Declared Value", "TotalDeclaredValue");
         columnMapping.put("Value (Custom)", "CustomerShipmentValue");
         columnMapping.put("VAT Amount", "VatAmountCustomDeclarationForm");
         columnMapping.put("Custom Form Charges","CustomFormCharges");
@@ -674,7 +674,7 @@ public class ExcelService {
         columnNames.add("MAWB Number");
         columnNames.add("Custom Declartion#");
         columnNames.add("Total AWB Count");
-        columnNames.add("Total Value");
+        columnNames.add("Total Declared Value");
         columnNames.add("Value (Custom)");
         columnNames.add("VAT Amount");
         columnNames.add("Custom Form Charges");

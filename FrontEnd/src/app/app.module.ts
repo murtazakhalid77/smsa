@@ -44,9 +44,11 @@ import { StackedBarChartComponent } from './pages/stacked-bar-chart/stacked-bar-
 import { NgModule } from '@angular/core';
 import { AutoGrowDirective } from './directives/auto-grow-directive.directive';
 import { ExcelComponent } from './pages/importCustom/excel/excel.component';
+import { CurrencyWithCommasPipePipe } from './pages/report/currency-with-commas-pipe.pipe';
 @NgModule({
   declarations: [
     AppComponent,
+    CurrencyWithCommasPipePipe,
     SidebarComponent,
     DashboardHeadComponent,
     DashboardComponent,
@@ -77,6 +79,7 @@ import { ExcelComponent } from './pages/importCustom/excel/excel.component';
     StackedBarChartComponent,
     AutoGrowDirective,
     ExcelComponent,
+    CurrencyWithCommasPipePipe,
   ],
   imports: [
     NgxPaginationModule,

@@ -42,7 +42,7 @@ export class ExcelComponent {
   @ViewChild('modalId') modalElement?: ElementRef; // making it optional
 
 
-  headers: any = ['mawb', 'manifest date', 'account number', 'awb', 'ordernumber', 'origin', 'destination', 'shipper name', 'consignee name', 'weight', 'declared value', 'value (custom)', 'vat amount', 'custom form', 'other', 'total charges', 'custom declaration', 'ref#', 'custom declaration date'];
+  headers: any = ['mawb', 'manifest date', 'account number', 'awb', 'ordernumber', 'origin', 'destination', 'shipper name', 'consignee name', 'weight', 'declared value', 'value (custom)', 'custom declaration', 'ref#', 'custom declaration date'];
 
   constructor(private service: UploadExcelService,private renderer: Renderer2, private toastr: ToastrService, private customService: CustomService,     private router:Router, private datePipe: DatePipe, private fileService: FileService) { }
   reloadPage() {
@@ -186,8 +186,14 @@ cancelDialogueBox(){
               present: custom.present,
               date1: this.startDate != null ? new Date(this.startDate!) : undefined,
               date2: this.endDate != null ? new Date(this.endDate!) : undefined,
-              date3: this.invoiceDate != null ? new Date(this.invoiceDate!) : undefined
+              date3: this.invoiceDate != null ? new Date(this.invoiceDate!) : undefined,
+              customPlusExcel:this.excelImportDto.customPlusExcel,
+              vatAmountPercentage:this.excelImportDto.vatAmountPercentage,
+              customFormValue:this.excelImportDto.customFormValue
             };
+            debugger
+            console.log(this.excelImportDto);
+            
             try {
               const res = await this.service.uploadFile(this.fileToUpload, this.excelImportDto);
               this.toastr.success(res.message);
