@@ -260,33 +260,40 @@ public class PdfService {
                 }
             }
 
-            double grandTotal = 0.0;
-            for (Map<String, Object> rowDataMap : calculatedValuesList) {
-                String totalAmountKey = columnMapping.get("Total Amount");
-                Object totalAmountValue = rowDataMap.get(totalAmountKey);
+            Map<String, Double> columnSumMap = new HashMap<>();
 
-                if (totalAmountValue instanceof Number) {
-                    grandTotal += ((Number) totalAmountValue).doubleValue();
+// Iterate through the calculated values list
+            for (Map<String, Object> rowDataMap : calculatedValuesList) {
+                // Iterate through the last 4 columns
+                for (int i = columnNames.size() - 4; i < columnNames.size(); i++) {
+                    String columnName = columnNames.get(i);
+                    String totalCalculatedKey = columnMapping.get(columnName);
+                    Object totalCalculatedAmount = rowDataMap.get(totalCalculatedKey);
+
+                    if (totalCalculatedAmount instanceof Number) {
+                        // Update the sum for the current column
+                        columnSumMap.merge(columnName, ((Number) totalCalculatedAmount).doubleValue(), Double::sum);
+                    }
                 }
             }
-            // Add grand total cell
             PdfPCell emptyCell = new PdfPCell(new Phrase("")); // Empty cell for the first 7 columns
-            emptyCell.setColspan(7);
+            emptyCell.setColspan(4); // Adjust colspan based on the number of columns to sum
             emptyCell.setBorder(Rectangle.NO_BORDER); // Remove cell border
             dataTable.addCell(emptyCell);
 
-            PdfPCell grandTotalLabelCell = new PdfPCell(new Paragraph("Grand Total:", englishBoldFont));
-            grandTotalLabelCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            grandTotalLabelCell.setBackgroundColor(new BaseColor(192, 192, 192));
-            dataTable.addCell(grandTotalLabelCell);
+// Iterate through the last 4 columns to add their sums to the PDF
+            for (int i = columnNames.size() - 4; i < columnNames.size(); i++) {
+                String columnName = columnNames.get(i);
 
-            PdfPCell grandTotalValueCell = new PdfPCell(new Paragraph(formatCurrency(grandTotal), pdfFont));
-            grandTotalValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            grandTotalValueCell.setBackgroundColor(new BaseColor(192, 192, 192));
-            dataTable.addCell(grandTotalValueCell);        document.add(dataTable);
+                // Add sum value cell
+                Double mapValue = columnSumMap.get(columnName);
+                PdfPCell sumValueCell = new PdfPCell(new Paragraph(formatCurrency(mapValue), pdfFont));
+                sumValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                sumValueCell.setBackgroundColor(new BaseColor(192, 192, 192));
+                dataTable.addCell(sumValueCell);
+            }
 
-
-
+            document.add(dataTable);
 
         // Create the single column table
         PdfPTable table1 = new PdfPTable(1);
