@@ -340,8 +340,10 @@ public class ExcelService {
         double vatAmountPercentageValue = parseDoubleOrDefault(vatAmountPercentage, 0.0);
         double vatAmount = (vatAmountPercentageValue / 100) * valueCustom;
 
+        double others=parseDoubleOrDefault(row.get(12), 0.0);
+
         double customFormValueCalculated=parseDoubleOrDefault(customFormValue,0.0)/totalRows;
-        double total=vatAmount+customFormValueCalculated+0.0;
+        double total=vatAmount+customFormValueCalculated+others;
 
         return InvoiceDetails.builder()
                 .invoiceDetailsId(invoiceDetailsId)
@@ -355,11 +357,11 @@ public class ExcelService {
                 .valueCustom(parseDoubleOrDefault(row.get(11), 0.0))
                 .vatAmount(vatAmount)
                 .customFormCharges(customFormValueCalculated)
-                .other(0.0)
                 .totalCharges(total)
                 .customDeclarationNumber(row.get(12))
-                .ref(row.get(13))
-                .customDeclarationDate(row.get(14))
+                .other(parseDoubleOrDefault(row.get(13), 0.0))
+                .ref(row.get(14))
+                .customDeclarationDate(row.get(15))
                 .build();
     }
     public SalesReportHelperDto updateExcelFile(List<InvoiceDetails> invoiceDetailsList, Customer customer, String sheetUniqueId, Long invoiceNumber) throws Exception {

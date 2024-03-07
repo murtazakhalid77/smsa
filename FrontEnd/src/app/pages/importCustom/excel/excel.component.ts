@@ -42,7 +42,7 @@ export class ExcelComponent {
   @ViewChild('modalId') modalElement?: ElementRef; // making it optional
 
 
-  headers: any = ['mawb', 'manifest date', 'account number', 'awb', 'ordernumber', 'origin', 'destination', 'shipper name', 'consignee name', 'weight', 'declared value', 'value (custom)', 'custom declaration', 'ref#', 'custom declaration date'];
+  headers: any = ['mawb', 'manifest date', 'account number', 'awb', 'ordernumber', 'origin', 'destination', 'shipper name', 'consignee name', 'weight', 'declared value', 'value (custom)', 'custom declaration','other', 'ref#', 'custom declaration date'];
 
   constructor(private service: UploadExcelService,private renderer: Renderer2, private toastr: ToastrService, private customService: CustomService,     private router:Router, private datePipe: DatePipe, private fileService: FileService) { }
   reloadPage() {

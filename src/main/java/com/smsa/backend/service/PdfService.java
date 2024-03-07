@@ -262,34 +262,49 @@ public class PdfService {
 
             Map<String, Double> columnSumMap = new HashMap<>();
 
-// Iterate through the calculated values list
             for (Map<String, Object> rowDataMap : calculatedValuesList) {
-                // Iterate through the last 4 columns
+
                 for (int i = columnNames.size() - 4; i < columnNames.size(); i++) {
                     String columnName = columnNames.get(i);
                     String totalCalculatedKey = columnMapping.get(columnName);
                     Object totalCalculatedAmount = rowDataMap.get(totalCalculatedKey);
 
                     if (totalCalculatedAmount instanceof Number) {
-                        // Update the sum for the current column
                         columnSumMap.merge(columnName, ((Number) totalCalculatedAmount).doubleValue(), Double::sum);
                     }
                 }
             }
-            PdfPCell emptyCell = new PdfPCell(new Phrase("")); // Empty cell for the first 7 columns
-            emptyCell.setColspan(4); // Adjust colspan based on the number of columns to sum
-            emptyCell.setBorder(Rectangle.NO_BORDER); // Remove cell border
+            int emptyCellColspan = columnNames.size() - 4;
+            PdfPCell emptyCell = new PdfPCell(new Phrase(""));
+            emptyCell.setColspan(emptyCellColspan);
+            emptyCell.setBorder(Rectangle.NO_BORDER);
             dataTable.addCell(emptyCell);
-
 // Iterate through the last 4 columns to add their sums to the PDF
             for (int i = columnNames.size() - 4; i < columnNames.size(); i++) {
                 String columnName = columnNames.get(i);
-
-                // Add sum value cell
                 Double mapValue = columnSumMap.get(columnName);
-                PdfPCell sumValueCell = new PdfPCell(new Paragraph(formatCurrency(mapValue), pdfFont));
+
+                PdfPCell sumValueCell = new PdfPCell();
+
+                // Add sum value cell content
+                Paragraph paragraphCell;
+                if (shouldApplyCurrencyFormat(columnName)) {
+                    String formattedValue = formatCurrency(Double.valueOf(mapValue.toString()));
+                    paragraphCell = new Paragraph(formattedValue, pdfFont);
+                    paragraphCell.setAlignment(Element.ALIGN_RIGHT);
+                } else {
+                    paragraphCell = new Paragraph(mapValue != null ? mapValue.toString() : "", pdfFont);
+                    paragraphCell.setAlignment(Element.ALIGN_CENTER);
+                }
+
+                // Add the paragraph to the cell
+                sumValueCell.addElement(paragraphCell);
+
+                // Set cell properties
                 sumValueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
                 sumValueCell.setBackgroundColor(new BaseColor(192, 192, 192));
+
+                // Add the cell to the table
                 dataTable.addCell(sumValueCell);
             }
 

@@ -35,25 +35,26 @@ public class JwtUtil {
     }
 
     public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-
-        // Extract roles and permissions into separate lists
+         Map<String,Object> rolesAndPermissions = new HashMap<>();
         List<String> roles = new ArrayList<>();
         List<String> permissions = new ArrayList<>();
 
-        userDetails.getAuthorities().forEach(authority -> {
-            String authorityName = authority.getAuthority();
-            if (authorityName.startsWith("ROLE_")) {
-                roles.add(authorityName.substring(5));
-            } else {
-                permissions.add(authorityName);
-            }
-        });
+        if (userDetails instanceof CustomUserDetail) {
+            CustomUserDetail customUserDetail = (CustomUserDetail) userDetails;
 
-        claims.put("ROLES", roles);
-        claims.put("PERMISSIONS", permissions);
+            customUserDetail.user.getRoles().forEach(role -> {
+                // Adding role name to the roles list
+                roles.add(role.getName().startsWith("ROLE_") ? role.getName().substring(5) : role.getName());
+                // Adding associated permission names to the permissions list
+                role.getPermissions().forEach(permission -> permissions.add(permission.getName()));
+            });
+        }
 
-        return createToken(claims, userDetails.getUsername());
+        rolesAndPermissions.put("ROLES", roles);
+        rolesAndPermissions.put("PERMISSIONS", permissions);
+
+
+        return createToken(rolesAndPermissions, userDetails.getUsername());
     }
 
 
