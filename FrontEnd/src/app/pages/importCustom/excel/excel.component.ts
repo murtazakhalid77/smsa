@@ -15,6 +15,8 @@ import { saveAs } from 'file-saver';
 import { ICustom } from '../../custom-port/custom.model';
 import { IExcelImportDto } from '../../model/excel-import.model';
 import { CustomService, EntityAllCustomsResponseType } from '../../custom-port/service/custom-port.service';
+import { ImportCustomService } from './import-custom.service';
+import { NumberData } from '../../import/importCustom/excel';
 @Component({
   selector: 'app-excel',
   templateUrl: './excel.component.html',
@@ -35,24 +37,47 @@ export class ExcelComponent {
   customVat?: any;
   isModalOpen = false;
   errorModalOpen = false;
+  openModelTable : Boolean = false
   accountNumbers:any;
   excelImportDto: IExcelImportDto = {};
   duplicateExceptionMessage?:string = 'There was a duplication of these AWBs'
   duplicateAwbsMessage?: string = ''
   @ViewChild('modalId') modalElement?: ElementRef; // making it optional
+  userInput: { [key: string]: string } = {};
 
+ openTable(){
+  this.openModal();
+ }
+  numberData: NumberData[] = [];
 
   headers: any = ['mawb', 'manifest date', 'account number', 'awb', 'ordernumber', 'origin', 'destination', 'shipper name', 'consignee name', 'weight', 'declared value', 'value (custom)', 'vat amount', 'custom form', 'other', 'total charges', 'custom declaration', 'ref#', 'custom declaration date'];
 
-  constructor(private service: UploadExcelService,private renderer: Renderer2, private toastr: ToastrService, private customService: CustomService,     private router:Router, private datePipe: DatePipe, private fileService: FileService) { }
+  constructor(private service: UploadExcelService,private importCustomService : ImportCustomService,private renderer: Renderer2, private toastr: ToastrService, private customService: CustomService,     private router:Router, private datePipe: DatePipe, private fileService: FileService) { }
   reloadPage() {
     window.location.reload()
   }
 
   ngOnInit(): void {
     this.getCustomsPresent();
+    this.getNumberData();
   }
-
+  getNumberData(): void {
+    this.importCustomService.getNumberData().subscribe({
+      next: (data) => this.numberData = data,
+      error: (err) => console.error('Failed to fetch number data:', err),
+    });
+  }
+  onSubmit(): void {
+    const allDataPayload = this.numberData.map(item => {
+      const id = item.id || ''; // Provide a fallback or handle null/undefined id appropriately
+      return { id: item.id, Number: item.Number, UserInput: this.userInput[id] };
+    });
+    allDataPayload.forEach(payload => {
+      this.importCustomService.postAllData(payload).subscribe(response => {
+        console.log('Data submitted:', response);
+      });
+    });
+  }
   getCustom(selectedCustomPort?: string): any | undefined {
     const selectedCustom = this.customs?.find((custom) => custom.customPort === selectedCustomPort);
     return selectedCustom;
@@ -85,6 +110,7 @@ cancelDialogueBox(){
 }
   onFileChange(event: any) {
     this.fileToUpload = event.target.files[0];
+this.openModelTable = true;
     this.readFile(this.fileToUpload);
     if (this.fileToUpload) {
       this.openModal1();

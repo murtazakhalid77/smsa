@@ -155,26 +155,34 @@
                 style="width: 120px; height: 40px;">
           Import
         </button>
+        <button type="button" *ngIf="openModelTable"
+        (click)="openTable()"
+        class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg"
+        style="width: 120px; height: 40px;">
+  Open Table
+</button>
   <div  id="fileModal" #modalId  class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
         </div>
         <div class="modal-body">
-          <!-- <input type="text" placeholder="Enter Vat Amount Percentage"> -->
-          <input type="text" class="form-control" required #vatAmountPercentage="ngModel" [(ngModel)]="excelImportDto.vatAmountPercentage" placeholder="Enter Vat Amount Percentage" id="recipient-name">
-          <div *ngIf="vatAmountPercentage.touched && vatAmountPercentage.errors?.['required']" class="text-danger">
-            VAT Amount Percentage is required.
-          </div>
-          <br>
-          <input type="text" class="form-control" required #customFormValue="ngModel" [(ngModel)]="excelImportDto.customFormValue" placeholder="Enter Custom Form Value" id="recipient-name">
-          <div *ngIf="customFormValue.touched && customFormValue.errors?.['required']" class="text-danger">
-            Custom Form Value is required.
-          </div>
+          <table>
+            <tr>
+              <th>Static Value</th>
+              <th>Editable Value</th>
+            </tr>
+            <tr *ngFor="let item of numberData; let i = index">
+              <td>{{ item.Number }}</td>
+              <td>
+                <input type="text" [(ngModel)]="userInput[item.id!]" name="editable{{i}}">
+              </td>
+            </tr>
+          </table>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeModal()">Close</button>
-            <button type="button" class="btn btn-primary" (click)="submitForm()">Save changes</button>
+            <button type="button" class="btn btn-primary" (click)="onSubmit()">Save changes</button>
         </div>
       </div>
     </div>
