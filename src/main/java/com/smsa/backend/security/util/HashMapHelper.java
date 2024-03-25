@@ -33,7 +33,7 @@ public class HashMapHelper {
         Double vatAmountCustomDeclartionForm = 0.0;
         Double customFormChares = 0.0;
         Double others = 0.0;
-        Double totalValue = 0.0;
+        Double totalDeclaredValue = 0.0;
         //
         Double vatAmountCustomerCurrency = 0.0;
         Double customFormChargesCustomerCurrency = 0.0;
@@ -55,7 +55,7 @@ public class HashMapHelper {
             vatAmountCustomDeclartionForm = 0.0;
             customFormChares = 0.0;
             others = 0.0;
-            totalValue = 0.0;
+            totalDeclaredValue = 0.0;
 
             vatAmountCustomerCurrency = 0.0;
             customFormChargesCustomerCurrency = 0.0;
@@ -71,8 +71,8 @@ public class HashMapHelper {
                     vatAmountCustomerCurrency += invoiceDetails.getVatAmount() * conversionRate;
                     customFormChargesCustomerCurrency += invoiceDetails.getCustomFormCharges() * conversionRate;
                     otherCustomerCurrency += invoiceDetails.getOther() * conversionRate;
-
-                    totalValue += invoiceDetails.getTotalCharges() + invoiceDetails.getValueCustom() + invoiceDetails.getVatAmount() + invoiceDetails.getCustomFormCharges() + invoiceDetails.getOther();
+                    totalDeclaredValue += invoiceDetails.getDeclaredValue();
+//                    totalDeclaredValue += invoiceDetails.getTotalCharges() + invoiceDetails.getValueCustom() + invoiceDetails.getVatAmount() + invoiceDetails.getCustomFormCharges() + invoiceDetails.getOther();
                     customDecarationNumberSet.add(invoiceDetails.getCustomDeclarationNumber());
                     customDecarationDateSet.add(invoiceDetails.getCustomDeclarationDate());
 
@@ -95,7 +95,7 @@ public class HashMapHelper {
                 calculatedValuesMap.put("Others", others);
                 calculatedValuesMap.put("TotalCharges", totalCharges); //for excel
                 calculatedValuesMap.put("CustomDeclarationCurrency", custom.getCurrency());
-                calculatedValuesMap.put("TotalValue", totalValue);   //for excel
+                calculatedValuesMap.put("TotalDeclaredValue", totalDeclaredValue);   //for excel
                 calculatedValuesMap.put("VatAmountCustomerCurrency", vatAmountCustomerCurrency);
                 calculatedValuesMap.put("CustomFormChargesCustomerCurrency", customFormChargesCustomerCurrency);
                 calculatedValuesMap.put("OtherCustomerCurrency", otherCustomerCurrency);
@@ -149,7 +149,7 @@ public class HashMapHelper {
                 customFormChargesSum += (Double) calculatedValuesMap.get("CustomFormCharges");
                 othersSum += (Double) calculatedValuesMap.get("Others");
                 totalChargesSum += (Double) calculatedValuesMap.get("TotalCharges");
-                totalValue += (Double) calculatedValuesMap.get("TotalValue");
+                totalValue += (Double) calculatedValuesMap.get("TotalDeclaredValue");
 
                 vatAmountCustomerCurrencySum += (Double) calculatedValuesMap.get("VatAmountCustomerCurrency");
                 customFormChargesCustomerCurrencySum += (Double) calculatedValuesMap.get(

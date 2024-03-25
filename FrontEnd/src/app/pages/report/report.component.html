@@ -158,10 +158,10 @@
                             <td class="text-center w-auto">{{saleReport?.customerName}}</td>
                             <td class="text-center w-auto">{{saleReport?.customerRegion}}</td>
                             <td class="text-center w-auto" style="width: 50px;white-space: nowrap;">{{saleReport?.period}}</td>
-                            <td class="text-center w-auto">{{saleReport?.   totalChargesAsPerCustomerDeclarationForm}}</td>
-                            <td class="text-center w-auto">{{saleReport?.smsaFeeCharges}}</td>
-                            <td class="text-center w-auto">{{saleReport?.vatOnSmsaFees}}</td>
-                            <td class="text-center w-auto">{{saleReport?.totalAmount}}</td>
+                            <td class="text-center w-auto">{{(saleReport?.totalChargesAsPerCustomerDeclarationForm ?? 0)| currencyWithCommasPipe }}</td>
+                            <td class="text-center w-auto">{{(saleReport?.smsaFeeCharges ?? 0)| currencyWithCommasPipe  }}</td>
+                            <td class="text-center w-auto">{{(saleReport?.vatOnSmsaFees?? 0)| currencyWithCommasPipe }}</td>
+                            <td class="text-center w-auto">{{(saleReport?.totalAmount ?? 0)| currencyWithCommasPipe  }}</td>
                             <td class="text-center w-auto">{{saleReport?.invoiceCurrency}}</td>
                             <td class="text-center w-auto" (click)="downloadExcel(saleReport)">
                                 <!-- Render download icon when mailSent is true -->
@@ -178,7 +178,7 @@
                                   <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
                                 </svg>
                               </td>
-                            <td class="text-center w-auto">{{saleReport?.createdAt}}</td>
+                            <td class="text-center w-auto">{{saleReport?.createdAt | date}}</td>
                         </tr>
                     </tbody>
                 </table>

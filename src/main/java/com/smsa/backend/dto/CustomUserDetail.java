@@ -11,31 +11,20 @@ import java.util.List;
 
 public class CustomUserDetail implements UserDetails {
 
-    private User user;
+    public User user;
 
     public CustomUserDetail(User user) {
         this.user = user;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
-
-        // Add roles to authorities
-        this.user.getRoles().forEach(role -> {
-            authorityList.add(new SimpleGrantedAuthority(role.getName()));
-
-            // Add permissions associated with the role to authorities
-            role.getPermissions().forEach(permission -> {
-                authorityList.add(new SimpleGrantedAuthority(permission.getName()));
-            });
-        });
-
-        return authorityList;
-    }
 
     public Long getUserId(){
         return this.user.getId();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
     }
 
     @Override

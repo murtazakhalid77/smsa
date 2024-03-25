@@ -14,24 +14,24 @@ export class UploadExcelService {
 
   }
 
-  async uploadFile(file: File, excelImportDto: any): Promise<any> {
-    const formData: FormData = new FormData();
-    formData.append('file', file);
-    formData.append('excelImport', JSON.stringify(excelImportDto));
+    async uploadFile(file: File, excelImportDto: any): Promise<any> {
+      const formData: FormData = new FormData();
+      formData.append('file', file);
+      formData.append('excelImport', JSON.stringify(excelImportDto));
+      debugger
+      try {
+        const response = await this.http
+          .post<any>(`${this._url}/excel/upload`, formData)
+          .toPromise();
 
-    try {
-      const response = await this.http
-        .post<any>(`${this._url}/excel/upload`, formData)
-        .toPromise();
-
-      // Process the response data as needed
-      return response;
-    } catch (error) {
-      // Handle HTTP or other errors here
-      console.error('Error:', error);
-      throw error;
+        // Process the response data as needed
+        return response;
+      } catch (error) {
+        // Handle HTTP or other errors here
+        console.error('Error:', error);
+        throw error;
+      }
     }
-  }
 
    }
 
