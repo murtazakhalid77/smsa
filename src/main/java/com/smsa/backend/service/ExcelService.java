@@ -10,7 +10,6 @@ import com.smsa.backend.repository.*;
 import com.smsa.backend.security.util.ExcelImportHelper;
 import com.smsa.backend.security.util.HashMapHelper;
 import org.apache.poi.ss.usermodel.*;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +71,7 @@ public class ExcelService {
 
     private static final Logger logger = LoggerFactory.getLogger(ExcelService.class);
 
-    public HashMap<String,List<InvoiceDetails>> saveInvoicesToDatabase(MultipartFile file, ExcelImportDto excelImportDto) throws Exception {
+    public HashMap<String,List<InvoiceDetails>> saveInvoicesToDatabase(MultipartFile file, ExcelImportDto excelImportDto, Map<String, String> userInputMap) throws Exception {
 
         if(!this.helperService.checkExcelSize(file)){
             throw new ExcelImportException("File size should not be greater then 2MB");
@@ -85,7 +84,7 @@ public class ExcelService {
 
         Map<String, List<InvoiceDetails>> filterd;
 
-        filterd = filterRowsByAccountNumber(file, excelImportDto,invoicesWithAccount,invoicesWithoutAccount);
+        filterd = filterRowsByAccountNumber(file, excelImportDto,invoicesWithAccount,invoicesWithoutAccount,userInputMap);
 
 
         for (List<InvoiceDetails> invoiceDetailsList : filterd.values()) {
@@ -95,7 +94,7 @@ public class ExcelService {
         invoicesHashmap.put("invoicesWithoutAccount",invoicesWithoutAccount);
         return invoicesHashmap;
     }
-    public Map<String, List<InvoiceDetails>> filterRowsByAccountNumber(MultipartFile multipartFile, ExcelImportDto excelImportDto,List<InvoiceDetails> invoiceWithAccount,List<InvoiceDetails> invoicesWithoutAccount) {
+    public Map<String, List<InvoiceDetails>> filterRowsByAccountNumber(MultipartFile multipartFile, ExcelImportDto excelImportDto, List<InvoiceDetails> invoiceWithAccount, List<InvoiceDetails> invoicesWithoutAccount, Map<String, String> userInputMap) {
 
         LocalDate currentDate = getTodaysDate();
         String sheetId = getUuId();
@@ -108,10 +107,11 @@ public class ExcelService {
 
         validateSheetName(originalFilename);
 
-        rowsToBeFiltered = ExcelImportHelper.parseExcelFile(multipartFile);
+                rowsToBeFiltered = ExcelImportHelper.parseExcelFile(multipartFile);
 
         findDuplicatesOfAwb(rowsToBeFiltered);
 
+        HashMap<String,Long> mawbCounts=getMawbCounts(rowsToBeFiltered);
 
         if (!rowsToBeFiltered.isEmpty()) {
             rowsToBeFiltered.remove(0);
@@ -131,7 +131,7 @@ public class ExcelService {
                         if(!excelImportDto.isCustomPlusExcel()){
                              invoiceDetails = mapToDomain(row);
                         }else {
-                             invoiceDetails = mapToDomainForCustomPlus(row,excelImportDto.getVatAmountPercentage(),excelImportDto.getCustomFormValue(),rowsToBeFiltered.size());
+                             invoiceDetails = mapToDomainForCustomPlus(row,excelImportDto,rowsToBeFiltered.size(),userInputMap,mawbCounts);
                         }
                         // Map the fields from the row list to the InvoiceDetails object
 
@@ -175,6 +175,23 @@ public class ExcelService {
 
     }
 
+    public Set<String> extractUniqueFromTheExcel(MultipartFile file) {
+
+        if(!this.helperService.checkExcelSize(file)){
+            throw new ExcelImportException("File size should not be greater then 2MB");
+        }
+        List<List<String>> rowsToBeFiltered=ExcelImportHelper.parseExcelFile(file);
+
+        if (!rowsToBeFiltered.isEmpty()) {
+            rowsToBeFiltered.remove(0);
+        }
+        Set<String> uniqueMawb= new HashSet<>();
+        for (List<String> row : rowsToBeFiltered) {
+            uniqueMawb.add(row.get(0));
+        }
+        logger.info(String.valueOf(uniqueMawb));
+        return uniqueMawb;
+    }//continue from here of aligning the sum values in the sumamary excel
 
 
     private String getAccountNumber(InvoiceDetails invoiceDetails) {
@@ -325,8 +342,20 @@ public class ExcelService {
                 .build();
     }
 
+    private HashMap<String, Long> getMawbCounts(List<List<String>> rowsToBeFiltered) {
+        HashMap<String, Long> mawbCount = new HashMap<>();
 
-    private InvoiceDetails mapToDomainForCustomPlus(List<String> row,String vatAmountPercentage,String customFormValue,Integer totalRows) {
+
+        for (List<String> row : rowsToBeFiltered) {
+            String mawb = row.get(0);
+
+            mawbCount.put(mawb, mawbCount.getOrDefault(mawb, 0L) + 1);
+        }
+
+        return mawbCount;
+    }
+
+    private InvoiceDetails mapToDomainForCustomPlus(List<String> row, ExcelImportDto excelImportDto, Integer totalRows, Map<String, String> userInputMap, HashMap<String, Long> mawbCounts) {
 
         InvoiceDetailsId invoiceDetailsId = InvoiceDetailsId.builder()
                 .mawb(row.get(0))
@@ -335,15 +364,17 @@ public class ExcelService {
                 .awb(row.get(3))
                 .build();
 
-        double valueCustom = parseDoubleOrDefault(row.get(11), 0.0);
+        double valueCustom = parseDoubleOrDefault(row.get(11), 0.0); //541
 
-        double vatAmountPercentageValue = parseDoubleOrDefault(vatAmountPercentage, 0.0);
-        double vatAmount = (vatAmountPercentageValue / 100) * valueCustom;
+        Optional<Custom> custom = customRepository.findByCustomPort(excelImportDto.getCustomPort());//5
 
-        double others=parseDoubleOrDefault(row.get(12), 0.0);
+        double others=parseDoubleOrDefault(row.get(12), 0.0); //0.0
 
-        double customFormValueCalculated=parseDoubleOrDefault(customFormValue,0.0)/totalRows;
+        double customFormValueCalculated= Long.valueOf(userInputMap.get(row.get(0))) /mawbCounts.get(row.get(0));
+
+        double vatAmount=(valueCustom+customFormValueCalculated*custom.get().getSmsaFeeVat())/100;
         double total=vatAmount+customFormValueCalculated+others;
+
 
         return InvoiceDetails.builder()
                 .invoiceDetailsId(invoiceDetailsId)
@@ -518,14 +549,14 @@ public class ExcelService {
     private static List<String> getSumColumnsList() {
         return Arrays.asList(
                 "TotalValueSum",
-                "CustomerShipmentValueSum",
                 "VatAmountCustomDeclarationFormSum",
+                "CustomerShipmentValueSum",
                 "CustomFormChargesSum",
                 "OthersSum",
                 "TotalChargesSum",
                 "CustomDeclartionCurrency", //ignore
-                "VatAmountCustomerCurrencySum",
                 "CustomFormChargesCustomerCurrencySum",
+                "VatAmountCustomerCurrencySum",
                 "OtherCustomerCurrencySum",
                 "TotalChargesCustomerCurrencySum"
         );
@@ -569,13 +600,14 @@ public class ExcelService {
                     setCellValue(row, ++columnCount, invoiceDetails.getWeight(),centeredStyle);
                     setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getDeclaredValue()),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getValueCustom()),rightAlignedStyle);
-                    setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getVatAmount()),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getCustomFormCharges()),rightAlignedStyle);
+                    setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getVatAmount()),rightAlignedStyle);
+
                     setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getOther()),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getTotalCharges()),rightAlignedStyle);
                     setCellValue(row, ++columnCount,custom.getCurrency(),centeredStyle);
-                    setCellValue(row, ++columnCount, formatCurrency(vatAmount),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(customFormCharges),rightAlignedStyle);
+                    setCellValue(row, ++columnCount, formatCurrency(vatAmount),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(other),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(totalCharges),rightAlignedStyle);
                     setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationNumber(),centeredStyle);
@@ -677,14 +709,14 @@ public class ExcelService {
         columnNames.add("Custom Declartion#");
         columnNames.add("Total AWB Count");
         columnNames.add("Total Declared Value");
-        columnNames.add("Value (Custom)");
         columnNames.add("VAT Amount");
+        columnNames.add("Value (Custom)");
         columnNames.add("Custom Form Charges");
         columnNames.add("Other");
         columnNames.add("Total Charges");
         columnNames.add("Custom Declartion Currency");
-        columnNames.add("VAT Amount-");
         columnNames.add("Custom Form Charges-");
+        columnNames.add("VAT Amount-");
         columnNames.add("Other-");
         columnNames.add("Total Charges-");
         columnNames.add("Total Amount");
