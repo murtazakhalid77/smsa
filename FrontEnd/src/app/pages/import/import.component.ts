@@ -42,6 +42,7 @@ export class ImportComponent {
   excelImportDto?: IExcelImportDto = {};
   duplicateExceptionMessage?:string = 'There was a duplication of these AWBs'
   duplicateAwbsMessage?: string = ''
+  userInput: { [key: string]: string | null } = {};
 
   headers: any = ['mawb', 'manifest date', 'account number', 'awb', 'ordernumber', 'origin', 'destination', 'shipper name', 'consignee name', 'weight', 'declared value', 'value (custom)', 'vat amount', 'custom form', 'other', 'total charges', 'custom declaration', 'ref#', 'custom declaration date'];
 
@@ -111,7 +112,6 @@ export class ImportComponent {
       }
     }
     const custom = this.getCustom(this.selectedCustomPort);
-
     if(custom){
       if(this.startDate || this.endDate){
         if(this.fileToUpload!==undefined){
@@ -124,10 +124,12 @@ export class ImportComponent {
               present: custom.present,
               date1: this.startDate != null ? new Date(this.startDate!) : undefined,
               date2: this.endDate != null ? new Date(this.endDate!) : undefined,
-              date3: this.invoiceDate != null ? new Date(this.invoiceDate!) : undefined
+              date3: this.invoiceDate != null ? new Date(this.invoiceDate!) : undefined,
+              customPlusExcel:false
             };
             try {
-              const res = await this.service.uploadFile(this.fileToUpload, this.excelImportDto);
+              debugger
+              const res = await this.service.uploadFile(this.fileToUpload, this.excelImportDto,this.userInput);
               this.toastr.success(res.message);
               this.accountNumbers = res.accountNumbers;
               

@@ -169,13 +169,13 @@
         <div class="modal-body">
           <table>
             <tr>
-              <th>Static Value</th>
+              <th>Mawb Numbers</th>
               <th>Editable Value</th>
             </tr>
             <tr *ngFor="let item of numberData; let i = index">
-              <td>{{ item.Number }}</td>
+              <td>{{ item}}</td>
               <td>
-                <input type="text" [(ngModel)]="userInput[item.id!]" name="editable{{i}}">
+                <input type="text" [(ngModel)]="userInput[item]" name="editable{{i}}">
               </td>
             </tr>
           </table>

@@ -14,6 +14,8 @@ import java.util.Optional;
 @Repository
 public interface CustomRepository extends JpaRepository<Custom, Long>, JpaSpecificationExecutor<Custom> {
     Optional<Custom> findByCustom(String customName);
+
+    Optional<Custom> findByCustomPort(String customPort);
     @Query(value = "select new com.smsa.backend.dto.CustomDto(c.id, c.customPort, c.custom, c.smsaFeeVat, c.currency, c.isPresent) from Custom c where c.isPresent = true")
     List<CustomDto> findByIsPresent();
 
