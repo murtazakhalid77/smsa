@@ -372,7 +372,7 @@ public class ExcelService {
 
         double customFormValueCalculated= Long.valueOf(userInputMap.get(row.get(0))) /mawbCounts.get(row.get(0));
 
-        double vatAmount=(valueCustom+customFormValueCalculated*custom.get().getSmsaFeeVat())/100;
+        double vatAmount=(valueCustom+customFormValueCalculated)*custom.get().getSmsaFeeVat()/100;
         double total=vatAmount+customFormValueCalculated+others;
 
 
@@ -402,7 +402,7 @@ public class ExcelService {
             Map<String, List<InvoiceDetails>> filteredRowsMap;
             Custom custom = getSheetHistory(sheetUniqueId).getCustom();
 
-            FileInputStream fileInputStream = new FileInputStream(sampleFileLocalLocation + "/sample.xlsx");
+            FileInputStream fileInputStream = new FileInputStream(sampleFileLocalLocation + "/sample1.xlsx");
             Workbook newWorkBook = WorkbookFactory.create(fileInputStream);
 
             setSheetDetails(newWorkBook, customer, sheetUniqueId);
@@ -549,9 +549,9 @@ public class ExcelService {
     private static List<String> getSumColumnsList() {
         return Arrays.asList(
                 "TotalValueSum",
-                "VatAmountCustomDeclarationFormSum",
                 "CustomerShipmentValueSum",
                 "CustomFormChargesSum",
+                "VatAmountCustomDeclarationFormSum",
                 "OthersSum",
                 "TotalChargesSum",
                 "CustomDeclartionCurrency", //ignore
@@ -709,9 +709,9 @@ public class ExcelService {
         columnNames.add("Custom Declartion#");
         columnNames.add("Total AWB Count");
         columnNames.add("Total Declared Value");
-        columnNames.add("VAT Amount");
         columnNames.add("Value (Custom)");
         columnNames.add("Custom Form Charges");
+        columnNames.add("VAT Amount");
         columnNames.add("Other");
         columnNames.add("Total Charges");
         columnNames.add("Custom Declartion Currency");

@@ -229,6 +229,8 @@ cancelDialogueBox(){
                 this.toastr.success(res.accountNumbers);
                 if (this.accountNumbers.length > 0) {
                   this.isModalOpen = true;
+                }else{
+                  this.toastr.success("Sheet Uploaded succesfully");
                 }
               }
              
