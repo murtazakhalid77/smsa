@@ -402,7 +402,7 @@ public class ExcelService {
             Map<String, List<InvoiceDetails>> filteredRowsMap;
             Custom custom = getSheetHistory(sheetUniqueId).getCustom();
 
-            FileInputStream fileInputStream = new FileInputStream(sampleFileLocalLocation + "/sample1.xlsx");
+            FileInputStream fileInputStream = new FileInputStream(sampleFileLocalLocation + "/sample.xlsx");
             Workbook newWorkBook = WorkbookFactory.create(fileInputStream);
 
             setSheetDetails(newWorkBook, customer, sheetUniqueId);
