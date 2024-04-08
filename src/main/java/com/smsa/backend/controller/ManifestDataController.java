@@ -1,6 +1,6 @@
 package com.smsa.backend.controller;
 
-import com.smsa.backend.service.DemoService;
+import com.smsa.backend.service.ManifestDataService;
 import com.smsa.backend.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +13,11 @@ import java.util.*;
 @RestController
 @CrossOrigin("*")
 @RequestMapping("/api")
-public class DemoController {
+public class ManifestDataController {
     @Autowired
     StorageService storageService;
     @Autowired
-    DemoService demoService;
+    ManifestDataService manifestDataService;
 
     @GetMapping("/download/getAllFilesName")
     public ResponseEntity<List<String>> getAllFilesName(){
@@ -26,7 +26,7 @@ public class DemoController {
 
     @GetMapping("/download/getAllFilesData")
     public ResponseEntity<Void> getAllFilesData(){
-        demoService.readFilesInManifestFolder();
+        manifestDataService.readFilesInManifestFolder();
         return ResponseEntity.ok().build();
     }
 }

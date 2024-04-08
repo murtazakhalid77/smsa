@@ -6,7 +6,7 @@ import org.apache.poi.ss.usermodel.*;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.smsa.backend.model.ManifestData;
-import com.smsa.backend.repository.DemoRepository;
+import com.smsa.backend.repository.ManifestDataRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,15 +21,12 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class DemoService {
-    private static final Logger logger = LoggerFactory.getLogger(StorageService.class);
-    public static final String BUCKET_NAME="cdvinv";
-    private static final String MANIFEST_FOLDER="manifestFolder/";
-
+public class ManifestDataService {
+    private static final Logger logger = LoggerFactory.getLogger(ManifestDataService.class);
     @Autowired
     private AmazonS3 s3Client;
     @Autowired
-    private DemoRepository demoRepository;
+    private ManifestDataRepository manifestDataRepository;
     @Autowired
     private RecordManifestFolderRepository manifestFolderRepository;
     @Autowired
@@ -47,17 +44,21 @@ public class DemoService {
                 boolean found = filesNamesDone.stream().anyMatch(e -> e.equals(fileName));
                 if (fileName.endsWith(".csv") && !found) {
                     List<ManifestData> csvContent = readCSVFile(fileName);
-                    demoRepository.saveAll(csvContent);
+                    manifestDataRepository.saveAll(csvContent);
 
                     //manifestFolderRepository is used to record manifest folder which has been done
                     manifestFolderRepository.save(RecordManifestFolder.builder()
                             .fileName(fileName)
                             .build());
                 }
-//                else if(fileName.endsWith(".xlsx") && !found){
-//                    List<ManifestData> csvContent = readXLSXFile(fileName);
-////                    demoRepository.saveAll(csvContent);
-//                }
+                else if(fileName.endsWith(".xlsx") && !found){
+                    List<ManifestData> xlsxContent = readXLSXFile(fileName);
+                    manifestDataRepository.saveAll(xlsxContent);
+
+                    manifestFolderRepository.save(RecordManifestFolder.builder()
+                            .fileName(fileName)
+                            .build());
+                }
             }
         } catch (Exception e) {
             logger.error("Failed to read CSV files from manifest folder", e);
@@ -66,7 +67,7 @@ public class DemoService {
     }
 
     private List<ManifestData> readCSVFile(String fileName) throws IOException {
-        S3Object s3Object = s3Client.getObject(new GetObjectRequest(BUCKET_NAME, MANIFEST_FOLDER + fileName));
+        S3Object s3Object = s3Client.getObject(new GetObjectRequest(StorageService.BUCKET_NAME, StorageService.MANIFEST_FOLDER + fileName));
         S3ObjectInputStream inputStream = s3Object.getObjectContent();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         List<ManifestData> manifestDataList = new ArrayList<>();
@@ -114,7 +115,7 @@ public class DemoService {
     }
 
     private List<ManifestData> readXLSXFile(String fileName) throws IOException {
-        S3Object s3Object = s3Client.getObject(new GetObjectRequest(BUCKET_NAME, MANIFEST_FOLDER + fileName));
+        S3Object s3Object = s3Client.getObject(new GetObjectRequest(StorageService.BUCKET_NAME, StorageService.MANIFEST_FOLDER + fileName));
         S3ObjectInputStream inputStream = s3Object.getObjectContent();
 
         List<ManifestData> manifestDataList = new ArrayList<>();
@@ -122,11 +123,7 @@ public class DemoService {
         try (Workbook workbook = WorkbookFactory.create(inputStream)) {
             Sheet sheet = workbook.getSheetAt(0);// Assuming you want to read from the first sheet
 
-            int startRow;
-            if(sheet.getRow(0).getCell(0).equals("company_name")){
-                startRow = 1;
-            }
-            else {startRow=0;}
+            int startRow = sheet.getRow(0).getCell(0).toString().equals("company_name") ? 1 : 0;
 
             for (int rowIndex = startRow; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
                 Row row = sheet.getRow(rowIndex);
