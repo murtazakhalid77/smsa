@@ -1,5 +1,6 @@
 package com.smsa.backend.service;
 
+import com.smsa.backend.model.RecordManifestFolder;
 import com.smsa.backend.repository.RecordManifestFolderRepository;
 import org.apache.poi.ss.usermodel.*;
 import com.amazonaws.services.s3.AmazonS3;
@@ -16,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -36,18 +38,23 @@ public class DemoService {
     public void readFilesInManifestFolder() {
         List<String> csvContents = new ArrayList<>();
         try {
-//            List<String> filesNamesDone = manifestFolderRepository.findAllfileName();
+            List<String> filesNamesDone = manifestFolderRepository.findAll()
+                    .stream()
+                    .map(RecordManifestFolder::getFileName) // Assuming getFileName() returns the file name
+                    .collect(Collectors.toList());;
             List<String> fileNames = storageService.getFileNamesInManifestFolder();
             for (String fileName : fileNames) {
-//                boolean found = filesNamesDone.stream().anyMatch(e -> e.equals(fileName));
-                if (fileName.endsWith(".csv")) {
+                boolean found = filesNamesDone.stream().anyMatch(e -> e.equals(fileName));
+                if (fileName.endsWith(".csv") && !found) {
                     List<ManifestData> csvContent = readCSVFile(fileName);
                     demoRepository.saveAll(csvContent);
 
                     //manifestFolderRepository is used to record manifest folder which has been done
-//                    manifestFolderRepository.saveFileName(fileName);
+                    manifestFolderRepository.save(RecordManifestFolder.builder()
+                            .fileName(fileName)
+                            .build());
                 }
-//                else if(fileName.endsWith(".xlsx") &&!found){
+//                else if(fileName.endsWith(".xlsx") && !found){
 //                    List<ManifestData> csvContent = readXLSXFile(fileName);
 ////                    demoRepository.saveAll(csvContent);
 //                }

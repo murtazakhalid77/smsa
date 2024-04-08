@@ -8,10 +8,4 @@ import java.util.*;
 
 @Repository
 public interface RecordManifestFolderRepository extends JpaRepository<RecordManifestFolder, Long> {
-
-//    @Query(value = "SELECT r.file_name FROM record_manifest_folder r")
-//    List<String> findAllfileName();
-
-//    @Query(value = "INSERT INTO record_manifest_folder(file_name) VALUES (:fileName)")
-//    void saveByName(String fileName);
 }
