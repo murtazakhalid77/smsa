@@ -111,7 +111,7 @@ public class ExcelService {
 
         findDuplicatesOfAwb(rowsToBeFiltered);
 
-        HashMap<String,Long> mawbCounts=getMawbCounts(rowsToBeFiltered);
+        HashMap<String,Double> mawbCounts=getMawbCounts(rowsToBeFiltered);
 
         if (!rowsToBeFiltered.isEmpty()) {
             rowsToBeFiltered.remove(0);
@@ -342,20 +342,20 @@ public class ExcelService {
                 .build();
     }
 
-    private HashMap<String, Long> getMawbCounts(List<List<String>> rowsToBeFiltered) {
-        HashMap<String, Long> mawbCount = new HashMap<>();
+    private HashMap<String, Double> getMawbCounts(List<List<String>> rowsToBeFiltered) {
+        HashMap<String, Double> mawbCount = new HashMap<>();
 
 
         for (List<String> row : rowsToBeFiltered) {
             String mawb = row.get(0);
 
-            mawbCount.put(mawb, mawbCount.getOrDefault(mawb, 0L) + 1);
+            mawbCount.put(mawb, mawbCount.getOrDefault(mawb, 0.0) + 1);
         }
 
         return mawbCount;
     }
 
-    private InvoiceDetails mapToDomainForCustomPlus(List<String> row, ExcelImportDto excelImportDto, Integer totalRows, Map<String, String> userInputMap, HashMap<String, Long> mawbCounts) {
+    private InvoiceDetails mapToDomainForCustomPlus(List<String> row, ExcelImportDto excelImportDto, Integer totalRows, Map<String, String> userInputMap, HashMap<String, Double> mawbCounts) {
 
         InvoiceDetailsId invoiceDetailsId = InvoiceDetailsId.builder()
                 .mawb(row.get(0))
@@ -370,7 +370,7 @@ public class ExcelService {
 
         double others=parseDoubleOrDefault(row.get(12), 0.0); //0.0
 
-        double customFormValueCalculated= Long.valueOf(userInputMap.get(row.get(0))) /mawbCounts.get(row.get(0));
+        double customFormValueCalculated= Double.valueOf(userInputMap.get(row.get(0))) /mawbCounts.get(row.get(0));
 
         double vatAmount=(valueCustom+customFormValueCalculated)*custom.get().getSmsaFeeVat()/100;
         double total=vatAmount+customFormValueCalculated+others;
