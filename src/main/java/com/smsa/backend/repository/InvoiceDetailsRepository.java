@@ -27,7 +27,7 @@ public interface InvoiceDetailsRepository extends JpaRepository<InvoiceDetails, 
     List<InvoiceDetails> findAllBySheetUniqueId(String sheetUniqueId);
 
     @Query("SELECT details.invoiceDetailsId.awb FROM InvoiceDetails details WHERE details.invoiceDetailsId.awb IN :awbList")
-    List<String> findDuplicateAwbs(Set<String> awbList);;
+    List<String> findDuplicateAwbs(Set<String> awbList);
 
     @Transactional
     @Modifying
