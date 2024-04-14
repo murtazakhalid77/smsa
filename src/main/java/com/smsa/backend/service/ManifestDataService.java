@@ -33,7 +33,6 @@ public class ManifestDataService {
     private StorageService storageService;
 
     public void readFilesInManifestFolder() {
-        List<String> csvContents = new ArrayList<>();
         try {
             List<String> filesNamesDone = manifestFolderRepository.findAll()
                     .stream()
