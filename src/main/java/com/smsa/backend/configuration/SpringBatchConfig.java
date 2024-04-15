@@ -29,7 +29,6 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 @Configuration
 @EnableBatchProcessing
-@AllArgsConstructor
 public class SpringBatchConfig {
     private static final Logger logger = Logger.getLogger(SpringBatchConfig.class.getName());
 
