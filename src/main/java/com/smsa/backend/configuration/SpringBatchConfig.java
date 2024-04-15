@@ -20,6 +20,7 @@ import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -40,6 +41,9 @@ public class SpringBatchConfig {
     private AmazonS3 s3Client;
     @Autowired
     private StorageService storageService;
+
+    @Value("${smsa.file.location}")
+    String sampleFileLocalLocation;
 
     @Bean
     public FlatFileItemReader<ManifestData> reader() {
@@ -127,9 +131,8 @@ public class SpringBatchConfig {
     }
 
     public Resource[] getResources() throws IOException {
-        String directoryPath = "C:\\Users\\ahmed\\OneDrive\\Desktop\\Excel Data";
+        String directoryPath = sampleFileLocalLocation + "/Manifest Data";
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         return resolver.getResources("file:" + directoryPath + "/*.csv");
     }
-
 }
