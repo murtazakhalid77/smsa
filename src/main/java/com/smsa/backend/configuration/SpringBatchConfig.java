@@ -7,6 +7,7 @@ import com.smsa.backend.model.ManifestData;
 import com.smsa.backend.repository.ManifestDataRepository;
 import com.smsa.backend.service.StorageService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -29,20 +30,13 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 @Configuration
 @EnableBatchProcessing
+@AllArgsConstructor
 public class SpringBatchConfig {
     private static final Logger logger = Logger.getLogger(SpringBatchConfig.class.getName());
 
     private JobBuilderFactory jobBuilderFactory;
     private StepBuilderFactory stepBuilderFactory;
     private ManifestDataRepository manifestDataRepository;
-
-    @Autowired
-    private AmazonS3 s3Client;
-    @Autowired
-    private StorageService storageService;
-
-    @Value("${smsa.file.location}")
-    String sampleFileLocalLocation;
 
     @Bean
     public FlatFileItemReader<ManifestData> reader() {
@@ -130,7 +124,7 @@ public class SpringBatchConfig {
     }
 
     public Resource[] getResources() throws IOException {
-        String directoryPath = sampleFileLocalLocation + "/Manifest Data";
+        String directoryPath = "/applications/apicdvbill.smsaexpress.com/public_html/Manifest Data";
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         return resolver.getResources("file:" + directoryPath + "/*.csv");
     }
