@@ -107,8 +107,8 @@ public class SpringBatchConfig {
     }
 
     public Step step1(){
-            return stepBuilderFactory.get("csv-step")
-                    .<ManifestData,ManifestData>chunk(1000)
+            return stepBuilderFactory.get("csv-step-a")
+                    .<ManifestData,ManifestData>chunk(100000)
                     .reader(multiResourceItemReader())
                     .processor(processor())
                     .writer(writer())
@@ -117,7 +117,7 @@ public class SpringBatchConfig {
 
     @Bean
     public Job runJob(){
-        return jobBuilderFactory.get("ImportManifestData")
+        return jobBuilderFactory.get("ImportManifestDataForCsv")
                 .flow(step1())
                 .end()
                 .build();
