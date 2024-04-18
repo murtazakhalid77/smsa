@@ -368,7 +368,7 @@ public class ExcelService {
 
         Optional<Custom> custom = customRepository.findByCustomPort(excelImportDto.getCustomPort());//5
 
-        double others=parseDoubleOrDefault(row.get(12), 0.0); //0.0
+        double others=parseDoubleOrDefault(row.get(13), 0.0); //0.0
 
         double customFormValueCalculated= Double.valueOf(userInputMap.get(row.get(0))) /mawbCounts.get(row.get(0));
 
@@ -390,7 +390,7 @@ public class ExcelService {
                 .customFormCharges(customFormValueCalculated)
                 .totalCharges(total)
                 .customDeclarationNumber(row.get(12))
-                .other(parseDoubleOrDefault(row.get(13), 0.0))
+                .other(others)
                 .ref(row.get(14))
                 .customDeclarationDate(row.get(15))
                 .build();
