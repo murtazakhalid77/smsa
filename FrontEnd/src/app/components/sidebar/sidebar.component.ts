@@ -57,4 +57,7 @@ export class SidebarComponent implements OnInit{
   sheetHistory(){
     this.router.navigateByUrl('sheetHistory')
   }
+  manifestData(){
+    this.router.navigateByUrl('manifestData')
+  }
 }

@@ -31,12 +31,12 @@ export class CustomPortComponent implements OnInit {
 
 
     let search = {};
-  
+
     const pageable = {
       page: page,
       size: size,
     };
-  
+
     if (this.searchText !== undefined && this.searchText !== '') {
       search = {
         mapper: 'CUSTOM_PORT',
@@ -57,7 +57,7 @@ export class CustomPortComponent implements OnInit {
         if(res && res.body){
           this.customs = res.body;
           this.totalItems = res.headers.get('X-Total-Count') ?? '';
-        } 
+        }
       },
       (error) => {
         // Handle the error if needed

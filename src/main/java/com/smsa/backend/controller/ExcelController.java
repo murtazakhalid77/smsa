@@ -96,6 +96,16 @@ public class ExcelController {
                 .body(file);
     }
 
+    @GetMapping("/export/manifest-data")
+    public ResponseEntity<Resource> exportToExcelManifestData(@RequestParam List<Long> manifestDataIds) throws IOException {
+
+        Resource file = excelService.manifestDataExcel(manifestDataIds);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                .body(file);
+    }
 
     @GetMapping("/customer")
     public ResponseEntity<Resource> customerExcelDownload() throws IOException {

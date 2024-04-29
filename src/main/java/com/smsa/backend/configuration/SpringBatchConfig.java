@@ -40,6 +40,7 @@ public class SpringBatchConfig {
     public FlatFileItemReader<ManifestData> reader() {
         FlatFileItemReader<ManifestData> itemReader = new FlatFileItemReader<>();
         itemReader.setLineMapper(lineMapper());
+        itemReader.setLinesToSkip(1);
         return itemReader;
     }
 
@@ -81,7 +82,7 @@ public class SpringBatchConfig {
         DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
         lineTokenizer.setDelimiter(",");
         lineTokenizer.setStrict(false);
-        lineTokenizer.setNames("companyName", "mode", "shipmentMode", "encodeDesc", "loadingPortCode", "encodeDescSec", "destinationPort", "carrierCode", "flightNumber", "departureDate", "arrivalDate", "actualWeight", "dimWeight", "prefix", "manifestNumber", "blDate", "awb", "orderNumber", "customShipDate", "accountNumber", "weight", "amount", "shipmentCountry");
+        lineTokenizer.setNames("companyName", "mode", "shipmentMode", "encodeDesc", "loadingPortCode", "encodeDescSec", "destinationPort", "carrierCode", "flightNumber", "departureDate", "arrivalDate", "actualWeight", "dimWeight", "prefix", "manifestNumber", "blDate", "awb", "orderNumber", "customShipDate", "accountNumber", "weight", "amount", "shipmentCountry", "consigneeName","consigneeCity");
 
         BeanWrapperFieldSetMapper<ManifestData> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
         fieldSetMapper.setTargetType(ManifestData.class);

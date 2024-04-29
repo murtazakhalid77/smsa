@@ -1,0 +1,237 @@
+<app-sidebar></app-sidebar>
+<div class="body-position">
+    <app-dashboard-head></app-dashboard-head>
+    <div class="main-container">
+        <div>
+            <h4>Manifest Data</h4>
+            <p class="page-intro">Whole data about your business here</p>
+        </div>
+        <div class="order-body">
+            <div class="container-fluid">
+                <div class="search-option">
+                    <div class="gap-above-bottom">
+                        <input type="radio" name="searchOption" value="awbs" [(ngModel)]="selectedSearchOption" (change)="onSearchOptionChange('awbs')" class="ml-2">
+                        <label for="date" class="font-size14px">AWB's</label>
+
+                        <input type="radio" name="searchOption" value="manifestNo" [(ngModel)]="selectedSearchOption" (change)="onSearchOptionChange('manifestNo')">
+                        <label for="invoice" class="font-size14px mr-2">Manifest Number</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row w-100 mt-2" *ngIf="awb">
+                            <div class="col-md-8">
+                                <div class="col-md-6 d-flex">
+                                    <textarea style="width: 300px; max-height: 150px;" class="form-control report-order-search" placeholder="AWB's" [(ngModel)]="awbs"></textarea>
+                                </div>
+
+                                <div class="col-md-6">
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4 d-flex justify-content-end">
+                                <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3 custom-margin" type="submit" (click)="getManifestData()">
+                                    <span>Search</span>
+                                </button>
+                                <button *ngIf="manifestData!.length!=0 && manifestData!=null" class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" (click)="downloadFile()">
+                                    <span>Download Excel</span>
+                                </button>
+                            </div>
+
+                        </div>
+                        
+                        <div class="row w-100" *ngIf="manifestInput">
+                            <div class="col-md-4 d-flex">
+                                <input type="text" id="prefix" class="form-control report-order-search smaller-input" placeholder="Prefix" [(ngModel)]="prefix">
+                                <input type="text" id="manifestNo" class="form-control report-order-search larger-input" placeholder="Manifest Number" [(ngModel)]="manifestNo">
+                            </div>
+
+                            <div class="col-md-4">
+                            </div>
+                            
+                            <div class="col-md-4 d-flex justify-content-end">
+                                <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3 custom-margin" type="submit" (click)="getManifestData()">
+                                    <span>Search</span>
+                                </button>
+                                <button *ngIf="manifestData!.length!=0 && manifestData!=null" class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" (click)="downloadFile()">
+                                    <span>Download Excel</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="order-table table-container mt-5" *ngIf="manifestInput">
+                            <table class="table table-striped" id="excel-table">
+                                <thead style="
+                                background: #ffffff;
+                                position: sticky;">
+                                <tr class="header-fixed">
+                                    <th class="nowrap text-center">
+                                        <span class="font">Prefix</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Manifest Number</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font">AWB</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font">Weight</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Actual Weight</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Dim Weight</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Company Name</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font">Mode</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Shipment Mode</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font">Encodedesc</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Loading Port Code</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Encodedesc Second</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Destination Port</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Carrier Code</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Flight Number</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Departure Date</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Arrival Date</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">BL Date</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Order Number</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Custom Ship Date</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Account Number</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font">Amount</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Shipment Country</span>
+                                    </th>
+                                    <th class="text-center nowrap col-md-2 col-lg-1">
+                                        <span class="font">Actions</span>
+                                    </th>
+                                </tr>
+                            </thead>
+            
+                                <tbody>
+                                    <tr *ngFor="let data of manifestData" class="order-table-row-hover">
+                                        <td class="text-center w-auto">{{data?.prefix}}</td>
+                                        <td class="text-center w-auto">{{data?.manifestNumber}}</td>
+                                        <td class="text-center w-auto">{{data?.awb}}</td>
+                                        <td class="text-center w-auto">{{data?.weight}}</td>
+                                        <td class="text-center w-auto">{{data?.actualWeight}}</td>
+                                        <td class="text-center w-auto">{{data?.dimWeight}}</td>
+                                        <td class="text-center w-auto">{{data?.companyName}}</td>
+                                        <td class="text-center w-auto">{{data?.mode}}</td>
+                                        <td class="text-center w-auto">{{data?.shipmentMode}}</td>
+                                        <td class="text-center w-auto">{{data?.encodeDesc}}</td>
+                                        <td class="text-center w-auto">{{data?.loadingPortCode}}</td>
+                                        <td class="text-center w-auto">{{data?.encodeDescSec}}</td>
+                                        <td class="text-center w-auto">{{data?.destinationPort}}</td>
+                                        <td class="text-center w-auto">{{data?.carrierCode}}</td>
+                                        <td class="text-center w-auto">{{data?.flightNumber}}</td>
+                                        <td class="text-center w-auto">{{data?.departureDate}}</td>
+                                        <td class="text-center w-auto">{{data?.arrivalDate}}</td>
+                                        <td class="text-center w-auto">{{data?.blDate}}</td>
+                                        <td class="text-center w-auto">{{data?.orderNumber}}</td>
+                                        <td class="text-center w-auto">{{data?.customShipDate}}</td>
+                                        <td class="text-center w-auto">{{data?.accountNumber}}</td>
+                                        <td class="text-center w-auto">{{data?.amount}}</td>
+                                        <td class="text-center w-auto">{{data?.shipmentCountry}}</td>
+                                        <td class="order-table-btns-container text-center w-auto col-md-2 col-lg-1">
+                                            <i [style.color]="data?.id? 'black' : 'red'" style="cursor: pointer !important;" class="fa-solid fa-pen"(click)="updateManifestData(data?.id,prefix,manifestNo,awbs)"></i>&nbsp;
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+            
+                        </div>
+            
+                        <div class="order-table table-container mt-5" *ngIf="awb">
+                            <table class="table table-striped" id="excel-table">
+                                <thead style="
+                                background: #ffffff;
+                                position: sticky;">
+                                <tr class="header-fixed">
+                                    <th class="nowrap   text-center">
+                                        <span class="font">Prefix</span>
+                                    </th>
+                                    <th class="nowrap   text-center">
+                                        <span class="font">Manifest Number</span>
+                                    </th>
+                                    <th class="nowrap   text-center">
+                                        <span class="font">AWB</span>
+                                    </th>
+                                    <th class="nowrap   text-center">
+                                        <span class="font">Weight</span>
+                                    </th>
+                                    <th class="nowrap   text-center">
+                                        <span class="font" style="width: 50px;">Actual Weight</span>
+                                    </th>
+                                    <th class="nowrap   text-center">
+                                        <span class="font">Dim Weight</span>
+                                    </th>
+                                    <th class="text-center nowrap col-md-2 col-lg-1">
+                                        <span class="font">Actions</span>
+                                    </th>
+                                </tr>
+                            </thead>
+            
+                                <tbody>
+                                    <tr *ngFor="let data of manifestData" class="order-table-row-hover">
+                                        <td class="text-center w-auto">{{data?.prefix}}</td>
+                                        <td class="text-center w-auto">{{data?.manifestNumber}}</td>
+                                        <td class="text-center w-auto">{{data?.awb}}</td>
+                                        <td class="text-center w-auto">{{data?.weight}}</td>
+                                        <td class="text-center w-auto">{{data?.actualWeight}}</td>
+                                        <td class="text-center w-auto">{{data?.dimWeight}}</td>
+                                        <td class="order-table-btns-container text-center w-auto col-md-2 col-lg-1">
+                                            <i [style.color]="data?.id? 'black' : 'red'" style="cursor: pointer !important;" class="fa-solid fa-pen"(click)="updateManifestData(data?.id,prefix,manifestNo,awbs)"></i>&nbsp;
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4" *ngIf="manifestData!.length > 0">
+            <div class="col">
+              <!-- Your content here -->
+            </div>
+            <div class="col-auto">
+                <mat-paginator [pageSize]="itemsPerPage" [pageIndex]="pageIndex" [length]="totalItems" (page)="changePage($event)"> </mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

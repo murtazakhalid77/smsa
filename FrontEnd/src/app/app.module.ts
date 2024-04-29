@@ -45,6 +45,8 @@ import { NgModule } from '@angular/core';
 import { AutoGrowDirective } from './directives/auto-grow-directive.directive';
 import { ExcelComponent } from './pages/importCustom/excel/excel.component';
 import { CurrencyWithCommasPipePipe } from './pages/report/currency-with-commas-pipe.pipe';
+import { ManifestDataComponent } from './pages/manifest-data/list/manifest-data.component';
+import { ManifestDataUpdateComponent } from './pages/manifest-data/update/manifest-data-update.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -80,6 +82,8 @@ import { CurrencyWithCommasPipePipe } from './pages/report/currency-with-commas-
     AutoGrowDirective,
     ExcelComponent,
     CurrencyWithCommasPipePipe,
+    ManifestDataComponent,
+    ManifestDataUpdateComponent,
   ],
   imports: [
     NgxPaginationModule,

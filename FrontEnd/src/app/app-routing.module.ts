@@ -22,6 +22,8 @@ import { CurrencyHistoryComponent } from './pages/currency/currency-history/curr
 import { SheetHistoryListComponent } from './pages/sheetHistory/sheet-history-list/sheet-history-list.component';
 import { TransactionComponent } from './pages/tran/transaction/transaction.component';
 import { ExcelComponent } from './pages/importCustom/excel/excel.component';
+import { ManifestDataComponent } from './pages/manifest-data/list/manifest-data.component';
+import { ManifestDataUpdateComponent } from './pages/manifest-data/update/manifest-data-update.component';
 
 export const routes: Routes = [
   {
@@ -118,6 +120,14 @@ export const routes: Routes = [
   ,{
     path: 'transactions',
     component: TransactionComponent,
+  },
+  {
+    path: 'manifestData',
+    component: ManifestDataComponent
+  },
+  {
+    path: 'manifestDataUpdate',
+    component: ManifestDataUpdateComponent
   }
 ];
 

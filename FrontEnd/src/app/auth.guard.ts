@@ -100,6 +100,10 @@ getPermissionsObj():any{
     url:['/sheetHistory '],
     permissions:'SHEET_HISTORY_REPOSITORY'
    }
+   const manifestDataObj={
+    url:['/manifestData '],
+    permissions:'MANIFEST_DATA'
+   }
    
    
    return  [customerObj,userObj,currencyObj,customObj,regionObj,salesReportObj,permissionsObj,dashboardObj,sheetHistoryObj]

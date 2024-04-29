@@ -100,7 +100,14 @@
             </span>
             
         </span>
-        
+    </li>
+    <li *ngIf="sessionStorageService.hasPermission('MANIFEST_DATA')">
+        <span class="sidebar-list-hover" (click)="manifestData()">
+            <i class="fa fa-search fa-2x"></i>
+            <span class="nav-text">
+                Manifest Data
+            </span>
+        </span>
     </li>
     </ul>
 </nav>

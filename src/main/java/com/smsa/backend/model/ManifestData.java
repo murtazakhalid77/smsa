@@ -36,4 +36,6 @@ public class ManifestData {
     private String weight;
     private String amount;
     private String shipmentCountry;
+    private String consigneeName;
+    private String consigneeCity;
 }

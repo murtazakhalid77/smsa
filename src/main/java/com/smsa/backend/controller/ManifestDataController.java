@@ -1,6 +1,8 @@
 package com.smsa.backend.controller;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.smsa.backend.dto.ManifestDataDto;
+import com.smsa.backend.model.ManifestData;
 import com.smsa.backend.service.ManifestDataService;
 import com.smsa.backend.service.StorageService;
 import org.springframework.batch.core.Job;
@@ -12,6 +14,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +36,26 @@ public class ManifestDataController {
     StorageService storageService;
     @Autowired
     ManifestDataService manifestDataService;
+
+    @PostMapping("/manifest-data")
+    ResponseEntity<List<ManifestData>> getManifestData(@RequestBody ManifestDataDto manifestDataDto){
+        List<ManifestData> manifestDataList = this.manifestDataService.getManifestData(manifestDataDto);
+        HttpHeaders headers = new HttpHeaders();
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(manifestDataList);
+    }
+
+    @GetMapping("/manifest-data/{id}")
+    ResponseEntity<ManifestData> getManifestDataById(@PathVariable Long id){
+        return ResponseEntity.ok(this.manifestDataService.getManifestDataById(id));
+    }
+
+    @PatchMapping("/manifest-data/{id}")
+    ResponseEntity<ManifestData> updateManifestData(@RequestBody ManifestData manifestData, @PathVariable Long id){
+        return ResponseEntity.ok(this.manifestDataService.updateManifestData(manifestData, id));
+    }
 
     @GetMapping("/download/getAllFilesName")
     public ResponseEntity<List<String>> getAllFilesName(){

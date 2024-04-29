@@ -1,5 +1,8 @@
 package com.smsa.backend.service;
 
+import com.smsa.backend.Exception.RecordNotFoundException;
+import com.smsa.backend.criteria.SearchCriteria;
+import com.smsa.backend.dto.ManifestDataDto;
 import com.smsa.backend.model.RecordManifestFolder;
 import com.smsa.backend.repository.RecordManifestFolderRepository;
 import org.apache.poi.ss.usermodel.*;
@@ -16,6 +19,8 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,6 +37,34 @@ public class ManifestDataService {
     @Autowired
     private StorageService storageService;
 
+    public List<ManifestData> getManifestData(ManifestDataDto manifestDataDto){
+        SearchCriteria searchCriteria = new SearchCriteria();
+        searchCriteria.setMapper(manifestDataDto.getMapper());
+
+        Optional<List<ManifestData>> manifestDataList =null;
+        if (manifestDataDto.getAwbs()!=null){
+            manifestDataList = this.getManifestDataByAwbs(manifestDataDto.getAwbs());
+        }
+        else if(manifestDataDto.getManifestNo()!=null){
+            if(manifestDataDto.getPrefix()==null){
+                manifestDataList = this.getManifestDataByManifestNoOnly(manifestDataDto.getManifestNo());
+            }
+            else if(manifestDataDto.getPrefix().isEmpty()){
+                manifestDataList = this.getManifestDataByManifestNoOnly(manifestDataDto.getManifestNo());
+            }
+            else {
+                manifestDataList = this.getManifestDataByManifestNoAndPrefix(manifestDataDto.getPrefix(), manifestDataDto.getManifestNo());
+            }
+        }
+
+        for (ManifestData manifestData: manifestDataList.get()){
+            manifestData.setId(manifestData.getId());
+            manifestData.setActualWeight(manifestData.getActualWeight());
+            manifestData.setWeight(manifestData.getWeight());
+            manifestData.setDimWeight(manifestData.getDimWeight());
+        }
+        return manifestDataList.get();
+    }
     public void readFilesInManifestFolder() {
         try {
             List<String> filesNamesDone = manifestFolderRepository.findAll()
@@ -164,4 +197,89 @@ public class ManifestDataService {
         return manifestDataList;
     }
 
+    public ManifestData getManifestDataById(Long id) {
+        Optional<ManifestData> manifestData = this.manifestDataRepository.findById(id);
+        if(manifestData.isPresent()){
+            return manifestData.get();
+        }
+        throw new RecordNotFoundException(String.format("Custom Not Found On this Id => %d",id));
+    }
+
+    public ManifestData updateManifestData(ManifestData manifestData, Long id) {
+        Optional<ManifestData> optionalManifestData = this.manifestDataRepository.findById(id);
+
+        if(optionalManifestData.isPresent()){
+            optionalManifestData.get().setId(id);
+            optionalManifestData.get().setCompanyName(manifestData.getCompanyName());
+            optionalManifestData.get().setMode(manifestData.getMode());
+            optionalManifestData.get().setShipmentMode(manifestData.getShipmentMode());
+            optionalManifestData.get().setEncodeDesc(manifestData.getEncodeDesc());
+            optionalManifestData.get().setLoadingPortCode(manifestData.getLoadingPortCode());
+            optionalManifestData.get().setEncodeDescSec(manifestData.getEncodeDescSec());
+            optionalManifestData.get().setDestinationPort(manifestData.getDestinationPort());
+            optionalManifestData.get().setCarrierCode(manifestData.getCarrierCode());
+            optionalManifestData.get().setFlightNumber(manifestData.getFlightNumber());
+            optionalManifestData.get().setDepartureDate(manifestData.getDepartureDate());
+            optionalManifestData.get().setArrivalDate(manifestData.getArrivalDate());
+            optionalManifestData.get().setActualWeight(manifestData.getActualWeight());
+            optionalManifestData.get().setDimWeight(manifestData.getDimWeight());
+            optionalManifestData.get().setPrefix(manifestData.getPrefix());
+            optionalManifestData.get().setManifestNumber(manifestData.getManifestNumber());
+            optionalManifestData.get().setBlDate(manifestData.getBlDate());
+            optionalManifestData.get().setAwb(manifestData.getAwb());
+            optionalManifestData.get().setOrderNumber(manifestData.getOrderNumber());
+            optionalManifestData.get().setCustomShipDate(manifestData.getCustomShipDate());
+            optionalManifestData.get().setAccountNumber(manifestData.getAccountNumber());
+            optionalManifestData.get().setWeight(manifestData.getWeight());
+            optionalManifestData.get().setAmount(manifestData.getAmount());
+            optionalManifestData.get().setShipmentCountry(manifestData.getShipmentCountry());
+            optionalManifestData.get().setConsigneeName(manifestData.getConsigneeName());
+            optionalManifestData.get().setConsigneeCity(manifestData.getConsigneeCity());
+
+            return manifestDataRepository.save(optionalManifestData.get());
+        }
+        throw new RecordNotFoundException(String.format("Manifest Data Not Found On this Id => %d",id));
+    }
+
+    public Optional<List<ManifestData>> getManifestDataByAwbs(String awbs){
+        List<String> awbList = Arrays.stream(awbs.split(","))
+                .map(String::trim)
+                .collect(Collectors.toList());
+
+//        List<String> convertedAwbList = awbList.stream()
+//                .map(ManifestDataService::convertPlainNumberToScientific)
+//                .collect(Collectors.toList());
+        try {
+            Optional<List<ManifestData>> manifestData = Optional.of(this.manifestDataRepository.findByAwbIn(awbList));
+            if(manifestData.isPresent()){
+                return manifestData;
+            }
+        } catch (Exception e) {
+            log.error("Error fetching manifest data", e);
+        }
+        throw new RecordNotFoundException("Couldn't find data");
+    }
+
+    private static String convertPlainNumberToScientific(String value) {
+        NumberFormat numFormat = new DecimalFormat();
+        numFormat = new DecimalFormat("0.#####E0");
+        String format = numFormat.format(Double.parseDouble(value));
+        if (format.contains("E")) {
+            // Split the string at "E" into two parts
+            String[] parts = format.split("E");
+            // Add "+" after "E"
+            String modifiedFormat = parts[0] + "E+" + parts[1];
+            return modifiedFormat;
+        } else {
+            // If the string does not contain "E", handle it accordingly
+            System.out.println("String does not contain scientific notation.");
+        }
+        return null;
+    }
+    public Optional<List<ManifestData>> getManifestDataByManifestNoOnly(String manifestNumber){
+        return Optional.of(manifestDataRepository.getManifestDataByManifestNoOnly(manifestNumber));
+    }
+    public Optional<List<ManifestData>> getManifestDataByManifestNoAndPrefix(String prefix, String manifestNumber){
+        return Optional.of(manifestDataRepository.getManifestDataByManifestNoAndPrefix(prefix, manifestNumber));
+    }
 }

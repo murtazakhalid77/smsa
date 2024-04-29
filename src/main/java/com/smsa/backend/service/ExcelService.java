@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -62,6 +63,10 @@ public class ExcelService {
 
     @Autowired
     SalesReportRepository salesReportRepository;
+
+    @Autowired
+    ManifestDataRepository manifestDataRepository;
+
     @Autowired
     StorageService storageService;
     @Value("${smsa.file.location}")
@@ -1022,6 +1027,70 @@ public class ExcelService {
                 createCell(row, columnCount++, currencyAuditLog.getUpdatedBy() != null ? currencyAuditLog.getUpdatedBy().toString() : " ", style);
                 createCell(row, columnCount++, currencyAuditLog.getCreatedAt() != null ? currencyAuditLog.getCreatedAt().toString() : " ", style);
                 createCell(row, columnCount++, currencyAuditLog.getIsPresent() != null ? currencyAuditLog.getIsPresent().toString() : " ", style);
+            }
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            newWorkBook.write(byteArrayOutputStream);
+
+            byte[] workbookBytes = byteArrayOutputStream.toByteArray();
+
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(workbookBytes);
+
+            Resource resource = new InputStreamResource(byteArrayInputStream);
+            return resource;
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new SalesReportException(e.getMessage());
+        }
+
+    }
+
+    public Resource manifestDataExcel(List<Long> manifestDataIds) throws IOException {
+
+        try{
+            List<ManifestData> manifestDataList = this.manifestDataRepository.findAllByIdIn(manifestDataIds);
+            FileInputStream fileInputStream = new FileInputStream(sampleFileLocalLocation + "/excel-manifest-data.xlsx");
+            Workbook  newWorkBook = WorkbookFactory.create(fileInputStream);
+            Sheet summarySheet= newWorkBook.getSheetAt(0);
+            int rowCount = 1;
+
+            CellStyle rightAlignedStyle = newWorkBook.createCellStyle();
+            rightAlignedStyle.setAlignment(HorizontalAlignment.RIGHT);
+            CellStyle style = newWorkBook.createCellStyle();
+
+            for (ManifestData manifestData : manifestDataList) {
+                Row row = summarySheet.createRow(rowCount++);
+                int columnCount = 0;
+
+                createCell(row, columnCount++, manifestData.getId().toString(), style);
+                createCell(row, columnCount++, new BigDecimal(manifestData.getAwb()).toPlainString(), style);
+                createCell(row, columnCount++, manifestData.getPrefix(), style);
+                createCell(row, columnCount++, manifestData.getManifestNumber(), style);
+                createCell(row, columnCount++, manifestData.getWeight(), style);
+                createCell(row, columnCount++, manifestData.getDimWeight(), style);
+                createCell(row, columnCount++, manifestData.getActualWeight(), style);
+                createCell(row, columnCount++, manifestData.getCompanyName(), style);
+                createCell(row, columnCount++, manifestData.getMode(), style);
+                createCell(row, columnCount++, manifestData.getShipmentMode(), style);
+                createCell(row, columnCount++, manifestData.getEncodeDesc(), style);
+                createCell(row, columnCount++, manifestData.getLoadingPortCode(), style);
+                createCell(row, columnCount++, manifestData.getEncodeDescSec(), style);
+                createCell(row, columnCount++, manifestData.getDestinationPort(), style);
+                createCell(row, columnCount++, manifestData.getCarrierCode(), style);
+                createCell(row, columnCount++, manifestData.getFlightNumber(), style);
+                createCell(row, columnCount++, manifestData.getDepartureDate(), style);
+                createCell(row, columnCount++, manifestData.getArrivalDate(), style);
+                createCell(row, columnCount++, manifestData.getBlDate(), style);
+                createCell(row, columnCount++, manifestData.getOrderNumber(), style);
+                createCell(row, columnCount++, manifestData.getCustomShipDate(), style);
+                createCell(row, columnCount++, manifestData.getAccountNumber(), style);
+                createCell(row, columnCount++, manifestData.getAmount(), style);
+                createCell(row, columnCount++, manifestData.getShipmentCountry(), style);
+                createCell(row, columnCount++, manifestData.getConsigneeName(), style);
+                createCell(row, columnCount++, manifestData.getConsigneeCity(), style);
+
             }
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

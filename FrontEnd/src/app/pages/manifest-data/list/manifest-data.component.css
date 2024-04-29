@@ -1,0 +1,14 @@
+.prefix-input {
+    margin-right: 10px; /* Adjust the margin as needed */
+}
+.gap-above-bottom {
+    margin-top: 2rem; /* Adjust the value as needed */
+    margin-bottom: 2rem;
+  }
+.smaller-input {
+    width: 30%; /* Adjust this value as needed */
+}
+
+.larger-input {
+    width: 70%; /* Adjust this value as needed */
+}

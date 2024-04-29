@@ -1,0 +1,264 @@
+<app-sidebar></app-sidebar>
+<div class="body-position">
+    <app-dashboard-head></app-dashboard-head>
+    <div class="main-container">
+        <div>
+            <h4>Add Custom</h4>
+        </div>
+
+        <div class="order-body">
+            <form [formGroup]="customForm" (ngSubmit)="submit(customForm)">
+                <div class="order-form">
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Prefix</label>
+                        <input type="text" formControlName="prefix" placeholder="Enter Prefix"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('prefix')?.invalid && (customForm.get('prefix')?.dirty || customForm.get('prefix')?.touched)">
+                            Please provide prefix.
+                        </span>
+                    </div>
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Manifest Data</label>
+                        <input type="text" formControlName="manifestNumber" placeholder="Enter Manifest Number"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('manifestNumber')?.invalid && (customForm.get('manifestNumber')?.dirty || customForm.get('manifestNumber')?.touched)">
+                            Please provide Manifest Number.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">AWB</label>
+                        <input type="text" formControlName="awb" placeholder="Enter AWB"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('awb')?.invalid && (customForm.get('awb')?.dirty || customForm.get('awb')?.touched)">
+                            Please provide awb.
+                        </span>
+                    </div>
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Weight</label>
+                        <input type="text" formControlName="weight" placeholder="Enter Weight"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('weight')?.invalid && (customForm.get('weight')?.dirty || customForm.get('weight')?.touched)">
+                            Please provide weight
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Actual Weight</label>
+                        <input type="text" formControlName="actualWeight" placeholder="Enter Actual Weight"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('actualWeight')?.invalid && (customForm.get('actualWeight')?.dirty || customForm.get('actualWeight')?.touched)">
+                            Please provide Actual Weight.
+                        </span>
+                    </div>
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Dim Weight</label>
+                        <input type="text" formControlName="dimWeight" placeholder="Enter Dim Weight"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('dimWeight')?.invalid && (customForm.get('dimWeight')?.dirty || customForm.get('dimWeight')?.touched)">
+                            Please provide Dim Weight.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Company Name</label>
+                        <input type="text" formControlName="companyName" placeholder="Enter Company Name"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('companyName')?.invalid && (customForm.get('companyName')?.dirty || customForm.get('companyName')?.touched)">
+                            Please provide Company Name.
+                        </span>
+                    </div>
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Mode</label>
+                        <input type="text" formControlName="mode" placeholder="Enter Mode"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('mode')?.invalid && (customForm.get('mode')?.dirty || customForm.get('mode')?.touched)">
+                            Please provide Mode.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Shipment Mode</label>
+                        <input type="text" formControlName="shipmentMode" placeholder="Enter Shipment Mode"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('shipmentMode')?.invalid && (customForm.get('shipmentMode')?.dirty || customForm.get('shipmentMode')?.touched)">
+                            Please provide Shipment Mode.
+                        </span>
+                    </div>
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Encodedesc</label>
+                        <input type="text" formControlName="encodeDesc" placeholder="Enter Encodedesc"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('encodeDesc')?.invalid && (customForm.get('encodeDesc')?.dirty || customForm.get('encodeDesc')?.touched)">
+                            Please provide custom.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Loading Portcode</label>
+                        <input type="text" formControlName="loadingPortCode" placeholder="Enter Loading Port Code"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('loadingPortCode')?.invalid && (customForm.get('loadingPortCode')?.dirty || customForm.get('loadingPortCode')?.touched)">
+                            Please provide Loading Portcode.
+                        </span>
+                    </div>
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Encodedesc Second</label>
+                        <input type="text" formControlName="encodeDescSec" placeholder="Enter Encodedesc Second"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('encodeDescSec')?.invalid && (customForm.get('encodeDescSec')?.dirty || customForm.get('encodeDescSec')?.touched)">
+                            Please provide Encodedesc Second.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Destination Port</label>
+                        <input type="text" formControlName="destinationPort" placeholder="Enter Destination Port"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('destinationPort')?.invalid && (customForm.get('destinationPort')?.dirty || customForm.get('destinationPort')?.touched)">
+                            Please provide Destination Port.
+                        </span>
+                    </div>
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Carrier Code</label>
+                        <input type="text" formControlName="carrierCode" placeholder="Enter Carrier Code"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('carrierCode')?.invalid && (customForm.get('carrierCode')?.dirty || customForm.get('carrierCode')?.touched)">
+                            Please provide Carrier Code.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Flight Number</label>
+                        <input type="text" formControlName="flightNumber" placeholder="Enter Flight Number"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('flightNumber')?.invalid && (customForm.get('flightNumber')?.dirty || customForm.get('flightNumber')?.touched)">
+                            Please provide Flight Number.
+                        </span>
+                    </div>
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Departure Date</label>
+                        <input type="date" formControlName="departureDate" placeholder="Enter Departure Date"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('departureDate')?.invalid && (customForm.get('departureDate')?.dirty || customForm.get('departureDate')?.touched)">
+                            Please provide Departure Date.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Arrival Date</label>
+                        <input type="date" formControlName="arrivalDate" placeholder="Enter Arrival Date"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('arrivalDate')?.invalid && (customForm.get('arrivalDate')?.dirty || customForm.get('arrivalDate')?.touched)">
+                            Please provide Arrival Date.
+                        </span>
+                    </div>
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Bl Date</label>
+                        <input type="date" formControlName="blDate" placeholder="Enter Bl Date"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('blDate')?.invalid && (customForm.get('blDate')?.dirty || customForm.get('blDate')?.touched)">
+                            Please provide Bl Date.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Order Number</label>
+                        <input type="text" formControlName="orderNumber" placeholder="Enter Order Number"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('orderNumber')?.invalid && (customForm.get('orderNumber')?.dirty || customForm.get('orderNumber')?.touched)">
+                            Please provide Order Number.
+                        </span>
+                    </div>
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Custom Ship Date</label>
+                        <input type="datetime-local" formControlName="customShipDate" placeholder="Enter Custom Ship Date"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('customShipDate')?.invalid && (customForm.get('customShipDate')?.dirty || customForm.get('customShipDate')?.touched)">
+                            Please provide Custom Ship Date.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Account Number</label>
+                        <input type="text" formControlName="accountNumber" placeholder="Enter Account Number"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('accountNumber')?.invalid && (customForm.get('accountNumber')?.dirty || customForm.get('accountNumber')?.touched)">
+                            Please provide Account Number.
+                        </span>
+                    </div>
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Amount</label>
+                        <input type="text" formControlName="amount" placeholder="Enter Amount"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('amount')?.invalid && (customForm.get('amount')?.dirty || customForm.get('amount')?.touched)">
+                            Please provide Account.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-6 form-group" style="padding: 0 10px;">
+                        <label class="add-order-label">Shipment Country</label>
+                        <input type="text" formControlName="shipmentCountry" placeholder="Enter Shipment Country"
+                            class="order-search form-control order-form-input">
+                        <span class="inputValidators" style="color: red; margin-left: 2%;"
+                            *ngIf="customForm.get('shipmentCountry')?.invalid && (customForm.get('shipmentCountry')?.dirty || customForm.get('shipmentCountry')?.touched)">
+                            Please provide Shipment Country.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div class="col-md-12 form-group d-flex justify-content-end" style="padding: 0 10px;">
+                        <button class="btn btn-outline-primary custom-outline-primary font-size14px rounded-lg mt-3" type="submit" [disabled]="customForm.invalid">
+                          <span>Submit</span>
+                        </button>
+                      </div>         
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
