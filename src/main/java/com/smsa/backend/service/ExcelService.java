@@ -1065,7 +1065,7 @@ public class ExcelService {
                 int columnCount = 0;
 
                 createCell(row, columnCount++, manifestData.getId().toString(), style);
-                createCell(row, columnCount++, new BigDecimal(manifestData.getAwb()).toPlainString(), style);
+                createCell(row, columnCount++, manifestData.getAwb(), style);
                 createCell(row, columnCount++, manifestData.getPrefix(), style);
                 createCell(row, columnCount++, manifestData.getManifestNumber(), style);
                 createCell(row, columnCount++, manifestData.getWeight(), style);

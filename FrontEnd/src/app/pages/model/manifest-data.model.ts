@@ -23,6 +23,8 @@ export interface IManifestData {
     accountNumber?: string;
     amount?: string;
     shipmentCountry?: string;
+    consigneeName?: string;
+    consigneeCity?: string;
   }
 
   export class ManifestData implements IManifestData {
@@ -51,5 +53,7 @@ export interface IManifestData {
       public accountNumber?: string,
       public amount?: string,
       public shipmentCountry?: string,
+      public consigneeName?: string,
+      public consigneeCity?: string
     ) {}
   }

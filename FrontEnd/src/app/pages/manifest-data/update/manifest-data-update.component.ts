@@ -53,6 +53,8 @@ export class ManifestDataUpdateComponent implements OnInit {
         accountNumber: ['', [Validators.required]],
         amount: ['', [Validators.required]],
         shipmentCountry: ['', [Validators.required]],
+        consigneeName: ['', [Validators.required]],
+        consigneeCity: ['', [Validators.required]]
       })
 
       this.route.queryParams.subscribe( params => {
@@ -98,6 +100,8 @@ export class ManifestDataUpdateComponent implements OnInit {
           accountNumber: this.manifestData.accountNumber,
           amount: this.manifestData.amount,
           shipmentCountry: this.manifestData.shipmentCountry,
+          consigneeName: this.manifestData.consigneeName,
+          consigneeCity: this.manifestData.consigneeCity
         });
       }
     });
@@ -141,6 +145,8 @@ export class ManifestDataUpdateComponent implements OnInit {
         accountNumber: customForm.value.accountNumber,
         amount: customForm.value.amount,
         shipmentCountry: customForm.value.shipmentCountry,
+        consigneeName: customForm.value.consigneeName,
+        consigneeCity: customForm.value.consigneeCity
     }
 
     console.log(manifestData)

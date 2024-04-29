@@ -135,6 +135,12 @@
                                     <th class="nowrap text-center">
                                         <span class="font" style="white-space: nowrap;">Shipment Country</span>
                                     </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Consignee Name</span>
+                                    </th>
+                                    <th class="nowrap text-center">
+                                        <span class="font" style="white-space: nowrap;">Consignee City</span>
+                                    </th>
                                     <th class="text-center nowrap col-md-2 col-lg-1">
                                         <span class="font">Actions</span>
                                     </th>
@@ -166,6 +172,8 @@
                                         <td class="text-center w-auto">{{data?.accountNumber}}</td>
                                         <td class="text-center w-auto">{{data?.amount}}</td>
                                         <td class="text-center w-auto">{{data?.shipmentCountry}}</td>
+                                        <td class="text-center w-auto">{{data?.consigneeName}}</td>
+                                        <td class="text-center w-auto">{{data?.consigneeCity}}</td>
                                         <td class="order-table-btns-container text-center w-auto col-md-2 col-lg-1">
                                             <i [style.color]="data?.id? 'black' : 'red'" style="cursor: pointer !important;" class="fa-solid fa-pen"(click)="updateManifestData(data?.id,prefix,manifestNo,awbs)"></i>&nbsp;
                                         </td>
