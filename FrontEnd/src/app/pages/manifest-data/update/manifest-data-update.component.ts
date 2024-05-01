@@ -189,8 +189,8 @@ export class ManifestDataUpdateComponent implements OnInit {
 
   formatStringToDate(dateString: string): string {
     const parts = dateString.split('/');
-    const day = parseInt(parts[0], 10); // Day (as integer)
-    const month = parseInt(parts[1], 10) - 1; // Month (as integer), subtract 1 because months are zero-based in JavaScript Date
+    const day = parseInt(parts[1], 10); // Day (as integer)
+    const month = parseInt(parts[0], 10) - 1; // Month (as integer), subtract 1 because months are zero-based in JavaScript Date
     const year = parseInt(parts[2], 10); // Year (as integer)
 
     // Create a new Date object with the parsed parts
