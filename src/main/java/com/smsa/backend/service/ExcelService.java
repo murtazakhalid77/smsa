@@ -375,7 +375,12 @@ public class ExcelService {
 
         double others=parseDoubleOrDefault(row.get(12), 0.0); //0.0
 
-        double customFormValueCalculated= Long.valueOf(userInputMap.get(row.get(0))) /mawbCounts.get(row.get(0));
+        double customFormValueCalculated=
+                Double.parseDouble(
+                        String.format("%3f",
+                                ((double)
+                                        Long.valueOf(userInputMap.get(row.get(0))) /
+                                        mawbCounts.get(row.get(0)))));
 
         double vatAmount=(valueCustom+customFormValueCalculated)*custom.get().getSmsaFeeVat()/100;
         double total=vatAmount+customFormValueCalculated+others;

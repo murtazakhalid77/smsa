@@ -28,10 +28,10 @@ public class ManifestDataController {
 
     @Autowired
     private AmazonS3 s3Client;
-    @Autowired
-    private JobLauncher jobLauncher;
-    @Autowired
-    private Job job;
+    //    @Autowired
+    //    private JobLauncher jobLauncher;
+// @Autowired
+//    private Job job;
     @Autowired
     StorageService storageService;
     @Autowired
@@ -68,16 +68,16 @@ public class ManifestDataController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/download/getAllFiles")
-    public void getAllFiles(){
-        JobParameters jobParameter = new JobParametersBuilder()
-                .addLong("Start At",System.currentTimeMillis()).toJobParameters();
-
-        try {
-            jobLauncher.run(job, jobParameter);
-        } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException |
-                 JobParametersInvalidException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    @PostMapping("/download/getAllFiles")
+//    public void getAllFiles(){
+//        JobParameters jobParameter = new JobParametersBuilder()
+//                .addLong("Start At",System.currentTimeMillis()).toJobParameters();
+//
+//        try {
+//            jobLauncher.run(job, jobParameter);
+//        } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException |
+//                 JobParametersInvalidException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 }

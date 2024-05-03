@@ -46,10 +46,6 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>com.mysql</groupId>
@@ -69,11 +65,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.batch</groupId>
-			<artifactId>spring-batch-core</artifactId>
-			<version>4.3.4</version>
-		</dependency>
+
 		<dependency>
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
@@ -109,6 +101,12 @@
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.11.5</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.batch/spring-batch-core -->
+		<dependency>
+			<groupId>org.springframework.batch</groupId>
+			<artifactId>spring-batch-core</artifactId>
+			<version>4.3.3</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.security</groupId>
@@ -124,6 +122,9 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.batch/spring-batch-core -->
+
+
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
