@@ -7,6 +7,7 @@ import { AuthGuard } from '../auth.guard';
 })
 export class SessionStorageService  {
   userPermissions: string[] = [];
+  userRoles: string[] = [];
 
   constructor(private authGuardSerivce:AuthGuard) {
 
@@ -14,12 +15,18 @@ export class SessionStorageService  {
     const decodedToken =authGuardSerivce.getDecodedAccessToken(token!);
     if (decodedToken) {
     let  decodedTokenPermissions= decodedToken.PERMISSIONS;
+    let decodedRoles=decodedToken.ROLES
     this.userPermissions=decodedTokenPermissions
+    this.userRoles=decodedRoles;
     }
   }
 
   hasPermission(requiredPermission: string): boolean {
     return this.userPermissions.includes(requiredPermission);
+  }
+
+  hasRole(requiredRole: string): boolean {
+    return this.userRoles.includes(requiredRole);
   }
 
   

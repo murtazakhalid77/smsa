@@ -6,6 +6,7 @@ import { ManifestDataService } from 'src/app/pages/manifest-data/service/manifes
 import { ToastrService } from 'ngx-toastr';
 import { FileService } from 'src/app/services/file-service.service';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { SessionStorageService } from 'src/app/services/session-storage.service';
 
 @Component({
   selector: 'app-manifest-data',
@@ -40,7 +41,8 @@ export class ManifestDataComponent {
     private http: HttpClient,
     private toastr: ToastrService,
     private fileService: FileService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public storageService:SessionStorageService
   ){}
 
   ngOnInit(){

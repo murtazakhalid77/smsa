@@ -141,8 +141,8 @@
                                     <th class="nowrap text-center">
                                         <span class="font" style="white-space: nowrap;">Consignee City</span>
                                     </th>
-                                    <th class="text-center nowrap col-md-2 col-lg-1">
-                                        <span class="font">Actions</span>
+                                    <th class="text-center nowrap col-md-2 col-lg-1" *ngIf="this.storageService.hasRole('ADMIN')">
+                                        <span class="font" >Actions</span>
                                     </th>
                                 </tr>
                             </thead>
@@ -174,7 +174,7 @@
                                         <td class="text-center w-auto">{{data?.shipmentCountry}}</td>
                                         <td class="text-center w-auto">{{data?.consigneeName}}</td>
                                         <td class="text-center w-auto">{{data?.consigneeCity}}</td>
-                                        <td class="order-table-btns-container text-center w-auto col-md-2 col-lg-1">
+                                        <td class="order-table-btns-container text-center w-auto col-md-2 col-lg-1"  *ngIf="this.storageService.hasRole('ADMIN')">
                                             <i [style.color]="data?.id? 'black' : 'red'" style="cursor: pointer !important;" class="fa-solid fa-pen"(click)="updateManifestData(data?.id,prefix,manifestNo,awbs)"></i>&nbsp;
                                         </td>
                                     </tr>
@@ -207,7 +207,7 @@
                                     <th class="nowrap   text-center">
                                         <span class="font">Dim Weight</span>
                                     </th>
-                                    <th class="text-center nowrap col-md-2 col-lg-1">
+                                    <th class="text-center nowrap col-md-2 col-lg-1" *ngIf="this.storageService.hasRole('ADMIN')">
                                         <span class="font">Actions</span>
                                     </th>
                                 </tr>
@@ -221,7 +221,7 @@
                                         <td class="text-center w-auto">{{data?.weight}}</td>
                                         <td class="text-center w-auto">{{data?.actualWeight}}</td>
                                         <td class="text-center w-auto">{{data?.dimWeight}}</td>
-                                        <td class="order-table-btns-container text-center w-auto col-md-2 col-lg-1">
+                                        <td class="order-table-btns-container text-center w-auto col-md-2 col-lg-1" *ngIf="this.storageService.hasRole('ADMIN')">
                                             <i [style.color]="data?.id? 'black' : 'red'" style="cursor: pointer !important;" class="fa-solid fa-pen"(click)="updateManifestData(data?.id,prefix,manifestNo,awbs)"></i>&nbsp;
                                         </td>
                                     </tr>
