@@ -1,20 +1,17 @@
 package com.smsa.backend.service;
 
 
-
 import com.smsa.backend.Exception.RecordNotFoundException;
-
-import com.smsa.backend.dto.RoleDto;
 import com.smsa.backend.model.Permission;
 import com.smsa.backend.model.Roles;
 import com.smsa.backend.repository.RolesRepository;
-import jdk.nashorn.internal.runtime.options.Option;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class RolesService {

@@ -1,9 +1,6 @@
 package com.smsa.backend.dto;
 
-import com.amazonaws.services.dynamodbv2.xspec.S;
 import lombok.*;
-
-import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor

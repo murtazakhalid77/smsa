@@ -1,9 +1,7 @@
 package com.smsa.backend.service;
 
 import com.smsa.backend.dto.CurrencyAuditLogDto;
-import com.smsa.backend.dto.RegionDto;
 import com.smsa.backend.model.CurrencyAuditLog;
-import com.smsa.backend.model.Region;
 import com.smsa.backend.repository.CurrencyAuditLogRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CurrencyAuditLogService {

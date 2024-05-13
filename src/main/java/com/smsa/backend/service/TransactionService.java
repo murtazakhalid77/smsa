@@ -1,11 +1,8 @@
 package com.smsa.backend.service;
 
 import com.smsa.backend.Exception.RecordNotFoundException;
-import com.smsa.backend.model.InvoiceDetails;
-import com.smsa.backend.model.SheetHistory;
 import com.smsa.backend.model.Transaction;
 import com.smsa.backend.repository.InvoiceDetailsRepository;
-import com.smsa.backend.repository.SheetHistoryRepository;
 import com.smsa.backend.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

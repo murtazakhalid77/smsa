@@ -5,16 +5,11 @@
 
 package com.smsa.backend.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
-import java.time.LocalDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor

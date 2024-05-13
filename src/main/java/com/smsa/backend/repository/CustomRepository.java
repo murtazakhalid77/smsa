@@ -1,6 +1,5 @@
 package com.smsa.backend.repository;
 
-import com.smsa.backend.controller.CustomController;
 import com.smsa.backend.dto.CustomDto;
 import com.smsa.backend.model.Custom;
 import org.springframework.data.jpa.repository.JpaRepository;

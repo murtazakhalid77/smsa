@@ -1,6 +1,5 @@
 package com.smsa.backend.controller;
 
-import com.smsa.backend.dto.PermissionDto;
 import com.smsa.backend.model.Permission;
 import com.smsa.backend.service.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;

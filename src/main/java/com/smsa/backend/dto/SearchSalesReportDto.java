@@ -2,8 +2,6 @@ package com.smsa.backend.dto;
 
 import lombok.*;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

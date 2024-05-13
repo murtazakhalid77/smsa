@@ -4,7 +4,6 @@ import com.smsa.backend.Exception.RecordAlreadyExistException;
 import com.smsa.backend.Exception.RecordNotFoundException;
 import com.smsa.backend.criteria.SearchCriteria;
 import com.smsa.backend.dto.RegionDto;
-import com.smsa.backend.model.Customer;
 import com.smsa.backend.model.Region;
 import com.smsa.backend.repository.RegionRepository;
 import com.smsa.backend.specification.FilterSpecification;

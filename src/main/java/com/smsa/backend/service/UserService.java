@@ -5,12 +5,10 @@ import com.smsa.backend.Exception.RecordNotFoundException;
 import com.smsa.backend.criteria.SearchCriteria;
 import com.smsa.backend.dto.UserDto;
 import com.smsa.backend.model.Roles;
-import com.smsa.backend.model.SalesReport;
 import com.smsa.backend.model.User;
 import com.smsa.backend.repository.RolesRepository;
 import com.smsa.backend.repository.UserRepository;
 import com.smsa.backend.specification.FilterSpecification;
-import org.modelmapper.Converters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +16,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService {

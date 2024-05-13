@@ -1,7 +1,5 @@
 package com.smsa.backend.controller;
 
-import com.smsa.backend.dto.CurrencyAuditLogDto;
-import com.smsa.backend.dto.CurrencyDto;
 import com.smsa.backend.model.CurrencyAuditLog;
 import com.smsa.backend.service.CurrencyAuditLogService;
 import org.springframework.beans.factory.annotation.Autowired;

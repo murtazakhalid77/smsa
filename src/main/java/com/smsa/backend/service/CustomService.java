@@ -4,7 +4,6 @@ import com.smsa.backend.Exception.RecordNotFoundException;
 import com.smsa.backend.criteria.SearchCriteria;
 import com.smsa.backend.dto.CustomDto;
 import com.smsa.backend.model.Custom;
-import com.smsa.backend.model.Customer;
 import com.smsa.backend.repository.CustomRepository;
 import com.smsa.backend.specification.FilterSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

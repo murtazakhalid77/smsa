@@ -5,9 +5,8 @@
 
 package com.smsa.backend.model;
 
-import java.io.Serializable;
-import java.time.LocalDate;
 import javax.persistence.Column;
+import java.io.Serializable;
 
 public class InvoiceDetailsId implements Serializable {
     private String mawb;

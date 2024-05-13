@@ -4,7 +4,6 @@ import com.smsa.backend.Exception.RecordAlreadyExistException;
 import com.smsa.backend.Exception.RecordNotFoundException;
 import com.smsa.backend.criteria.SearchCriteria;
 import com.smsa.backend.dto.CurrencyDto;
-import com.smsa.backend.dto.CustomerDTO;
 import com.smsa.backend.model.Currency;
 import com.smsa.backend.model.CurrencyAuditLog;
 import com.smsa.backend.model.Custom;
@@ -17,10 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

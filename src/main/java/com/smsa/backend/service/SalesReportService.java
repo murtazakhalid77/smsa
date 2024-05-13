@@ -2,22 +2,16 @@ package com.smsa.backend.service;
 
 import com.smsa.backend.Exception.RecordNotFoundException;
 import com.smsa.backend.criteria.SearchCriteria;
-import com.smsa.backend.dto.RegionDto;
 import com.smsa.backend.dto.SalesReportDto;
 import com.smsa.backend.dto.SearchSalesReportDto;
-import com.smsa.backend.model.Region;
 import com.smsa.backend.model.SalesReport;
-import com.smsa.backend.model.SalesReportAwb;
 import com.smsa.backend.repository.SalesReportRepository;
 import com.smsa.backend.specification.FilterSpecification;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;

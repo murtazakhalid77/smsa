@@ -3,10 +3,6 @@ package com.smsa.backend.dto;
 import com.smsa.backend.model.Currency;
 import lombok.*;
 
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

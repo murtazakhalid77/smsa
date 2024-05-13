@@ -1,7 +1,6 @@
 package com.smsa.backend.service;
 
 import com.smsa.backend.Exception.InvalidEmailException;
-import com.smsa.backend.model.Custom;
 import com.smsa.backend.model.Customer;
 import com.smsa.backend.repository.InvoiceDetailsRepository;
 import com.smsa.backend.scheduler.EmailSchedular;
@@ -9,19 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
-import java.io.File;
 
 @Service
 public class EmailService {

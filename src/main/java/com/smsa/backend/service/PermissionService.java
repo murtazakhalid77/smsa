@@ -1,18 +1,14 @@
 package com.smsa.backend.service;
 
 import com.smsa.backend.Exception.RecordNotFoundException;
-import com.smsa.backend.dto.PermissionDto;
-import com.smsa.backend.dto.RoleDto;
 import com.smsa.backend.model.Permission;
-import com.smsa.backend.model.Roles;
 import com.smsa.backend.repository.PermissionRepository;
-import com.smsa.backend.repository.RolesRepository;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PermissionService {

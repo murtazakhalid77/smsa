@@ -1,13 +1,11 @@
 package com.smsa.backend.controller;
 
 
-import com.smsa.backend.dto.RoleDto;
 import com.smsa.backend.model.Roles;
 import com.smsa.backend.service.RolesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

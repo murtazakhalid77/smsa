@@ -23,4 +23,7 @@ public interface ManifestDataRepository extends JpaRepository<ManifestData,Long>
     List<ManifestData> getManifestDataByManifestNoAndPrefix(@Param("prefix") String prefix, @Param("manifestNo") String manifestNo);
 
     List<ManifestData> findAllByIdIn(List<Long> manifestDataIds);
+
+    @Query(value = "SELECT md.awb FROM manifest_data md", nativeQuery = true)
+    List<String> getAllAwb();
 }

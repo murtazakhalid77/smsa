@@ -1,7 +1,5 @@
 package com.smsa.backend.repository;
 
-import com.smsa.backend.dto.CurrencyAuditLogDto;
-import com.smsa.backend.model.Currency;
 import com.smsa.backend.model.CurrencyAuditLog;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

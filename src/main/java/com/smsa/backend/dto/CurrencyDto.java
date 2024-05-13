@@ -1,12 +1,6 @@
 package com.smsa.backend.dto;
 
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-
-import javax.persistence.*;
-import java.util.Date;
 
 @Data
 @AllArgsConstructor

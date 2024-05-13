@@ -5,25 +5,24 @@ import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.smsa.backend.model.*;
-import com.smsa.backend.repository.InvoiceRepository;
+import com.smsa.backend.model.Custom;
+import com.smsa.backend.model.Customer;
+import com.smsa.backend.model.InvoiceDetails;
+import com.smsa.backend.model.SheetHistory;
 import com.smsa.backend.repository.SheetHistoryRepository;
 import com.smsa.backend.security.util.HashMapHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Executable;
 import java.text.NumberFormat;
-import java.time.LocalDate;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 @Service
 public class PdfService {
