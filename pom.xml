@@ -102,11 +102,11 @@
 			<version>0.11.5</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springframework.batch/spring-batch-core -->
-		<dependency>
-			<groupId>org.springframework.batch</groupId>
-			<artifactId>spring-batch-core</artifactId>
-			<version>4.3.3</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.batch</groupId>-->
+<!--			<artifactId>spring-batch-core</artifactId>-->
+<!--			<version>4.3.3</version>-->
+<!--		</dependency>-->
 
 		<dependency>
 			<groupId>org.springframework.security</groupId>

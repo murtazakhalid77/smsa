@@ -373,13 +373,13 @@ public class ExcelService {
 
         Optional<Custom> custom = customRepository.findByCustomPort(excelImportDto.getCustomPort());//5
 
-        double others=parseDoubleOrDefault(row.get(12), 0.0); //0.0
+        double others=parseDoubleOrDefault(row.get(13), 0.0); //0.0
 
         double customFormValueCalculated=
                 Double.parseDouble(
                         String.format("%3f",
                                 ((double)
-                                        Long.valueOf(userInputMap.get(row.get(0))) /
+                                        Double.valueOf(userInputMap.get(row.get(0))) /
                                         mawbCounts.get(row.get(0)))));
 
         double vatAmount=(valueCustom+customFormValueCalculated)*custom.get().getSmsaFeeVat()/100;
