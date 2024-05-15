@@ -50,7 +50,7 @@ export class ExcelComponent {
     this.openModal();
   }
   numberData: any = [];
-
+  
   headers: any = ['mawb', 'manifest date', 'account number', 'awb', 'ordernumber', 'origin', 'destination', 'shipper name', 'consignee name', 'weight', 'declared value', 'value (custom)', 'custom declaration', 'other', 'ref#', 'custom declaration date'];
 
   constructor(private service: UploadExcelService, private importCustomService: ImportCustomService, private renderer: Renderer2, private toastr: ToastrService, private customService: CustomService, private router: Router, private datePipe: DatePipe, private fileService: FileService) { }
@@ -64,12 +64,24 @@ export class ExcelComponent {
   }
 
   onSubmit(): void {
-    this.excelImportDto.customPlusExcel=true;
-    this.importExcel(false)
+    let flag = true;
+    for (const key in this.userInput) {
+      if (this.userInput[key] === null) {
+          flag = false;
+          break;
+      }
+    }
 
-   
-
-    ;
+    if(flag){
+      this.excelImportDto.customPlusExcel=true
+      this.importExcel(false);
+      this.closeModal();
+      this.toastr.success("Your sheet has been uploaded")
+    }
+    else{
+      this.toastr.clear();
+      this.toastr.error("kindly fill out all the table editable values");
+    }
   }
 
 
@@ -191,68 +203,75 @@ cancelDialogueBox(){
         break;
       }
     }
+    
     const custom = this.getCustom(this.selectedCustomPort);
 
     if (custom) {
-      if (this.startDate || this.endDate) {
-        if (this.fileToUpload !== undefined) {
-          if (flag) {
-            this.excelImportDto = {
-              id: custom.id,
-              customPort: custom.customPort,
-              custom: custom.custom,
-              smsaFeeVat: custom.smsaFeeVat,
-              present: custom.present,
-              date1: this.startDate != null ? new Date(this.startDate!) : undefined,
-              date2: this.endDate != null ? new Date(this.endDate!) : undefined,
-              date3: this.invoiceDate != null ? new Date(this.invoiceDate!) : undefined,
-              customPlusExcel: this.excelImportDto.customPlusExcel,
-            };
+      debugger
+      if (arraysEqual(this.headers, this.dataArray.map((header: string) => header.toLowerCase()))){
+        if (this.startDate || this.endDate) {
+          if (this.fileToUpload !== undefined) {
+            if (flag) {
+              this.excelImportDto = {
+                id: custom.id,
+                customPort: custom.customPort,
+                custom: custom.custom,
+                smsaFeeVat: custom.smsaFeeVat,
+                present: custom.present,
+                date1: this.startDate != null ? new Date(this.startDate!) : undefined,
+                date2: this.endDate != null ? new Date(this.endDate!) : undefined,
+                date3: this.invoiceDate != null ? new Date(this.invoiceDate!) : undefined,
+                customPlusExcel: this.excelImportDto.customPlusExcel,
+              };
 
 
-            try {
-              debugger
-              const res = await this.service.uploadFile(this.fileToUpload, this.excelImportDto, this.userInput);
+              try {
+                debugger
+                const res = await this.service.uploadFile(this.fileToUpload, this.excelImportDto, this.userInput);
 
-              if (flag1) {
-                if (res) {
-                  this.numberData = res;
-                  this.openModelTable = true;
-                  this.openModal1();
-                  this.numberData.forEach((item: any) => {
-                    this.userInput[item] = null; // You can assign any value to the key if needed
-                  });
-                  this.toastr.success("kindly fill out all the table values");
-                }
-              }else{
-                this.accountNumbers = res.accountNumbers;
-                this.toastr.success(res.accountNumbers);
-                if (this.accountNumbers.length > 0) {
-                  this.isModalOpen = true;
+                if (flag1) {
+                  if (res) {
+                    this.numberData = res;
+                    this.openModelTable = true;
+                    this.openModal1();
+                    this.numberData.forEach((item: any) => {
+                      this.userInput[item] = null; // You can assign any value to the key if needed
+                    });
+                    this.toastr.success("Kindly fill out all the table editable values");
+                  }
                 }else{
-                  this.toastr.success("Sheet Uploaded succesfully");
+                  this.accountNumbers = res.accountNumbers;
+                  this.toastr.success(res.accountNumbers);
+                  if (this.accountNumbers.length > 0) {
+                    this.isModalOpen = true;
+                  }else{
+                    this.toastr.success("Sheet Uploaded succesfully");
+                  }
                 }
+              
+              } catch (error: any) {
+                this.toastr.error(error.error.body);
+
+                // if (error.error.body.includes(this.duplicateExceptionMessage)) {
+                //   this.duplicateAwbsMessage = error.error.body;
+                //   this.errorModalOpen = true;
+                // } else {
+                //   this.toastr.error(error.error.body);
+                // }
               }
-             
-            } catch (error: any) {
-              this.toastr.error(error.error.body);
 
-              // if (error.error.body.includes(this.duplicateExceptionMessage)) {
-              //   this.duplicateAwbsMessage = error.error.body;
-              //   this.errorModalOpen = true;
-              // } else {
-              //   this.toastr.error(error.error.body);
-              // }
+            } else {
+              this.toastr.error('The format of the file is Incorrect')
             }
-
           } else {
-            this.toastr.error('The format of the file is Incorrect')
+            this.toastr.error('Please select file')
           }
         } else {
-          this.toastr.error('Please select file')
+          this.toastr.error('Please select atleast one date')
         }
-      } else {
-        this.toastr.error('Please select atleast one date')
+      }
+      else{
+        this.toastr.error('Please choose file with right data sequence')
       }
     } else {
       this.toastr.error('Please select custom port')
@@ -291,5 +310,17 @@ cancelDialogueBox(){
     //   m => new Date(m.CreatedDate) >= new Date(startDate) && new Date(m.CreatedDate) <= new Date(endDate)
     // );
   }
+}
 
+//Function to check equal arrays having same data
+function arraysEqual(a: any[], b: any[]): boolean {
+  if (a.length !== b.length) {
+      return false;
+  }
+  for (let i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) {
+          return false;
+      }
+  }
+  return true;
 }

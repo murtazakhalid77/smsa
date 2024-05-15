@@ -400,7 +400,7 @@ public class ExcelService {
                 .customFormCharges(customFormValueCalculated)
                 .totalCharges(total)
                 .customDeclarationNumber(row.get(12))
-                .other(parseDoubleOrDefault(row.get(13), 0.0))
+                .other(others)
                 .ref(row.get(14))
                 .customDeclarationDate(row.get(15))
                 .build();
