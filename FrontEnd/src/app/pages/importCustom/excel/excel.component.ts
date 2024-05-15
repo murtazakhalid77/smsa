@@ -50,7 +50,7 @@ export class ExcelComponent {
     this.openModal();
   }
   numberData: any = [];
-  
+
   headers: any = ['mawb', 'manifest date', 'account number', 'awb', 'ordernumber', 'origin', 'destination', 'shipper name', 'consignee name', 'weight', 'declared value', 'value (custom)', 'custom declaration', 'other', 'ref#', 'custom declaration date'];
 
   constructor(private service: UploadExcelService, private importCustomService: ImportCustomService, private renderer: Renderer2, private toastr: ToastrService, private customService: CustomService, private router: Router, private datePipe: DatePipe, private fileService: FileService) { }
@@ -76,7 +76,6 @@ export class ExcelComponent {
       this.excelImportDto.customPlusExcel=true
       this.importExcel(false);
       this.closeModal();
-      this.toastr.success("Your sheet has been uploaded")
     }
     else{
       this.toastr.clear();
@@ -176,7 +175,7 @@ cancelDialogueBox(){
       // Other necessary modal setup
     }
   }
-  
+
   closeModal(): void {
     if (this.modalElement && this.modalElement.nativeElement) {
       this.renderer.setStyle(this.modalElement.nativeElement, 'display', 'none');
@@ -203,7 +202,7 @@ cancelDialogueBox(){
         break;
       }
     }
-    
+
     const custom = this.getCustom(this.selectedCustomPort);
 
     if (custom) {
@@ -241,14 +240,15 @@ cancelDialogueBox(){
                   }
                 }else{
                   this.accountNumbers = res.accountNumbers;
-                  this.toastr.success(res.accountNumbers);
-                  if (this.accountNumbers.length > 0) {
-                    this.isModalOpen = true;
+                  if(res.accountNumbers?.length>0){
+                    this.toastr.success("Accounts Created: "+res.accountNumbers+". Data Successfully Uploaded");
                   }else{
-                    this.toastr.success("Sheet Uploaded succesfully");
+                    this.toastr.success(res.message);
                   }
+
+
                 }
-              
+
               } catch (error: any) {
                 this.toastr.error(error.error.body);
 
