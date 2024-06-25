@@ -725,8 +725,8 @@ public class ExcelService {
         columnNames.add("Other");
         columnNames.add("Total Charges");
         columnNames.add("Custom Declartion Currency");
-        columnNames.add("Custom Form Charges-");
         columnNames.add("VAT Amount-");
+        columnNames.add("Custom Form Charges-");
         columnNames.add("Other-");
         columnNames.add("Total Charges-");
         columnNames.add("Total Amount");
