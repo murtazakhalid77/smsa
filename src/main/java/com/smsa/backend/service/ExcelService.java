@@ -565,8 +565,8 @@ public class ExcelService {
                 "OthersSum",
                 "TotalChargesSum",
                 "CustomDeclartionCurrency", //ignore
-                "CustomFormChargesCustomerCurrencySum",
                 "VatAmountCustomerCurrencySum",
+                "CustomFormChargesCustomerCurrencySum",
                 "OtherCustomerCurrencySum",
                 "TotalChargesCustomerCurrencySum"
         );
