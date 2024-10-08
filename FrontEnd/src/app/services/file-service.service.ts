@@ -51,7 +51,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none';
-            a.href = url; 
+            a.href = url;
             a.download = obj.accountNumber ? obj.accountNumber + '_invoice.pdf' : '_invoice.pdf';// Set the desired filename here
             document.body.appendChild(a);
             a.click();

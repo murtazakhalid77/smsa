@@ -14,8 +14,9 @@ export interface ICustomer {
     address?: Date;
     poBox?: boolean;
     country?: string;
-    present?: boolean
-    status?: boolean
+    present?: boolean;
+    status?: boolean;
+    smsaAdminChargesFromSAR?: string;
   }
 
   export class Customer implements ICustomer {
@@ -34,6 +35,7 @@ export interface ICustomer {
         public poBox?: boolean,
         public country?: string,
         public present?: boolean,
-        public status?: boolean
+        public status?: boolean,
+        public smsaAdminChargesFromSAR?: string,
     ) {}
   }

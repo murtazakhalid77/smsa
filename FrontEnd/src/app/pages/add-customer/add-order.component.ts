@@ -321,6 +321,7 @@ export class AddOrderComponent implements OnInit {
       poBox: ['', [Validators.required]],
       country: ['', [Validators.required]],
       email: ['', [Validators.required]],
+      smsaAdminCharges: ['', [Validators.required]]
     })
   }
 
@@ -359,6 +360,7 @@ export class AddOrderComponent implements OnInit {
           address: this.customer.address,
           poBox: this.customer.poBox,
           country: this.customer.country,
+          smsaAdminCharges: this.customer.smsaAdminChargesFromSAR
         };
         this.customerForm.patchValue(formData);
         this.customerForm.get('status')?.setValue(this.customer.status);
@@ -381,7 +383,8 @@ export class AddOrderComponent implements OnInit {
       vatNumber: customerForm.value.customerVAT,  
       address: customerForm.value.address,
       poBox: customerForm.value.poBox,
-      country: customerForm.value.country
+      country: customerForm.value.country,
+      smsaAdminChargesFromSAR: customerForm.value.smsaAdminCharges,
     }
 
     if(this.accountNumber!=null && this.accountNumber.length!=0){

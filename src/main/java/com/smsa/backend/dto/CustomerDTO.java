@@ -62,6 +62,8 @@ public class CustomerDTO {
 
     private boolean isPresent=Boolean.TRUE;
 
-
+    @NotNull(message = "SMSA Admin Charges from SAR is required")
+    @Min(value = 0, message = "SMSA Admin Charges from SAR must be greater than or equal to 0")
+    private Double smsaAdminChargesFromSAR;
 }
 

@@ -458,7 +458,7 @@ public class ExcelService {
         Double vatOnsmsaFees = 0.0;
 
         for (Map<String, Object> singleRecord : calculatedValuesList) {
-                totalChargesAsPerCustomDeclarationForm += Double.parseDouble(singleRecord.get("TotalCharges").toString());
+            totalChargesAsPerCustomDeclarationForm += Double.parseDouble(singleRecord.get("TotalCharges").toString());
             smsaFeesCharges += Double.parseDouble(singleRecord.get("SMSAFeeCharges").toString());
             totalAmount += Double.parseDouble(singleRecord.get("TotalAmount").toString());
             vatOnsmsaFees += Double.parseDouble(singleRecord.get("VatOnSmsaFees").toString());
@@ -592,10 +592,18 @@ public class ExcelService {
                     Row row = invoiceDetailSheet.createRow(rowCount);
                     int columnCount = 0;
 
-                    Double vatAmount = invoiceDetails.getVatAmount() * conversionRate;
+//                    Double vatAmountWithConversion = invoiceDetails.getVatAmount() * conversionRate;
                     Double customFormCharges = invoiceDetails.getCustomFormCharges() * conversionRate;
                     Double other = invoiceDetails.getOther() * conversionRate;
-                    Double totalCharges = invoiceDetails.getTotalCharges() * conversionRate;
+//                    Double totalCharges = (invoiceDetails.getTotalCharges() +  * conversionRate;
+
+                    Double totalChargesCustomerCurrency = invoiceDetails.getCustomFormCharges() + invoiceDetails.getOther() + invoiceDetails.getVatAmount();
+                    Double mawbCharges = customer.getSmsaServiceFromSAR();
+                    Double smsaAdminCharges = Double.valueOf(invoiceDetails.getInvoiceDetailsId().getAwb()) * customer.getSmsaAdminChargesFromSAR();
+                    Double vatAmountWithSMSAAdminCharges = (invoiceDetails.getVatAmount() + (customer.getSmsaServiceFromSAR()+smsaAdminCharges)*0.15);
+
+                    Double vatAmountWithConversion = vatAmountWithSMSAAdminCharges * conversionRate;
+                    Double totalCharges = (invoiceDetails.getTotalCharges() + totalChargesCustomerCurrency +  mawbCharges + vatAmountWithSMSAAdminCharges);
 
 
                     setCellValue(row, columnCount, invoiceDetails.getInvoiceDetailsId().getMawb(),centeredStyle);
@@ -611,15 +619,19 @@ public class ExcelService {
                     setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getDeclaredValue()),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getValueCustom()),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getCustomFormCharges()),rightAlignedStyle);
-                    setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getVatAmount()),rightAlignedStyle);
+                    setCellValue(row, ++columnCount, formatCurrency(vatAmountWithSMSAAdminCharges),rightAlignedStyle);// Changes here
 
                     setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getOther()),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getTotalCharges()),rightAlignedStyle);
                     setCellValue(row, ++columnCount,custom.getCurrency(),centeredStyle);
                     setCellValue(row, ++columnCount, formatCurrency(customFormCharges),rightAlignedStyle);
-                    setCellValue(row, ++columnCount, formatCurrency(vatAmount),rightAlignedStyle);
+                    setCellValue(row, ++columnCount, formatCurrency(vatAmountWithConversion),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(other),rightAlignedStyle);
-                    setCellValue(row, ++columnCount, formatCurrency(totalCharges),rightAlignedStyle);
+                    setCellValue(row, ++columnCount, formatCurrency(totalChargesCustomerCurrency * conversionRate), rightAlignedStyle);// Add 1
+                    setCellValue(row, ++columnCount, formatCurrency(mawbCharges * conversionRate), rightAlignedStyle);// Add 2
+                    setCellValue(row, ++columnCount, formatCurrency(smsaAdminCharges * conversionRate), rightAlignedStyle);// Add 3
+                    setCellValue(row, ++columnCount, formatCurrency(totalCharges * conversionRate),rightAlignedStyle);
+
                     setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationNumber(),centeredStyle);
                     setCellValue(row,++columnCount,invoiceDetails.getRef(),centeredStyle);
                     setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationDate(),centeredStyle);
@@ -702,11 +714,14 @@ public class ExcelService {
         columnMapping.put("Other", "Others"); // Duplicate key
         columnMapping.put("Total Charges", "TotalCharges");
 
-        columnMapping.put("VAT Amount-","VatAmountCustomerCurrency" );
+        columnMapping.put("VAT Amount-","VatAmountCustomerCurrency");
         columnMapping.put("Custom Form Charges-","CustomFormChargesCustomerCurrency");
         columnMapping.put("Other-", "OtherCustomerCurrency");
         columnMapping.put("Total Charges-", "TotalChargesCustomerCurrency");
-        columnMapping.put("Total Amount", "TotalAmountCustomerCurrency");
+        columnMapping.put("Total Custom Charges", "TotalChargesCustomerCurrency");
+        columnMapping.put("MAWB Charges", "MAWBCharges");
+        columnMapping.put("SMSA Admin Charges", "SMSAAdminCharges");
+        columnMapping.put("Total Amount", "TotalAmountCustomerCurrency"); //Check it again maybe its TotalAmount
         return columnMapping;
     }
     private static List<String> getColumnNamesList() {
@@ -729,6 +744,9 @@ public class ExcelService {
         columnNames.add("VAT Amount-");
         columnNames.add("Other-");
         columnNames.add("Total Charges-");
+        columnNames.add("Total Custom Charges");
+        columnNames.add("MAWB Charges");
+        columnNames.add("SMSA Admin Charges");
         columnNames.add("Total Amount");
         return columnNames;
     }

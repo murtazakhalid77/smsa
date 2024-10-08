@@ -39,7 +39,6 @@ public class HashMapHelper {
         Double customFormChargesCustomerCurrency = 0.0;
         Double otherCustomerCurrency = 0.0;
 
-
         for (Map.Entry<String, List<InvoiceDetails>> entry : filteredRowsMap.entrySet()) {
             String mawbNumber = entry.getKey();
             List<InvoiceDetails> filterInvoiceDetails = entry.getValue();
@@ -60,6 +59,7 @@ public class HashMapHelper {
             vatAmountCustomerCurrency = 0.0;
             customFormChargesCustomerCurrency = 0.0;
             otherCustomerCurrency = 0.0;
+
             try {
                 for (InvoiceDetails invoiceDetails : filterInvoiceDetails) {
                     totalAwbCount += 1;
@@ -72,6 +72,7 @@ public class HashMapHelper {
                     customFormChargesCustomerCurrency += invoiceDetails.getCustomFormCharges() * conversionRate;
                     otherCustomerCurrency += invoiceDetails.getOther() * conversionRate;
                     totalDeclaredValue += invoiceDetails.getDeclaredValue();
+
 //                    totalDeclaredValue += invoiceDetails.getTotalCharges() + invoiceDetails.getValueCustom() + invoiceDetails.getVatAmount() + invoiceDetails.getCustomFormCharges() + invoiceDetails.getOther();
                     customDecarationNumberSet.add(invoiceDetails.getCustomDeclarationNumber());
                     customDecarationDateSet.add(invoiceDetails.getCustomDeclarationDate());
@@ -106,9 +107,13 @@ public class HashMapHelper {
                 calculatedValuesMap.put("InvoiceType", "Bill-Shipper");
                 calculatedValuesMap.put("CustomDeclarationDate",
                         dateSetString.substring(1, dateSetString.length() - 1));
-                calculatedValuesMap.put("SMSAFeeCharges", customer.getSmsaServiceFromSAR());
+                calculatedValuesMap.put("SMSAFeeCharges", customer.getSmsaServiceFromSAR() + customer.getSmsaAdminChargesFromSAR());
 
                 calculatedValuesMap.put("CustomPort", custom.getCustomPort());
+
+                calculatedValuesMap.put("MAWBCharges", customer.getSmsaServiceFromSAR());
+                calculatedValuesMap.put("SMSAAdminCharges", totalAwbCount * customer.getSmsaAdminChargesFromSAR());
+
                 calculatedValuesMap.put("VatOnSmsaFees",
                         calculateVatOnSmsaFees(Double.valueOf(calculatedValuesMap.get("SMSAFeeCharges").toString()),
                                 customer.getRegion().getVat())); //for pdf
