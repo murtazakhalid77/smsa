@@ -427,6 +427,7 @@ public class ExcelService {
                     custom,
                     invoiceNumber,
                     sheetUniqueId);
+            //Put Variables of Total Here with Sum Column
             Map<String, Double> sumMap = hashMapHelper.sumNumericColumns(calculatedValuesList);
 
 
@@ -568,6 +569,11 @@ public class ExcelService {
                 "CustomFormChargesCustomerCurrencySum",
                 "VatAmountCustomerCurrencySum",
                 "OtherCustomerCurrencySum",
+
+                "TotalCustomChargesSum",
+                "MAWBChargesSum",
+                "SMSAAdminCharges",
+
                 "TotalChargesCustomerCurrencySum"
         );
     }

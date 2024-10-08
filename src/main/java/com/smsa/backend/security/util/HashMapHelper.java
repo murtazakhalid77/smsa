@@ -148,6 +148,10 @@ public class HashMapHelper {
             Double otherCustomerCurrencySum = 0.0;
             Double totalChargesCustomerCurrencySum = 0.0;
 
+            Double totalCustomChargesSum = 0.0;
+            Double mawbChargesSum = 0.0;
+            Double smsaAdminChargesSum = 0.0;
+
             for (Map<String, Object> calculatedValuesMap : resultList) {
                 customerShipmentValueSum += (Double) calculatedValuesMap.get("CustomerShipmentValue");
                 vatAmountCustomDeclarationFormSum += (Double) calculatedValuesMap.get("VatAmountCustomDeclarationForm");
@@ -155,6 +159,10 @@ public class HashMapHelper {
                 othersSum += (Double) calculatedValuesMap.get("Others");
                 totalChargesSum += (Double) calculatedValuesMap.get("TotalCharges");
                 totalValue += (Double) calculatedValuesMap.get("TotalDeclaredValue");
+
+                totalCustomChargesSum += (Double) calculatedValuesMap.get("TotalChargesCustomerCurrency");
+                mawbChargesSum += (Double) calculatedValuesMap.get("MAWBCharges");
+                smsaAdminChargesSum += (Double) calculatedValuesMap.get("SMSAAdminCharges");
 
                 vatAmountCustomerCurrencySum += (Double) calculatedValuesMap.get("VatAmountCustomerCurrency");
                 customFormChargesCustomerCurrencySum += (Double) calculatedValuesMap.get(
@@ -168,6 +176,11 @@ public class HashMapHelper {
             sumMap.put("VatAmountCustomDeclarationFormSum", vatAmountCustomDeclarationFormSum);
             sumMap.put("CustomFormChargesSum", customFormChargesSum);
             sumMap.put("OthersSum", othersSum);
+            //Changed By Ahmed
+            sumMap.put("TotalCustomChargesSum", totalCustomChargesSum);
+            sumMap.put("MAWBChargesSum", mawbChargesSum);
+            sumMap.put("SMSAAdminCharges", smsaAdminChargesSum);
+
             sumMap.put("TotalChargesSum", totalChargesSum);
 
             sumMap.put("VatAmountCustomerCurrencySum", vatAmountCustomerCurrencySum);

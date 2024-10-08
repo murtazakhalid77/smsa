@@ -79,6 +79,7 @@ public class CustomerService {
                     .invoiceCurrency(customer.getInvoiceCurrency())
                     .vatNumber(customer.getVatNumber())
                     .status(customer.getStatus())
+                    .smsaAdminChargesFromSAR(customer.getSmsaAdminChargesFromSAR())
                     .build();
     }
 
@@ -129,6 +130,7 @@ public class CustomerService {
             customer.get().setPoBox(customerDTO.getPoBox());
             customer.get().setStatus(customerDTO.getStatus());
             customer.get().setCountry(customerDTO.getCountry());
+            customer.get().setSmsaAdminChargesFromSAR(customerDTO.getSmsaAdminChargesFromSAR());
             return toDto(this.customerRepository.save(customer.get()));
         }
         throw new RecordNotFoundException(String.format("Customer Not Found On this Id => %d",accountNumber));
