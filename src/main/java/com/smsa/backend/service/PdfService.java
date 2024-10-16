@@ -77,7 +77,7 @@ public class PdfService {
         arabicCell.setBorder(Rectangle.NO_BORDER);
         arabicCell.setRunDirection(PdfWriter.RUN_DIRECTION_RTL);
 
-        String test = " ﺍﻟﺮﻗﻢ ﺍﻟﻀﺮﻳﺒﻲ:"+"300057426900003";
+        String test = " ﺍﻟﺮﻗﻢ ﺍﻟﻀﺮﻳﺒﻲ:"+"300057426910003";
         arabicCell.addElement(new Paragraph("ﺷﺮﻛﺔ ﺳﻤﺴﺎ ﻟﻠﻨﻘﻞ ﺍﻟﺴﺮﻳﻊ ﺍﻟﻤﺤﺪﻭﺩﺓ", arabicFont));
         arabicCell.addElement(new Paragraph(test, arabicFont));
 
@@ -196,14 +196,14 @@ public class PdfService {
 
 
         // Create the table with specified columns and cell properties
-        PdfPTable dataTable = new PdfPTable(9);
+        PdfPTable dataTable = new PdfPTable(10);
         dataTable.setWidthPercentage(100);
         dataTable.setSpacingBefore(20); // Add space before the table
 
         // Set column height to 50 points
         float columnHeight = 30;
 
-        List<String> columnNames =getColumnNamesList();
+        List<String> columnNames = getColumnNamesList();
 
         Map<String, String> columnMapping = getColumnMapping();
 
@@ -264,7 +264,7 @@ public class PdfService {
 
             for (Map<String, Object> rowDataMap : calculatedValuesList) {
 
-                for (int i = columnNames.size() - 4; i < columnNames.size(); i++) {
+                for (int i = columnNames.size() - 5; i < columnNames.size(); i++) {
                     String columnName = columnNames.get(i);
                     String totalCalculatedKey = columnMapping.get(columnName);
                     Object totalCalculatedAmount = rowDataMap.get(totalCalculatedKey);
@@ -274,13 +274,13 @@ public class PdfService {
                     }
                 }
             }
-            int emptyCellColspan = columnNames.size() - 4;
+            int emptyCellColspan = columnNames.size() - 5;
             PdfPCell emptyCell = new PdfPCell(new Phrase(""));
             emptyCell.setColspan(emptyCellColspan);
             emptyCell.setBorder(Rectangle.NO_BORDER);
             dataTable.addCell(emptyCell);
 // Iterate through the last 4 columns to add their sums to the PDF
-            for (int i = columnNames.size() - 4; i < columnNames.size(); i++) {
+            for (int i = columnNames.size() - 5; i < columnNames.size(); i++) {
                 String columnName = columnNames.get(i);
                 Double mapValue = columnSumMap.get(columnName);
 
@@ -375,9 +375,10 @@ public class PdfService {
         columnMapping.put("MAWB No.", "MawbNumber");
         columnMapping.put("Custom Declaration No", "CustomDeclarationNumber");
         columnMapping.put("Total Charges as per Custom Declaration Form", "TotalChargesCustomerCurrency");
-        columnMapping.put("SMSA Fee Charges", "SMSAFeeCharges");
-        columnMapping.put("VAT on SMSA Fee", "VatOnSmsaFees");
-        columnMapping.put("Total Amount", "TotalAmount");
+        columnMapping.put("MAWB Charges", "MAWBChargesCustomerCurrency");
+        columnMapping.put("SMSA Admin Charges", "SMSAAdminChargesCustomerCurrency");
+        columnMapping.put("VAT on SMSA Fee", "VatOnSmsaChargesCustomerCurrency");
+        columnMapping.put("Total Amount", "TotalAmountCustomerCurrency");
 
         return columnMapping;
     }
@@ -386,7 +387,8 @@ public class PdfService {
     private boolean shouldApplyCurrencyFormat(String columnName) {
         List<String> currencyFormattedColumns = Arrays.asList(
                 "Total Charges as per Custom Declaration Form",
-                "SMSA Fee Charges",
+                "MAWB Charges",
+                "SMSA Admin Charges",
                 "VAT on SMSA Fee",
                 "Total Amount"
         );
@@ -401,7 +403,8 @@ public class PdfService {
         columnNames.add("MAWB No.");
         columnNames.add("Custom Declaration No");
         columnNames.add("Total Charges as per Custom Declaration Form");
-        columnNames.add("SMSA Fee Charges");
+        columnNames.add("MAWB Charges");
+        columnNames.add("SMSA Admin Charges");
         columnNames.add("VAT on SMSA Fee");
         columnNames.add("Total Amount");
         return columnNames;

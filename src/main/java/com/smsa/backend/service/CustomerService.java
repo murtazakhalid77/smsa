@@ -100,6 +100,7 @@ public class CustomerService {
                 .nameEnglish(customerDTO.getNameEnglish())
                 .VatNumber(customerDTO.getVatNumber())
                 .status(customerDTO.getStatus())
+                .smsaAdminChargesFromSAR(customerDTO.getSmsaAdminChargesFromSAR())
                 .build();
     }
 
@@ -107,6 +108,9 @@ public class CustomerService {
     public CustomerDTO getCustomerById(String accountNumber) {
         Optional<Customer> customer = customerRepository.findByAccountNumber(accountNumber);
         if (customer.isPresent()){
+            if (customer.get().getSmsaAdminChargesFromSAR() == null){
+                customer.get().setSmsaAdminChargesFromSAR(2.0);
+            }
             return toDto(customer.get());
         }
 

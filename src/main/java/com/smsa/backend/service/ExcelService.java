@@ -560,21 +560,20 @@ public class ExcelService {
     private static List<String> getSumColumnsList() {
         return Arrays.asList(
                 "TotalValueSum",
+                "VatAmountCustomDeclarationFormSum",
                 "CustomerShipmentValueSum",
                 "CustomFormChargesSum",
-                "VatAmountCustomDeclarationFormSum",
                 "OthersSum",
                 "TotalChargesSum",
                 "CustomDeclartionCurrency", //ignore
                 "CustomFormChargesCustomerCurrencySum",
                 "VatAmountCustomerCurrencySum",
                 "OtherCustomerCurrencySum",
-
-                "TotalCustomChargesSum",
-                "MAWBChargesSum",
-                "SMSAAdminCharges",
-
-                "TotalChargesCustomerCurrencySum"
+                "TotalCustomChargesCustomerCurrencySum",
+                "MAWBChargesCustomerCurrencySum",
+                "SMSAAdminChargesCustomerCurrencySum",
+                "VatOnSmsaChargesCustomerCurrencySum",
+                "TotalAmountCustomerCurrencySum" // Changed  from Charges to Amount
         );
     }
 
@@ -598,20 +597,13 @@ public class ExcelService {
                     Row row = invoiceDetailSheet.createRow(rowCount);
                     int columnCount = 0;
 
-//                    Double vatAmountWithConversion = invoiceDetails.getVatAmount() * conversionRate;
+                    //Calculating Values Used Further For Conversion to Customer Currency
+                    Double vatAmount = invoiceDetails.getVatAmount() * conversionRate;
                     Double customFormCharges = invoiceDetails.getCustomFormCharges() * conversionRate;
                     Double other = invoiceDetails.getOther() * conversionRate;
-//                    Double totalCharges = (invoiceDetails.getTotalCharges() +  * conversionRate;
+                    Double totalCharges = invoiceDetails.getTotalCharges() * conversionRate;
 
-                    Double totalChargesCustomerCurrency = invoiceDetails.getCustomFormCharges() + invoiceDetails.getOther() + invoiceDetails.getVatAmount();
-                    Double mawbCharges = customer.getSmsaServiceFromSAR();
-                    Double smsaAdminCharges = Double.valueOf(invoiceDetails.getInvoiceDetailsId().getAwb()) * customer.getSmsaAdminChargesFromSAR();
-                    Double vatAmountWithSMSAAdminCharges = (invoiceDetails.getVatAmount() + (customer.getSmsaServiceFromSAR()+smsaAdminCharges)*0.15);
-
-                    Double vatAmountWithConversion = vatAmountWithSMSAAdminCharges * conversionRate;
-                    Double totalCharges = (invoiceDetails.getTotalCharges() + totalChargesCustomerCurrency +  mawbCharges + vatAmountWithSMSAAdminCharges);
-
-
+                    //Setting Normal Values to the Excel named as Sample.xlsx in Invoice Details Tab
                     setCellValue(row, columnCount, invoiceDetails.getInvoiceDetailsId().getMawb(),centeredStyle);
                     setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getManifestDate(),centeredStyle);
                     setCellValue(row, ++columnCount, invoiceDetails.getInvoiceDetailsId().getAccountNumber(),centeredStyle);
@@ -623,21 +615,23 @@ public class ExcelService {
                     setCellValue(row, ++columnCount, invoiceDetails.getConsigneeName(),centeredStyle);
                     setCellValue(row, ++columnCount, invoiceDetails.getWeight(),centeredStyle);
                     setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getDeclaredValue()),rightAlignedStyle);
+
+                    /*Setting Charges as per Custom Declaration Currency Values to the Excel named as Sample.xlsx
+                    in Invoice Details Tab */
                     setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getValueCustom()),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getCustomFormCharges()),rightAlignedStyle);
-                    setCellValue(row, ++columnCount, formatCurrency(vatAmountWithSMSAAdminCharges),rightAlignedStyle);// Changes here
-
+                    setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getVatAmount()),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getOther()),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(invoiceDetails.getTotalCharges()),rightAlignedStyle);
                     setCellValue(row, ++columnCount,custom.getCurrency(),centeredStyle);
+
+                    //Setting Charges as per Customer Currency to the Excel named as Sample.xlsx
+                    setCellValue(row, ++columnCount, formatCurrency(vatAmount),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(customFormCharges),rightAlignedStyle);
-                    setCellValue(row, ++columnCount, formatCurrency(vatAmountWithConversion),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(other),rightAlignedStyle);
-                    setCellValue(row, ++columnCount, formatCurrency(totalChargesCustomerCurrency * conversionRate), rightAlignedStyle);// Add 1
-                    setCellValue(row, ++columnCount, formatCurrency(mawbCharges * conversionRate), rightAlignedStyle);// Add 2
-                    setCellValue(row, ++columnCount, formatCurrency(smsaAdminCharges * conversionRate), rightAlignedStyle);// Add 3
                     setCellValue(row, ++columnCount, formatCurrency(totalCharges * conversionRate),rightAlignedStyle);
 
+                    //Remaining Normal Values
                     setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationNumber(),centeredStyle);
                     setCellValue(row,++columnCount,invoiceDetails.getRef(),centeredStyle);
                     setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationDate(),centeredStyle);
@@ -663,7 +657,7 @@ public class ExcelService {
 
 
             int startingRow = 11;
-            List<String> columnNames = getColumnNamesList();
+            List<String> columnNames =  getColumnNamesList();
             Map<String, String> columnMapping = getColumnMapping();
 
             for (Map<String, Object> calculatedValuesMap : calculatedValuesList) {
@@ -705,33 +699,40 @@ public class ExcelService {
     private static Map<String, String> getColumnMapping() {
         Map<String, String> columnMapping = new LinkedHashMap<>();
 
+        //Mapping normal values of Summary in Excel Named as Sample.xlsx
         columnMapping.put("Invoice Type", "InvoiceType");
         columnMapping.put("Custom Port", "CustomPort");
-        columnMapping.put("Custom Declartion Date", "CustomDeclarationDate");
+        columnMapping.put("Custom Declaration Date", "CustomDeclarationDate");
         columnMapping.put("Invoice#", "InvoiceNumber");
         columnMapping.put("MAWB Number", "MawbNumber");
-        columnMapping.put("Custom Declartion Currency", "CustomDeclarationCurrency");
-        columnMapping.put("Custom Declartion#", "CustomDeclarationNumber");
+        columnMapping.put("Custom Declaration#", "CustomDeclarationNumber");
         columnMapping.put("Total AWB Count", "TotalAwbCount");
+
+        /* Mapping Charges as per Custom Declaration Currency of Summary in Excel Named
+        as Sample.xlsx */
         columnMapping.put("Total Declared Value", "TotalDeclaredValue");
-        columnMapping.put("Value (Custom)", "CustomerShipmentValue");
         columnMapping.put("VAT Amount", "VatAmountCustomDeclarationForm");
+        columnMapping.put("Value (Custom)", "CustomerShipmentValue");
         columnMapping.put("Custom Form Charges","CustomFormCharges");
         columnMapping.put("Other", "Others"); // Duplicate key
         columnMapping.put("Total Charges", "TotalCharges");
+        columnMapping.put("Custom Declaration Currency", "CustomDeclarationCurrency");
 
-        columnMapping.put("VAT Amount-","VatAmountCustomerCurrency");
+        //Mapping Chargers as per Customer Currency of Summary in Excel Named as Sample.xlsx
         columnMapping.put("Custom Form Charges-","CustomFormChargesCustomerCurrency");
+        columnMapping.put("VAT Amount-","VatAmountCustomerCurrency");
         columnMapping.put("Other-", "OtherCustomerCurrency");
-        columnMapping.put("Total Charges-", "TotalChargesCustomerCurrency");
-        columnMapping.put("Total Custom Charges", "TotalChargesCustomerCurrency");
-        columnMapping.put("MAWB Charges", "MAWBCharges");
-        columnMapping.put("SMSA Admin Charges", "SMSAAdminCharges");
-        columnMapping.put("Total Amount", "TotalAmountCustomerCurrency"); //Check it again maybe its TotalAmount
+//        columnMapping.put("Total Charges-", "TotalChargesCustomerCurrency");
+        columnMapping.put("Total Custom Charges-", "TotalCustomChargesCustomerCurrency");
+        columnMapping.put("MAWB Charges-", "MAWBChargesCustomerCurrency");
+        columnMapping.put("SMSA Admin Charges-", "SMSAAdminChargesCustomerCurrency");
+        columnMapping.put("VAT on SMSA Charges-","VatOnSmsaChargesCustomerCurrency");
+        columnMapping.put("Total Amount", "TotalAmountCustomerCurrency");
         return columnMapping;
     }
     private static List<String> getColumnNamesList() {
         List<String> columnNames = new ArrayList<>();
+        //Adding Column Names for Normal Values in Summary of Excel named as Sample.xlsx
         columnNames.add("Invoice Type");
         columnNames.add("Custom Port");
         columnNames.add("Custom Declartion Date");
@@ -739,20 +740,25 @@ public class ExcelService {
         columnNames.add("MAWB Number");
         columnNames.add("Custom Declartion#");
         columnNames.add("Total AWB Count");
+
+        /*Adding Column Names for Charges as per Custom Declaration Currency in Summary of Excel
+        named as Sample.xlsx */
         columnNames.add("Total Declared Value");
+        columnNames.add("VAT Amount");
         columnNames.add("Value (Custom)");
         columnNames.add("Custom Form Charges");
-        columnNames.add("VAT Amount");
         columnNames.add("Other");
         columnNames.add("Total Charges");
-        columnNames.add("Custom Declartion Currency");
+        columnNames.add("Custom Declaration Currency");
+
+        //Adding Column Names for Chargers as per Customer Currency in Summary of Excel named as Sample.xlsx
         columnNames.add("Custom Form Charges-");
         columnNames.add("VAT Amount-");
         columnNames.add("Other-");
-        columnNames.add("Total Charges-");
-        columnNames.add("Total Custom Charges");
-        columnNames.add("MAWB Charges");
-        columnNames.add("SMSA Admin Charges");
+        columnNames.add("Total Custom Charges-");
+        columnNames.add("MAWB Charges-");
+        columnNames.add("SMSA Admin Charges-");
+        columnNames.add("VAT on SMSA Charges-");
         columnNames.add("Total Amount");
         return columnNames;
     }

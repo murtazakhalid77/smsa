@@ -1,6 +1,5 @@
 package com.smsa.backend.security.util;
 
-import com.smsa.backend.Exception.ExcelMakingException;
 import com.smsa.backend.model.Currency;
 import com.smsa.backend.model.Custom;
 import com.smsa.backend.model.Customer;
@@ -77,6 +76,7 @@ public class HashMapHelper {
                     customDecarationNumberSet.add(invoiceDetails.getCustomDeclarationNumber());
                     customDecarationDateSet.add(invoiceDetails.getCustomDeclarationDate());
 
+
                 }
                 String dateSetString = customDecarationDateSet.toString();
                 String customDeclarationNumbers = customDecarationNumberSet.stream()
@@ -87,6 +87,7 @@ public class HashMapHelper {
                 calculatedValuesMap.put("MawbNumber", mawbNumber);
                 Double totalCharges = customFormChares + others + vatAmountCustomDeclartionForm;
                 Double totalChargesCustomerCurrency = customFormChargesCustomerCurrency + otherCustomerCurrency + vatAmountCustomerCurrency;
+
 
                 // Put the calculated values into the result map
                 calculatedValuesMap.put("TotalAwbCount", totalAwbCount);
@@ -107,12 +108,18 @@ public class HashMapHelper {
                 calculatedValuesMap.put("InvoiceType", "Bill-Shipper");
                 calculatedValuesMap.put("CustomDeclarationDate",
                         dateSetString.substring(1, dateSetString.length() - 1));
-                calculatedValuesMap.put("SMSAFeeCharges", customer.getSmsaServiceFromSAR() + customer.getSmsaAdminChargesFromSAR());
+                calculatedValuesMap.put("SMSAFeeCharges", customer.getSmsaServiceFromSAR());
+                calculatedValuesMap.put("SMSAFeeChargesCustomerCurrency", customer.getSmsaServiceFromSAR() * conversionRate);
 
                 calculatedValuesMap.put("CustomPort", custom.getCustomPort());
 
-                calculatedValuesMap.put("MAWBCharges", customer.getSmsaServiceFromSAR());
-                calculatedValuesMap.put("SMSAAdminCharges", totalAwbCount * customer.getSmsaAdminChargesFromSAR());
+                calculatedValuesMap.put("TotalCustomChargesCustomerCurrency",totalChargesCustomerCurrency); //Total Charges is also known as  Total Custom Charges
+                calculatedValuesMap.put("MAWBChargesCustomerCurrency", customer.getSmsaServiceFromSAR() * conversionRate);
+                calculatedValuesMap.put("SMSAAdminChargesCustomerCurrency", totalAwbCount * customer.getSmsaAdminChargesFromSAR() * conversionRate);
+                calculatedValuesMap.put("VatOnSmsaChargesCustomerCurrency",calculateVatOnSmsaCharges(
+                        Double.valueOf(calculatedValuesMap.get("MAWBChargesCustomerCurrency").toString()),
+                        Double.valueOf(calculatedValuesMap.get("SMSAAdminChargesCustomerCurrency").toString()),
+                        customer.getRegion().getVat()));
 
                 calculatedValuesMap.put("VatOnSmsaFees",
                         calculateVatOnSmsaFees(Double.valueOf(calculatedValuesMap.get("SMSAFeeCharges").toString()),
@@ -122,6 +129,14 @@ public class HashMapHelper {
                         calculateTotalAmount(calculatedValuesMap.get("TotalChargesCustomerCurrency").toString(),
                                 calculatedValuesMap.get("SMSAFeeCharges").toString(),
                                 calculatedValuesMap.get("VatOnSmsaFees").toString()));
+
+                calculatedValuesMap.put("TotalAmountCustomerCurrency",
+                        calculateTotalAmountCustomerCurrency(
+                        Double.valueOf(calculatedValuesMap.get("TotalCustomChargesCustomerCurrency").toString()),
+                        Double.valueOf(calculatedValuesMap.get("MAWBChargesCustomerCurrency").toString()),
+                        Double.valueOf(calculatedValuesMap.get("SMSAAdminChargesCustomerCurrency").toString()),
+                        Double.valueOf(calculatedValuesMap.get("VatOnSmsaChargesCustomerCurrency").toString()))
+                        );
 
                 resultList.add(calculatedValuesMap);
             } catch (Exception e) {
@@ -146,11 +161,12 @@ public class HashMapHelper {
             Double vatAmountCustomerCurrencySum = 0.0;
             Double customFormChargesCustomerCurrencySum = 0.0;
             Double otherCustomerCurrencySum = 0.0;
-            Double totalChargesCustomerCurrencySum = 0.0;
+            Double totalAmountCustomerCurrencySum = 0.0;
 
-            Double totalCustomChargesSum = 0.0;
-            Double mawbChargesSum = 0.0;
-            Double smsaAdminChargesSum = 0.0;
+            Double totalCustomChargesCustomerCurrencySum = 0.0;
+            Double mawbChargesCustomerCurrencySum = 0.0;
+            Double smsaAdminChargesCustomerCurrencySum = 0.0;
+            Double vatOnSmsaChargesCustomerCurrencySum = 0.0;
 
             for (Map<String, Object> calculatedValuesMap : resultList) {
                 customerShipmentValueSum += (Double) calculatedValuesMap.get("CustomerShipmentValue");
@@ -160,33 +176,34 @@ public class HashMapHelper {
                 totalChargesSum += (Double) calculatedValuesMap.get("TotalCharges");
                 totalValue += (Double) calculatedValuesMap.get("TotalDeclaredValue");
 
-                totalCustomChargesSum += (Double) calculatedValuesMap.get("TotalChargesCustomerCurrency");
-                mawbChargesSum += (Double) calculatedValuesMap.get("MAWBCharges");
-                smsaAdminChargesSum += (Double) calculatedValuesMap.get("SMSAAdminCharges");
+
+                totalCustomChargesCustomerCurrencySum += (Double) calculatedValuesMap
+                        .get("TotalCustomChargesCustomerCurrency");
+                mawbChargesCustomerCurrencySum += (Double) calculatedValuesMap.get("MAWBChargesCustomerCurrency");
+                smsaAdminChargesCustomerCurrencySum += (Double) calculatedValuesMap.get("SMSAAdminChargesCustomerCurrency");
+                vatOnSmsaChargesCustomerCurrencySum += (Double) calculatedValuesMap.get("VatOnSmsaChargesCustomerCurrency");
 
                 vatAmountCustomerCurrencySum += (Double) calculatedValuesMap.get("VatAmountCustomerCurrency");
                 customFormChargesCustomerCurrencySum += (Double) calculatedValuesMap.get(
                         "CustomFormChargesCustomerCurrency");
                 otherCustomerCurrencySum += (Double) calculatedValuesMap.get("OtherCustomerCurrency");
-                totalChargesCustomerCurrencySum += (Double) calculatedValuesMap.get("TotalChargesCustomerCurrency");
+                totalAmountCustomerCurrencySum += (Double) calculatedValuesMap.get("TotalAmountCustomerCurrency");
             }
 
             sumMap.put("TotalValueSum", totalValue);
-            sumMap.put("CustomerShipmentValueSum", customerShipmentValueSum);
             sumMap.put("VatAmountCustomDeclarationFormSum", vatAmountCustomDeclarationFormSum);
+            sumMap.put("CustomerShipmentValueSum", customerShipmentValueSum);
             sumMap.put("CustomFormChargesSum", customFormChargesSum);
             sumMap.put("OthersSum", othersSum);
-            //Changed By Ahmed
-            sumMap.put("TotalCustomChargesSum", totalCustomChargesSum);
-            sumMap.put("MAWBChargesSum", mawbChargesSum);
-            sumMap.put("SMSAAdminCharges", smsaAdminChargesSum);
-
             sumMap.put("TotalChargesSum", totalChargesSum);
-
-            sumMap.put("VatAmountCustomerCurrencySum", vatAmountCustomerCurrencySum);
             sumMap.put("CustomFormChargesCustomerCurrencySum", customFormChargesCustomerCurrencySum);
+            sumMap.put("VatAmountCustomerCurrencySum", vatAmountCustomerCurrencySum);
             sumMap.put("OtherCustomerCurrencySum", otherCustomerCurrencySum);
-            sumMap.put("TotalChargesCustomerCurrencySum", totalChargesCustomerCurrencySum);
+            sumMap.put("TotalCustomChargesCustomerCurrencySum", totalCustomChargesCustomerCurrencySum);
+            sumMap.put("MAWBChargesCustomerCurrencySum", mawbChargesCustomerCurrencySum);
+            sumMap.put("SMSAAdminChargesCustomerCurrencySum", smsaAdminChargesCustomerCurrencySum);
+            sumMap.put("VatOnSmsaChargesCustomerCurrencySum", vatOnSmsaChargesCustomerCurrencySum);
+            sumMap.put("TotalAmountCustomerCurrencySum", totalAmountCustomerCurrencySum);
 
             return sumMap;
         } catch (Exception e) {
@@ -207,6 +224,15 @@ public class HashMapHelper {
 
     }
 
+    private Double calculateVatOnSmsaCharges(Double mawbCharges, Double smsaAdminCharges, Double vat) {
+        try{
+            return (mawbCharges + smsaAdminCharges) * (vat/100);
+        }
+        catch (Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
     private Double calculateTotalAmount(String totalChargesCustomerCurrency, String smsaFeesCharges, String vatOnSmsaFees) {
         Double totalCharges = Double.valueOf(totalChargesCustomerCurrency);
         Double vatPercentage = Double.valueOf(vatOnSmsaFees);
@@ -219,29 +245,41 @@ public class HashMapHelper {
         return totalAmount;
     }
 
+    private Double calculateTotalAmountCustomerCurrency(
+            Double totalCustomChargesCustomerCurrency,
+            Double mawbChargesCustomerCurrency,
+            Double smsaAdminChargesCustomerCurrency,
+            Double vatOnSmsaChargesCustomerCurrency) {
 
-    private Map<String, String> getColumnMapping() {
-        Map<String, String> columnMapping = new HashMap<>();
-        columnMapping.put("Invoice Type", "InvoiceType");
-        columnMapping.put("Custom Port", "CustomPort");
-        columnMapping.put("Custom Declartion Date", "CustomDeclarationDate");
-        columnMapping.put("Invoice#", "InvoiceNumber");
-        columnMapping.put("MAWB Number", "MAWBNumber");
-        columnMapping.put("Custom Declartion#", "CustomDeclarationNumber");
-        columnMapping.put("Total AWB Count", "TotalAwbCount");
-        columnMapping.put("Total Value", "TotalValue");
-        columnMapping.put("Value (Custom)", "CustomerShipmentValue");
-        columnMapping.put("VAT Amount", "VatAmountCustomDeclarationForm");
-        columnMapping.put("Custom Form Charges", "CustomFormCharges");
-        columnMapping.put("Other", "Others");
-        columnMapping.put("Total Charges", "TotalCharges");
-        columnMapping.put("Custom Declartion Currency", "CustomDeclarationCurrency");
-        columnMapping.put("VAT Amount", "VatAmountCustomerCurrency");
-        columnMapping.put("Custom Form Charges", "CustomFormChargesCustomerCurrency");
-        columnMapping.put("Other", "OtherCustomerCurrency");
-        columnMapping.put("Total Charges", "TotalChargesCustomerCurrency");
-        return columnMapping;
+        return totalCustomChargesCustomerCurrency +
+                mawbChargesCustomerCurrency +
+                smsaAdminChargesCustomerCurrency +
+                vatOnSmsaChargesCustomerCurrency;
     }
+
+
+//    private Map<String, String> getColumnMapping() {
+//        Map<String, String> columnMapping = new HashMap<>();
+//        columnMapping.put("Invoice Type", "InvoiceType");
+//        columnMapping.put("Custom Port", "CustomPort");
+//        columnMapping.put("Custom Declartion Date", "CustomDeclarationDate");
+//        columnMapping.put("Invoice#", "InvoiceNumber");
+//        columnMapping.put("MAWB Number", "MAWBNumber");
+//        columnMapping.put("Custom Declartion#", "CustomDeclarationNumber");
+//        columnMapping.put("Total AWB Count", "TotalAwbCount");
+//        columnMapping.put("Total Value", "TotalValue");
+//        columnMapping.put("Value (Custom)", "CustomerShipmentValue");
+//        columnMapping.put("VAT Amount", "VatAmountCustomDeclarationForm");
+//        columnMapping.put("Custom Form Charges", "CustomFormCharges");
+//        columnMapping.put("Other", "Others");
+//        columnMapping.put("Total Charges", "TotalCharges");
+//        columnMapping.put("Custom Declartion Currency", "CustomDeclarationCurrency");
+//        columnMapping.put("VAT Amount", "VatAmountCustomerCurrency");
+//        columnMapping.put("Custom Form Charges", "CustomFormChargesCustomerCurrency");
+//        columnMapping.put("Other", "OtherCustomerCurrency");
+//        columnMapping.put("Total Charges", "TotalChargesCustomerCurrency");
+//        return columnMapping;
+//    }
 
 
     public Map<String, List<InvoiceDetails>> filterRowsByMawbNumber(List<InvoiceDetails> invoiceDetailsList) throws RuntimeException {
