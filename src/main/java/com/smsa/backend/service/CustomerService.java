@@ -109,7 +109,7 @@ public class CustomerService {
         Optional<Customer> customer = customerRepository.findByAccountNumber(accountNumber);
         if (customer.isPresent()){
             if (customer.get().getSmsaAdminChargesFromSAR() == null){
-                customer.get().setSmsaAdminChargesFromSAR(2.0);
+                customer.get().setSmsaAdminChargesFromSAR(2.40);
             }
             return toDto(customer.get());
         }

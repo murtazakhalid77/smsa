@@ -601,7 +601,7 @@ public class ExcelService {
                     Double vatAmount = invoiceDetails.getVatAmount() * conversionRate;
                     Double customFormCharges = invoiceDetails.getCustomFormCharges() * conversionRate;
                     Double other = invoiceDetails.getOther() * conversionRate;
-                    Double totalCharges = invoiceDetails.getTotalCharges() * conversionRate;
+                    Double totalCharges = customFormCharges + other + vatAmount;
 
                     //Setting Normal Values to the Excel named as Sample.xlsx in Invoice Details Tab
                     setCellValue(row, columnCount, invoiceDetails.getInvoiceDetailsId().getMawb(),centeredStyle);
