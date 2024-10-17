@@ -629,7 +629,7 @@ public class ExcelService {
                     setCellValue(row, ++columnCount, formatCurrency(vatAmount),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(customFormCharges),rightAlignedStyle);
                     setCellValue(row, ++columnCount, formatCurrency(other),rightAlignedStyle);
-                    setCellValue(row, ++columnCount, formatCurrency(totalCharges * conversionRate),rightAlignedStyle);
+                    setCellValue(row, ++columnCount, formatCurrency(totalCharges),rightAlignedStyle);
 
                     //Remaining Normal Values
                     setCellValue(row, ++columnCount, invoiceDetails.getCustomDeclarationNumber(),centeredStyle);
@@ -735,10 +735,10 @@ public class ExcelService {
         //Adding Column Names for Normal Values in Summary of Excel named as Sample.xlsx
         columnNames.add("Invoice Type");
         columnNames.add("Custom Port");
-        columnNames.add("Custom Declartion Date");
+        columnNames.add("Custom Declaration Date");
         columnNames.add("Invoice#");
         columnNames.add("MAWB Number");
-        columnNames.add("Custom Declartion#");
+        columnNames.add("Custom Declaration#");
         columnNames.add("Total AWB Count");
 
         /*Adding Column Names for Charges as per Custom Declaration Currency in Summary of Excel
