@@ -213,7 +213,7 @@ public class PdfService {
                 PdfPCell cell;
 
                 if (columnName.equals("VAT on SMSA Fee")) {
-                    cell = new PdfPCell(new Paragraph(customer.getRegion().getVat() + "%" + columnName, columnFontBold));
+                    cell = new PdfPCell(new Paragraph(custom.getSmsaFeeVat() + "%" + columnName, columnFontBold));
                 } else {
                     cell = new PdfPCell(new Paragraph(columnName, columnFontBold));
                 }
