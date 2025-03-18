@@ -110,6 +110,9 @@
                             <span class="font">Invoice Number</span>
                         </th>
                         <th class="nowrap   text-center">
+                            <span class="font">Invoice Date</span>
+                        </th>
+                        <th class="nowrap   text-center">
                             <span class="font">Account Number</span>
                         </th>
                         <th class="nowrap   text-center">
@@ -154,6 +157,7 @@
                         <tr *ngFor="let saleReport of salesReport" class="order-table-row-hover">
                             <td class="text-center w-auto">{{saleReport?.id}}</td>
                             <td class="text-center w-auto">{{saleReport?.invoiceNumber}}</td>
+                            <td class="text-center w-auto">{{saleReport?.invoiceDate}}</td>
                             <td class="text-center w-auto">{{saleReport?.customerAccountNumber}}</td>
                             <td class="text-center w-auto">{{saleReport?.customerName}}</td>
                             <td class="text-center w-auto">{{saleReport?.customerRegion}}</td>

@@ -21,6 +21,7 @@ public class SalesReportDto {
     String customerName;
     String customerRegion;
     String period;
+    String invoiceDate;
     Double totalChargesAsPerCustomerDeclarationForm;
     Double smsaFeeCharges;
     Double vatOnSmsaFees;

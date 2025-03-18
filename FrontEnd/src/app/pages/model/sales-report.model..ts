@@ -7,6 +7,7 @@ export interface ISalesReport {
     customerName?: string;
     customerRegion?: string;
     period?: string;
+    invoiceDate?: string;
     totalChargesAsPerCustomerDeclarationForm?: number;
     smsaFeeCharges?: number;
     vatOnSmsaFees?: number;
@@ -24,6 +25,7 @@ export interface ISalesReport {
         public customerName?: string,
         public customerRegion?: string,
         public period?: string,
+        public invoiceDate?: string,
         public totalChargesAsPerCustomerDeclarationForm?: number,
         public smsaFeeCharges?: number,
         public vatOnSmsaFees?: number,

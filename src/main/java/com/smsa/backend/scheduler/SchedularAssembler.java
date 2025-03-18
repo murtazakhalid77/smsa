@@ -23,6 +23,7 @@ public class SchedularAssembler {
                 .customerName(customer.getNameEnglish())
                 .customerRegion(customer.getRegion().getCustomerRegion())
                 .period(helperService.generateInvoiceDatePeriod(sheetUniqueId))
+                .invoiceDate(helperService.generateInvoiceDate(sheetUniqueId))
                 .totalChargesAsPerCustomerDeclarationForm(salesReportHelperDto.getTotalChargesAsPerCustomDeclarationForm())
                 .vatOnSmsaFees(salesReportHelperDto.getVatOnSmsaFees())
                 .totalAmount(salesReportHelperDto.getTotalAmount())

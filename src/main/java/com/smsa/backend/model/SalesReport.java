@@ -30,6 +30,7 @@ public class SalesReport {
     String customerName;
     String customerRegion;
     String period;
+    String invoiceDate;
     Double totalChargesAsPerCustomerDeclarationForm;
     Double smsaFeeCharges;
     Double vatOnSmsaFees;
@@ -51,6 +52,7 @@ public class SalesReport {
                 ", customerName='" + customerName + '\'' +
                 ", customerRegion='" + customerRegion + '\'' +
                 ", period='" + period + '\'' +
+                ", invoiceDate='" + invoiceDate + '\'' +
                 ", totalChargesAsPerCustomerDeclarationForm=" + totalChargesAsPerCustomerDeclarationForm +
                 ", smsaFeeCharges=" + smsaFeeCharges +
                 ", vatOnSmsaFees=" + vatOnSmsaFees +
