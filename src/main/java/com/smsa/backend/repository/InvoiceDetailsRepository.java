@@ -5,6 +5,7 @@ import com.smsa.backend.model.InvoiceDetailsId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 
 import javax.transaction.Transactional;
@@ -33,7 +34,10 @@ public interface InvoiceDetailsRepository extends JpaRepository<InvoiceDetails, 
     @Modifying
     @Query("DELETE FROM InvoiceDetails i WHERE i.invoiceDetailsId.accountNumber = ?1 AND i.sheetUniqueId = ?2")
     void deleteInvoiceData(String accountNumber, String sheetUniqueId);
-    ;
+
+    @Query("SELECT DISTINCT i.sheetUniqueId FROM InvoiceDetails i WHERE i.invoiceDetailsId.accountNumber = :accountNumber AND i.invoiceDetailsId.awb IN :awbList")
+    List<String> getSheetUniqueIdbyAwbandAccountNumber(@Param("accountNumber")String accountNumber,@Param("awbList") List<String> awbList);
+
     @Transactional
     @Modifying
     void deleteBySheetUniqueId(String uniqueId);

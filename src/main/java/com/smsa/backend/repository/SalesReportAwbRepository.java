@@ -10,5 +10,5 @@ import java.util.List;
 
 @Repository
 public interface SalesReportAwbRepository extends JpaRepository<SalesReportAwb, Long> {
-    SalesReportAwb findBySalesReport(SalesReport salesReport);
+    List<SalesReportAwb> findBySalesReport(SalesReport salesReport);
 }

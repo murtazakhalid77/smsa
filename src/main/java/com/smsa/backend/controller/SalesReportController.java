@@ -34,6 +34,15 @@ public class SalesReportController {
                 .body(salesReports);
     }
 
+    @PutMapping("/sales-report-update")
+    ResponseEntity<List<SalesReport>> updateSalesReport(){
+        List<SalesReport> salesReportList = this.salesReportService.updateSalesReport();
+        HttpHeaders headers = new HttpHeaders();
+
+        return ResponseEntity.ok()
+                .headers(headers)// Set the headers
+                .body(salesReportList);
+    }
 //    @GetMapping("/sales-report-awb")
 //    ResponseEntity<List<SalesReport>> getSalesReportByAwbs(@RequestParam List<String> awbs){
 //        return ResponseEntity.ok(this.salesReportService.getSalesReportByAwbs(awbs));

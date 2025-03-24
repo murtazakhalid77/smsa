@@ -5,9 +5,12 @@ import com.smsa.backend.criteria.SearchCriteria;
 import com.smsa.backend.dto.RegionDto;
 import com.smsa.backend.dto.SalesReportDto;
 import com.smsa.backend.dto.SearchSalesReportDto;
+import com.smsa.backend.model.InvoiceDetails;
 import com.smsa.backend.model.Region;
 import com.smsa.backend.model.SalesReport;
 import com.smsa.backend.model.SalesReportAwb;
+import com.smsa.backend.repository.InvoiceDetailsRepository;
+import com.smsa.backend.repository.SalesReportAwbRepository;
 import com.smsa.backend.repository.SalesReportRepository;
 import com.smsa.backend.specification.FilterSpecification;
 import org.modelmapper.ModelMapper;
@@ -20,17 +23,17 @@ import org.springframework.stereotype.Service;
 import javax.swing.text.html.Option;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class SalesReportService {
 
     @Autowired
-
+    InvoiceDetailsRepository invoiceDetailsRepository;
+    @Autowired
+    SalesReportAwbRepository salesReportAwbRepository;
+    @Autowired
     SalesReportRepository salesReportRepository;
     @Autowired
     FilterSpecification<SalesReport> salesReportFilterSpecification;
@@ -77,6 +80,36 @@ public class SalesReportService {
         }
 
         return salesReports.get();
+    }
+
+    public List<SalesReport> updateSalesReport(){
+        List<SalesReport> salesReports = null;
+        salesReports = this.salesReportRepository.findAll();
+        List<SalesReport> salesReportList = new ArrayList<>(Collections.emptyList());
+        for (SalesReport salesReport : salesReports) {
+            if (salesReport.getInvoiceDate() == null) {
+
+                String customerAccountNumber = salesReport.getCustomerAccountNumber();
+                List<SalesReportAwb> salesReportAwb = salesReportAwbRepository
+                        .findBySalesReport(salesReport);
+
+                List<String> awb = salesReportAwb.stream()
+                        .map(SalesReportAwb::getAwb)
+                        .collect(Collectors.toList());
+
+                List<String> sheetUniqueIdList = invoiceDetailsRepository
+                        .getSheetUniqueIdbyAwbandAccountNumber(customerAccountNumber, awb);
+
+                if(sheetUniqueIdList.size() == 1){
+                    String invoiceDate = helperService.generateInvoiceDate(sheetUniqueIdList.get(0));
+                    salesReport.setInvoiceDate(invoiceDate);
+                    this.salesReportRepository.save(salesReport);
+                } else {
+                    salesReportList.add(salesReport);
+                }
+            }
+        }
+        return salesReportList;
     }
 
     public Double decimalFormat(String value){
