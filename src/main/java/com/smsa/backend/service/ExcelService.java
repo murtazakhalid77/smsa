@@ -784,6 +784,7 @@ public class ExcelService {
 
                 createCell(row, columnCount++, salesReport.getId().toString(), style);
                 createCell(row, columnCount++, salesReport.getInvoiceNumber(), style);
+                createCell(row, columnCount++, salesReport.getInvoiceDate(), style);
                 createCell(row, columnCount++, salesReport.getCustomerAccountNumber(), style);
                 createCell(row, columnCount++, salesReport.getCustomerName(), style);
                 createCell(row, columnCount++, salesReport.getCustomerRegion(), style);
