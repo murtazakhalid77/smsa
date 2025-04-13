@@ -102,7 +102,6 @@ export class ReportComponent {
 
           this.salesReportService.getSalesReport(searchSalesReport).subscribe((res:any) => {
             if (res.body?.length !== 0 && res) {
-              debugger
               this.salesReport = res.body!;
               // this.itemsPerPage = res.body.numberOfElements 
               this.totalItems = res.headers.get('X-Total-Count') ?? '';
@@ -123,7 +122,6 @@ export class ReportComponent {
 
 
   changePage(event: any) {
-    debugger
     this.pageIndex = event.pageIndex;
     this.getSalesReport(this.pageIndex, this.itemsPerPage);
   }

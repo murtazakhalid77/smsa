@@ -33,7 +33,8 @@ public class RegionController {
     }
 
     @GetMapping("/region/pagination")
-    ResponseEntity<List<RegionDto>> getAllRegions(@RequestParam("search") String search, @RequestParam(value = "page", defaultValue = "0") int page,
+    ResponseEntity<List<RegionDto>> getAllRegions(@RequestParam("search") String search,
+                                                  @RequestParam(value = "page", defaultValue = "0") int page,
                                                   @RequestParam(value = "size", defaultValue = "10") int size,
                                                   @RequestParam(value = "sort", defaultValue = "id") String sort) throws JsonProcessingException {
         SearchCriteria searchCriteria = new ObjectMapper().readValue(search, SearchCriteria.class);

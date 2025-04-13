@@ -7,19 +7,19 @@ import { SessionStorageService } from 'src/app/services/session-storage.service'
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent implements OnInit{
+export class SidebarComponent implements OnInit {
 
-  
-  permissions1!:String[]
 
-  constructor(private router: Router, public sessionStorageService:SessionStorageService) {
-  
-   }
+  permissions1!: String[]
 
-  ngOnInit():void {
-    
+  constructor(private router: Router, public sessionStorageService: SessionStorageService) {
+
   }
-  
+
+  ngOnInit(): void {
+
+  }
+
   dashboard() {
     this.router.navigateByUrl('/dashboard');
   }
@@ -28,30 +28,32 @@ export class SidebarComponent implements OnInit{
   }
   customer() {
     this.router.navigateByUrl('/customer/view');
-  }
+  } 
 
   import() {
     this.router.navigateByUrl('/import');
   }
-  customPort(){
+  customPort() {
     this.router.navigateByUrl('/custom/view');
   }
-  user(){
+  user() {
     this.router.navigateByUrl('/user/view');
   }
-  currency(){
+  currency() {
     this.router.navigateByUrl('/currency/view');
   }
-  region(){
+  region() {
     this.router.navigateByUrl('region/view')
   }
-  salesReports(){
+  salesReports() {
     this.router.navigateByUrl('reports')
   }
-  permissions(){
+  permissions() {
     this.router.navigateByUrl('permissions')
   }
-  sheetHistory(){
+  sheetHistory() {
     this.router.navigateByUrl('sheetHistory')
   }
 }
+
+

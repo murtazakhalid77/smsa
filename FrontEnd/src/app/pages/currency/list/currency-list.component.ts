@@ -53,7 +53,6 @@ export class CurrencyListComponent {
     this.currencyService.getCurrency(queryParams).subscribe(
       (res: EntityAllCurrencyResponseType) => {
         if(res && res.body){
-          debugger;
           this.currency = res.body;
           this.totalItems = res.headers.get('X-Total-Count') ?? '';
         } 
@@ -79,7 +78,6 @@ export class CurrencyListComponent {
   }
 
   changePage(value: any){
-    debugger;    
     this.getCurrency(value.pageIndex, this.itemsPerPage);
   }
 

@@ -52,8 +52,8 @@ public class SalesReportService {
                 if(searchSalesReportDto.getInvoiceTo().length()<5 || searchSalesReportDto.getInvoiceFrom().length()<5){
                     throw new RecordNotFoundException(String.format("Invalid format"));
                 }else{
-                    salesReports = Optional.of(this.salesReportRepository.findByInvoiceNumberBetween(searchSalesReportDto.getInvoiceTo().substring(5),
-                            searchSalesReportDto.getInvoiceFrom().substring(5), pageable));
+                    salesReports = Optional.of(this.salesReportRepository.findByInvoiceNumberBetween(searchSalesReportDto.getInvoiceTo().substring(4),
+                            searchSalesReportDto.getInvoiceFrom().substring(4), pageable));
                 }
             }else if(searchSalesReportDto.getAwbs()!=null){
                 salesReports = this.getSalesReportByAwbs(searchSalesReportDto.getAwbs(), pageable);

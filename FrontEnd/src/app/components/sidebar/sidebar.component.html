@@ -21,14 +21,14 @@
 
         </li>
 
-        <li *ngIf="sessionStorageService.hasPermission('PERMISSIONS_MANAGEMENT')">
+        <!-- <li *ngIf="sessionStorageService.hasPermission('PERMISSIONS_MANAGEMENT')">
             <span  class="sidebar-list-hover" (click)="permissions()">
               <i class="fa fa-add fa-2x"></i>
               <span class="nav-text">
                 Permissions
               </span>
             </span>
-          </li>
+          </li> -->
 
         <li *ngIf="sessionStorageService.hasPermission('CUSTOMER_MANAGEMENT')">
             <span class="sidebar-list-hover" (click)="customer()">

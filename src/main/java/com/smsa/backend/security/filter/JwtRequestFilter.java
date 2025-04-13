@@ -3,6 +3,7 @@ package com.smsa.backend.security.filter;//package com.company.ComplainProject.c
 import com.smsa.backend.security.util.JwtUtil;
 import com.smsa.backend.service.MyUserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -48,6 +49,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     //error here
                     usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                } else {
+                    // Token is expired, return a 401 status response
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    response.setHeader("Access-Control-Allow-Origin", "*");
+                    return;
                 }
             }
         }
@@ -55,10 +61,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     } catch (Exception e) {
         e.printStackTrace();
-//        ExceptionResponseDto exception= new ExceptionResponseDto(HttpStatus.UNAUTHORIZED, LocalDateTime.now().toString(),"Jwt Token is Expired");
-        response.setStatus(401);
+        // Handle other exceptions as needed
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value()); // Example: Internal Server Error
         response.setHeader("Access-Control-Allow-Origin", "*");
-//        response.getWriter().write(new Gson().toJson(exception));
         return;
     }
 

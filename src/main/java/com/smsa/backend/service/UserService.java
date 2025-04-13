@@ -43,8 +43,6 @@ public class UserService {
                     .password(bCryptPasswordEncoder.encode(userDto.getPassword()))
                     .roles(assignRolesToUser(userDto))
                     .build();
-
-
             return userRepository.save(user);
 
         }catch (Exception e){
